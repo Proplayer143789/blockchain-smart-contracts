@@ -12,6 +12,7 @@ members = [
 	"node",
 	"runtime",
 	"parachain-runtime",
+	"smart_contract",
 ]
 
 [profile.release]
