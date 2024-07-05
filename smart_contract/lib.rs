@@ -7,6 +7,7 @@ mod smart_contracts {
     //use scale_info::TypeInfo;
     use scale_info::prelude::format;
     use scale_info::prelude::string::String;
+    use scale_info::prelude::vec::Vec;
     use ink_storage::Mapping; 
     /*use ink::storage::{
         traits::ManualKey,
@@ -48,7 +49,7 @@ mod smart_contracts {
     #[ink(storage)]
     pub struct AccessControl{
         // Asociar una clave privada con el DNI
-        //accounts: Mapping<AccountId, String>,
+        accounts: Mapping<String, [Option<AccountId>; 2]>,
         // La información asociada a la cuenta
         users: Mapping<AccountId, UserInfo>,
         // El rol asociada a la cuenta
@@ -69,6 +70,7 @@ mod smart_contracts {
             Self { 
                 users: Mapping::default(),
                 roles: Mapping::default(),
+                accounts: Mapping::default(),
                 permissions: Mapping::default(),
                 grantees: Mapping::default(),
             }
@@ -83,20 +85,72 @@ mod smart_contracts {
         }
 
         // Asignar un rol a un usuario que está creando cuenta
-        #[ink(message)]
+        /*#[ink(message)]
         pub fn assign_role(&mut self, clave_privada : AccountId, role: u8)->String {
             // Si ya existe el dni al rol que se quiere crear, es true
-            let did_user_exist  = if self.roles.get(clave_privada.clone())== Some(role) {true} else {false};
+            let did_user_exist  = self.roles.get(clave_privada)== Some(role);
             // El doctor puede crearse una cuenta de paciente
             if !did_user_exist {
-                self.roles.insert(clave_privada.clone(), &role);
-                return format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada);
+                self.roles.insert(clave_privada, &role);
+                
+                format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada)
             }else{
-                return format!("La cuenta {:?} ya tiene el rol {}", clave_privada, role);
-
+                format!("La cuenta {:?} ya tiene el rol {}", clave_privada, role)
             }
-        }
+        }*/
         
+        #[ink(message)]
+        pub fn assign_role(&mut self, clave_privada: AccountId, role: u8, user_info: UserInfo) -> String {
+            // Verifica si el DNI ya está asociado a dos cuentas con roles diferentes
+            if let Some(mut accounts) = self.accounts.get(user_info.dni.clone()) {
+                // Verifica el primer elemento
+                if let Some(existing_account) = accounts[0] {
+                    if let Some(existing_role) = self.roles.get(existing_account) {
+                        if (existing_role == 1 && role == 1) || (existing_role == 0 && role == 0) {
+                            return format!("El DNI {} ya está asociado a una cuenta con el rol {}", user_info.dni, role);
+                        }
+                    }
+                } else {
+                    // Si el primer elemento está vacío, asigna la cuenta aquí
+                    accounts[0] = Some(clave_privada);
+                    self.accounts.insert(user_info.dni.clone(), &accounts);
+                    self.roles.insert(clave_privada, &role);
+                    self.users.insert(clave_privada, &user_info);
+                    return format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada);
+                }
+
+                // Verifica el segundo elemento
+                if let Some(existing_account) = accounts[1] {
+                    if let Some(existing_role) = self.roles.get(existing_account) {
+                        if (existing_role == 1 && role == 1) || (existing_role == 0 && role == 0) {
+                            return format!("El DNI {} ya está asociado a una cuenta con el rol {}", user_info.dni, role);
+                        }
+                    }
+                } else {
+                    // Si el segundo elemento está vacío, asigna la cuenta aquí
+                    accounts[1] = Some(clave_privada);
+                    self.accounts.insert(user_info.dni.clone(), &accounts);
+                    self.roles.insert(clave_privada, &role);
+                    self.users.insert(clave_privada, &user_info);
+                    return format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada);
+                }
+
+                // Si ambos elementos están ocupados y no se puede asignar el rol
+                return format!("El DNI {} ya está asociado a cuentas de doctor y paciente", user_info.dni);
+            } else {
+                // Si no hay cuentas asociadas a este DNI, crea una nueva matriz y almacena la cuenta
+                let mut new_accounts = [None, None];
+                new_accounts[0] = Some(clave_privada);
+                self.accounts.insert(user_info.dni.clone(), &new_accounts);
+            }
+            
+            // Asigna el rol y guarda la información del usuario
+            self.roles.insert(clave_privada, &role);
+            self.users.insert(clave_privada, &user_info);
+
+            format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada)
+        }
+
         // Verifica si tiene un rol
         #[ink(message)]
         pub fn user_role(&self, clave_privada: AccountId) -> bool {
@@ -106,7 +160,8 @@ mod smart_contracts {
         // Añade la información y el usuario
         #[ink(message)]
         pub fn add_user(&mut self, clave_privada: AccountId, user_info: UserInfo) {
-            self.users.insert(clave_privada.clone(), &user_info);
+            self.users.insert(clave_privada, &user_info);
+            //self.assign_role(clave_privada, role, user_info);
         }
         
         // Trae el rol del usuario
@@ -144,7 +199,7 @@ mod smart_contracts {
         // Verifica si tiene permiso
         #[ink(message)]
         pub fn has_permission(&self, granter: AccountId, grantee: AccountId) -> bool {
-            self.permissions.get(&(granter, grantee)).unwrap_or(false)
+            self.permissions.get((granter, grantee)).unwrap_or(false)
         }
         
         // Trae todo las personas de las que se tiene permiso
