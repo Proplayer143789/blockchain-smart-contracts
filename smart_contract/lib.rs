@@ -9,6 +9,7 @@ mod smart_contracts {
     use scale_info::prelude::string::String;
     use scale_info::prelude::vec::Vec;
     use ink_storage::Mapping; 
+    use scale_info::prelude::string::ToString;
     /*use ink::storage::{
         traits::ManualKey,
         Mapping,
@@ -58,6 +59,7 @@ mod smart_contracts {
         permissions: Mapping<(AccountId, AccountId), bool>,
         // Lista de quienes tienen permisos 
         grantees: Mapping<AccountId, Vec<AccountId>>,
+        access_requests: Mapping<AccountId, Vec<AccountId>>,
 
     }
 
@@ -73,6 +75,7 @@ mod smart_contracts {
                 accounts: Mapping::default(),
                 permissions: Mapping::default(),
                 grantees: Mapping::default(),
+                access_requests: Mapping::default(),
             }
         }
 
@@ -99,6 +102,43 @@ mod smart_contracts {
             }
         }*/
         
+        // Función para solicitar acceso
+        #[ink(message)]
+        pub fn request_access(&mut self, doctor_id: AccountId, patient_id: AccountId) -> String {
+            if let Some(role) = self.roles.get(doctor_id) {
+                if role == 1 { // Suponiendo que el rol de doctor es 1
+                    let mut requests = self.access_requests.get(patient_id).unwrap_or(Vec::new());
+                    if !requests.contains(&doctor_id) {
+                        requests.push(doctor_id); // Agrega la solicitud de acceso
+                        self.access_requests.insert(patient_id, &requests);
+                        return format!("Solicitud de acceso enviada de doctor {:?} a paciente {:?}", doctor_id, patient_id);
+                    } else {
+                        return format!("El doctor {:?} ya ha solicitado acceso al paciente {:?}", doctor_id, patient_id);
+                    }
+                }
+            }
+            return format!("El usuario no tiene el rol de doctor")
+        }
+
+        // Función para aprobar acceso
+        #[ink(message)]
+        pub fn approve_access(&mut self, patient_id: AccountId, doctor_id: AccountId, approve: bool) -> String {
+            if let Some(mut requests) = self.access_requests.get(patient_id) {
+                if let Some(pos) = requests.iter().position(|&x| x == doctor_id) {
+                    requests.swap_remove(pos); // Elimina la solicitud de acceso
+                    self.access_requests.insert(patient_id, &requests);
+
+                    if approve {
+                        self.grant_permission(patient_id, doctor_id); // Otorga el permiso si el paciente aprueba
+                        return format!("Acceso aprobado para el doctor {:?} al paciente {:?}", doctor_id, patient_id);
+                    } else {
+                        return format!("Acceso denegado para el doctor {:?} al paciente {:?}", doctor_id, patient_id);
+                    }
+                }
+            }
+            return format!("No hay solicitud de acceso pendiente para este doctor")
+        }
+
         #[ink(message)]
         pub fn assign_role(&mut self, clave_privada: AccountId, role: u8, user_info: UserInfo) -> String {
             // Verifica si el DNI ya está asociado a dos cuentas con roles diferentes
@@ -151,6 +191,55 @@ mod smart_contracts {
             format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada)
         }
 
+        // Prueba de assign_role
+        pub fn assign_role_prueba(&mut self, clave_privada: AccountId, role: u8, dni: String) -> String {
+            // Verifica si el DNI ya está asociado a dos cuentas con roles diferentes
+            if let Some(mut accounts) = self.accounts.get(dni.clone()) {
+                // Verifica el primer elemento
+                if let Some(existing_account) = accounts[0] {
+                    if let Some(existing_role) = self.roles.get(existing_account) {
+                        if (existing_role == 1 && role == 1) || (existing_role == 0 && role == 0) {
+                            return format!("El DNI {} ya está asociado a una cuenta con el rol {}", dni, role);
+                        }
+                    }
+                } else {
+                    // Si el primer elemento está vacío, asigna la cuenta aquí
+                    accounts[0] = Some(clave_privada);
+                    self.accounts.insert(dni.clone(), &accounts);
+                    self.roles.insert(clave_privada, &role);
+                    return format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada);
+                }
+        
+                // Verifica el segundo elemento
+                if let Some(existing_account) = accounts[1] {
+                    if let Some(existing_role) = self.roles.get(existing_account) {
+                        if (existing_role == 1 && role == 1) || (existing_role == 0 && role == 0) {
+                            return format!("El DNI {} ya está asociado a una cuenta con el rol {}", dni, role);
+                        }
+                    }
+                } else {
+                    // Si el segundo elemento está vacío, asigna la cuenta aquí
+                    accounts[1] = Some(clave_privada);
+                    self.accounts.insert(dni.clone(), &accounts);
+                    self.roles.insert(clave_privada, &role);
+                    return format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada);
+                }
+        
+                // Si ambos elementos están ocupados y no se puede asignar el rol
+                return format!("El DNI {} ya está asociado a cuentas de doctor y paciente", dni);
+            } else {
+                // Si no hay cuentas asociadas a este DNI, crea una nueva matriz y almacena la cuenta
+                let mut new_accounts = [None, None];
+                new_accounts[0] = Some(clave_privada);
+                self.accounts.insert(dni.clone(), &new_accounts);
+            }
+            
+            // Asigna el rol
+            self.roles.insert(clave_privada, &role);
+        
+            format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada)
+        }
+
         // Verifica si tiene un rol
         #[ink(message)]
         pub fn user_role(&self, clave_privada: AccountId) -> bool {
@@ -159,9 +248,24 @@ mod smart_contracts {
 
         // Añade la información y el usuario
         #[ink(message)]
-        pub fn add_user(&mut self, clave_privada: AccountId, user_info: UserInfo) {
+        pub fn add_user(&mut self, clave_privada: AccountId, user_info: UserInfo) -> Result<(), String> {
+            // Comprobación de la longitud de los campos y que no estén vacíos
+            if user_info.name.is_empty() || user_info.name.len() > 12 {
+                return Err("El nombre no puede estar vacío y debe tener menos de 50 caracteres".to_string());
+            }
+            if user_info.lastname.is_empty() || user_info.lastname.len() > 12 {
+                return Err("El apellido no puede estar vacío y debe tener menos de 50 caracteres".to_string());
+            }
+            if user_info.dni.is_empty() || user_info.dni.len() > 10 {
+                return Err("El DNI no puede estar vacío y debe tener menos de 10 caracteres".to_string());
+            }
+            if user_info.email.is_empty() || user_info.email.len() > 20 {
+                return Err("El correo electrónico no puede estar vacío y debe tener menos de 50 caracteres".to_string());
+            }
+        
+            // Si todas las comprobaciones pasan, inserta el usuario
             self.users.insert(clave_privada, &user_info);
-            //self.assign_role(clave_privada, role, user_info);
+            Ok(())
         }
         
         // Trae el rol del usuario
@@ -240,7 +344,7 @@ mod smart_contracts {
             assert_eq!(access.user_exists(account_id.clone()), false);
 
             // Añade el usuario
-            access.add_user(account_id.clone(), user_info);
+            let _ =  access.add_user(account_id.clone(), user_info);
 
             // Ahora el usuario debería existir
             assert_eq!(access.user_exists(account_id.clone()), true);
