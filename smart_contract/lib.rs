@@ -2,37 +2,17 @@
 
 #[ink::contract]
 mod smart_contracts {
-    //use parity_scale_codec::{Encode, Decode};
-    //use ink_storage::traits::{PackedLayout, SpreadLayout};
-    //use scale_info::TypeInfo;
     use scale_info::prelude::format;
     use scale_info::prelude::string::String;
     use scale_info::prelude::vec::Vec;
     use ink_storage::Mapping; 
     use scale_info::prelude::string::ToString;
     use regex::Regex;
-    /*use ink::storage::{
-        traits::ManualKey,
-        Mapping,
-    };*/
-     // Almacenamiento ===========
-    // PartialEq y Eq para comparar estructuras, servira para ver si la información ya fue ingresada
-    // PackedLayout y SpreadLayout para poder almacenar la información en el contrato de forma eficiente
-    // Si está activo el std, se activa TypeInfo. Sirve para la serializacion y deserializacion de datos
-    // Es la información que el usuario ingresa
-    //#[derive(Debug, Clone, PartialEq, Eq, Encode, Decode)]
-    //#[cfg_attr(feature = "std", derive(TypeInfo))]
-    /// #[ink::scale_derive(Encode, Decode, TypeInfo)]
-    //  #[cfg_attr(
-    //     feature = "std",
-    //     derive(ink::storage::traits::StorageLayout)
-    //  )]
 
-    //#[ink::storage_item]
     #[ink::scale_derive(Encode, Decode, TypeInfo)]
     #[cfg_attr(
         feature = "std",
-        derive(ink::storage::traits::StorageLayout,Clone)
+        derive(ink::storage::traits::StorageLayout, Clone)
     )]
     pub struct UserInfo {
         name: String,
@@ -40,16 +20,9 @@ mod smart_contracts {
         dni: String, // Servira para asociar la información y rol
         email: String,
     }
-   
-    // Tipos de roles
-    /// Doctor = 1
-    /// Paciente = 0
-    
 
-
-    // La información que maneja el smart contract
     #[ink(storage)]
-    pub struct AccessControl{
+    pub struct AccessControl {
         // Asociar una clave privada con el DNI
         accounts: Mapping<String, [Option<AccountId>; 2]>,
         // La información asociada a la cuenta
@@ -62,13 +35,10 @@ mod smart_contracts {
         grantees: Mapping<AccountId, Vec<AccountId>>,
         // Lista de solicitudes de acceso
         access_requests: Mapping<AccountId, Vec<AccountId>>,
-
     }
 
-    
     impl AccessControl {
-        // Es el constructor por default, se deben colocar todos los campos de la estructura
-        // Constructor
+        // Constructor por defecto
         #[ink(constructor)]
         pub fn default() -> Self {
             Self { 
@@ -81,35 +51,18 @@ mod smart_contracts {
             }
         }
 
-        
-        // Funciones
-        // Ver si la información existe, si el dni existe, la información ya fue ingresada
+        // Verifica si un usuario existe
         #[ink(message)]
-        pub fn user_exists(&self, clave_privada : AccountId) -> bool {
+        pub fn user_exists(&self, clave_privada: AccountId) -> bool {
             self.users.contains(clave_privada)
         }
 
-        // Asignar un rol a un usuario que está creando cuenta
-        /*#[ink(message)]
-        pub fn assign_role(&mut self, clave_privada : AccountId, role: u8)->String {
-            // Si ya existe el dni al rol que se quiere crear, es true
-            let did_user_exist  = self.roles.get(clave_privada)== Some(role);
-            // El doctor puede crearse una cuenta de paciente
-            if !did_user_exist {
-                self.roles.insert(clave_privada, &role);
-                
-                format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada)
-            }else{
-                format!("La cuenta {:?} ya tiene el rol {}", clave_privada, role)
-            }
-        }*/
-        
-        // Función para solicitar acceso
+        // Solicita acceso de un doctor a un paciente
         #[ink(message)]
         pub fn request_access(&mut self, doctor_id: AccountId, patient_id: AccountId) -> String {
             if let Some(role) = self.roles.get(doctor_id) {
                 if role == 1 { // Suponiendo que el rol de doctor es 1
-                    let mut requests = self.access_requests.get(patient_id).unwrap_or(Vec::new());
+                    let mut requests = self.access_requests.get(patient_id).unwrap_or_default();
                     if !requests.contains(&doctor_id) {
                         requests.push(doctor_id); // Agrega la solicitud de acceso
                         self.access_requests.insert(patient_id, &requests);
@@ -119,10 +72,10 @@ mod smart_contracts {
                     }
                 }
             }
-            return format!("El usuario no tiene el rol de doctor")
+            "El usuario no tiene el rol de doctor".to_string()
         }
 
-        // Función para aprobar acceso
+        // Aprueba o rechaza una solicitud de acceso
         #[ink(message)]
         pub fn approve_access(&mut self, patient_id: AccountId, doctor_id: AccountId, approve: bool) -> String {
             if let Some(mut requests) = self.access_requests.get(patient_id) {
@@ -138,10 +91,10 @@ mod smart_contracts {
                     }
                 }
             }
-            return format!("No hay solicitud de acceso pendiente para este doctor")
+            "No hay solicitud de acceso pendiente para este doctor".to_string()
         }
 
-        // Asignar un rol a un usuario que está creando cuenta
+        // Asigna un rol a un usuario que está creando cuenta
         #[ink(message)]
         pub fn assign_role(&mut self, clave_privada: AccountId, role: u8, user_info: UserInfo) -> String {
             // Verifica si el DNI ya está asociado a dos cuentas con roles diferentes
@@ -186,7 +139,7 @@ mod smart_contracts {
                 new_accounts[0] = Some(clave_privada);
                 self.accounts.insert(user_info.dni.clone(), &new_accounts);
             }
-            
+
             // Asigna el rol y guarda la información del usuario
             self.roles.insert(clave_privada, &role);
             self.users.insert(clave_privada, &user_info);
@@ -194,111 +147,60 @@ mod smart_contracts {
             format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada)
         }
 
-        // Prueba de assign_role
-        pub fn assign_role_prueba(&mut self, clave_privada: AccountId, role: u8, dni: String) -> String {
-            // Verifica si el DNI ya está asociado a dos cuentas con roles diferentes
-            if let Some(mut accounts) = self.accounts.get(dni.clone()) {
-                // Verifica el primer elemento
-                if let Some(existing_account) = accounts[0] {
-                    if let Some(existing_role) = self.roles.get(existing_account) {
-                        if (existing_role == 1 && role == 1) || (existing_role == 0 && role == 0) {
-                            return format!("El DNI {} ya está asociado a una cuenta con el rol {}", dni, role);
-                        }
-                    }
-                } else {
-                    // Si el primer elemento está vacío, asigna la cuenta aquí
-                    accounts[0] = Some(clave_privada);
-                    self.accounts.insert(dni.clone(), &accounts);
-                    self.roles.insert(clave_privada, &role);
-                    return format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada);
-                }
-        
-                // Verifica el segundo elemento
-                if let Some(existing_account) = accounts[1] {
-                    if let Some(existing_role) = self.roles.get(existing_account) {
-                        if (existing_role == 1 && role == 1) || (existing_role == 0 && role == 0) {
-                            return format!("El DNI {} ya está asociado a una cuenta con el rol {}", dni, role);
-                        }
-                    }
-                } else {
-                    // Si el segundo elemento está vacío, asigna la cuenta aquí
-                    accounts[1] = Some(clave_privada);
-                    self.accounts.insert(dni.clone(), &accounts);
-                    self.roles.insert(clave_privada, &role);
-                    return format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada);
-                }
-        
-                // Si ambos elementos están ocupados y no se puede asignar el rol
-                return format!("El DNI {} ya está asociado a cuentas de doctor y paciente", dni);
-            } else {
-                // Si no hay cuentas asociadas a este DNI, crea una nueva matriz y almacena la cuenta
-                let mut new_accounts = [None, None];
-                new_accounts[0] = Some(clave_privada);
-                self.accounts.insert(dni.clone(), &new_accounts);
-            }
-            
-            // Asigna el rol
-            self.roles.insert(clave_privada, &role);
-        
-            format!("Se asignó el rol {} a la cuenta {:?}", role, clave_privada)
-        }
-
-        // Verifica si tiene un rol
+        // Verifica si un usuario tiene un rol
         #[ink(message)]
         pub fn user_role(&self, clave_privada: AccountId) -> bool {
             self.roles.contains(clave_privada)
         }
 
-        // Añade la información y el usuario
+        // Añade la información de un usuario
         #[ink(message)]
         pub fn add_user(&mut self, clave_privada: AccountId, user_info: UserInfo) -> Result<(), String> {
             // Comprobación de que el nombre solo contenga letras (sin caracteres especiales ni números)
             if user_info.name.is_empty() || user_info.name.len() > 12 || !user_info.name.chars().all(|c| c.is_alphabetic()) {
                 return Err("El nombre no puede estar vacío, debe tener menos de 12 caracteres y solo contener letras".to_string());
             }
-            
+
             // Comprobación de que el apellido solo contenga letras (sin caracteres especiales ni números)
             if user_info.lastname.is_empty() || user_info.lastname.len() > 12 || !user_info.lastname.chars().all(|c| c.is_alphabetic()) {
                 return Err("El apellido no puede estar vacío, debe tener menos de 12 caracteres y solo contener letras".to_string());
             }
-        
+
             // Comprobación de que el DNI solo contenga números (sin letras ni caracteres especiales)
             if user_info.dni.is_empty() || user_info.dni.len() > 10 || !user_info.dni.chars().all(|c| c.is_numeric()) {
                 return Err("El DNI no puede estar vacío, debe tener menos de 10 caracteres y solo contener números".to_string());
             }
-        
+
             // Expresión regular para validar un email más complejo
             let email_regex = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
             if user_info.email.is_empty() || user_info.email.len() > 50 || !email_regex.is_match(&user_info.email) {
                 return Err("El correo electrónico no es válido o excede los 50 caracteres".to_string());
             }
-        
+
             // Inserta el usuario si todas las comprobaciones pasan
             self.users.insert(clave_privada, &user_info);
             Ok(())
         }
-        
-        // Trae el rol del usuario
+
+        // Obtiene el rol de un usuario
         #[ink(message)]
-        pub fn get_role(&mut self, clave_privada: AccountId)->Option<u8> {
+        pub fn get_role(&mut self, clave_privada: AccountId) -> Option<u8> {
             self.roles.get(clave_privada)
         }
-    
-        // Permisos
-        // Otorga rol
+
+        // Otorga permiso de acceso
         #[ink(message)]
         pub fn grant_permission(&mut self, granter: AccountId, grantee: AccountId) {
             self.permissions.insert((granter, grantee), &true);
-            let mut grantees = self.grantees.get(granter).unwrap_or(Vec::new());
+            let mut grantees = self.grantees.get(granter).unwrap_or_default();
+
             if !grantees.contains(&grantee) {
                 grantees.push(grantee);
                 self.grantees.insert(granter, &grantees);
             }
         }
 
-        
-
-        // Revoca permiso
+        // Revoca permiso de acceso
         #[ink(message)]
         pub fn revoke_permission(&mut self, granter: AccountId, grantee: AccountId) {
             self.permissions.insert((granter, grantee), &false);
@@ -310,34 +212,33 @@ mod smart_contracts {
             }
         }
 
-        // Verifica si tiene permiso
+        // Verifica si un usuario tiene permiso de acceso
         #[ink(message)]
         pub fn has_permission(&self, granter: AccountId, grantee: AccountId) -> bool {
-            self.permissions.get((granter, grantee)).unwrap_or(false)
+            self.grantees.get(granter).unwrap_or_default().contains(&grantee)
         }
-        
-        // Trae todo las personas de las que se tiene permiso
+
+        // Obtiene la lista de personas a las que se ha otorgado permiso
         #[ink(message)]
         pub fn get_grantees(&self, granter: AccountId) -> Vec<AccountId> {
-            self.grantees.get(granter).unwrap_or(Vec::new())
+            self.grantees.get(granter).unwrap_or_default()
         }
     }
 
     // Tests
     #[cfg(test)]
     mod tests {
-        /// Imports all the definitions from the outer scope so we can use them here.
         use super::*;
 
-        /// We test if the default constructor does its job.
+        // Prueba si el constructor por defecto funciona
         #[ink::test]
         fn default_works() {
             let mut access_control = AccessControl::default();
-            // En los tests, puedes usar AccountId::default() o crear uno específico con AccountId::from([u8; 32])
             let account_id = AccountId::from([0u8; 32]);
             assert_eq!(access_control.get_role(account_id), None);
         }
 
+        // Prueba la función de añadir usuario y verificar si existe
         #[ink::test]
         fn test_add_user_and_user_exists() {
             let mut access = AccessControl::default();
@@ -347,40 +248,56 @@ mod smart_contracts {
                 lastname: String::from("Prueba"),
                 email: String::from("nxhm@gmail.com"),
                 dni: String::from("74493233"),
-            
-            }; // Asume que UserInfo tiene un método new
+            };
 
-            // Asegúrate de que el usuario no exista al principio
             assert_eq!(access.user_exists(account_id.clone()), false);
 
-            // Añade el usuario
-            let _ =  access.add_user(account_id.clone(), user_info);
+            let _ = access.add_user(account_id.clone(), user_info);
 
-            // Ahora el usuario debería existir
             assert_eq!(access.user_exists(account_id.clone()), true);
         }
 
+        // Prueba la función de otorgar y revocar permisos
         #[ink::test]
         fn test_permision() {
             let mut access = AccessControl::default();
             let alice = AccountId::from([0u8; 32]);
             let bob = AccountId::from([0u8; 32]);
 
-            // Da permiso
             access.grant_permission(alice, bob);
 
-            // Verifica permiso
             let has_perm = access.has_permission(alice, bob);
             assert_eq!(has_perm, true);
 
-            // Revoca permiso
             access.revoke_permission(alice, bob);
 
-            // Verifica permiso
             let has_perm = access.has_permission(alice, bob);
             assert_eq!(has_perm, false);
+        }
+    }
 
+    // Benchmarking setup for pallet
+    #[cfg(feature = "runtime-benchmarks")]
+    mod benchmarking {
+        use super::*;
+        use frame_benchmarking::{benchmarks, whitelisted_caller};
+        use frame_system::RawOrigin;
 
+        benchmarks! {
+            do_something {
+                let caller: T::AccountId = whitelisted_caller();
+            }: _(RawOrigin::Signed(caller), 42)
+            verify {
+                assert_eq!(Something::<T>::get(), Some(42));
+            }
+        }
+
+        #[cfg(test)]
+        mod tests {
+            use super::*;
+            use frame_benchmarking::impl_benchmark_test_suite;
+
+            impl_benchmark_test_suite!(Pallet, crate::mock::new_test_ext(), crate::mock::Test);
         }
     }
 }
