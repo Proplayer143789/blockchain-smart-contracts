@@ -10,6 +10,7 @@ mod smart_contracts {
     use scale_info::prelude::vec::Vec;
     use ink_storage::Mapping; 
     use scale_info::prelude::string::ToString;
+    use regex::Regex;
     /*use ink::storage::{
         traits::ManualKey,
         Mapping,
@@ -59,6 +60,7 @@ mod smart_contracts {
         permissions: Mapping<(AccountId, AccountId), bool>,
         // Lista de quienes tienen permisos 
         grantees: Mapping<AccountId, Vec<AccountId>>,
+        // Lista de solicitudes de acceso
         access_requests: Mapping<AccountId, Vec<AccountId>>,
 
     }
@@ -139,6 +141,7 @@ mod smart_contracts {
             return format!("No hay solicitud de acceso pendiente para este doctor")
         }
 
+        // Asignar un rol a un usuario que está creando cuenta
         #[ink(message)]
         pub fn assign_role(&mut self, clave_privada: AccountId, role: u8, user_info: UserInfo) -> String {
             // Verifica si el DNI ya está asociado a dos cuentas con roles diferentes
@@ -249,21 +252,28 @@ mod smart_contracts {
         // Añade la información y el usuario
         #[ink(message)]
         pub fn add_user(&mut self, clave_privada: AccountId, user_info: UserInfo) -> Result<(), String> {
-            // Comprobación de la longitud de los campos y que no estén vacíos
-            if user_info.name.is_empty() || user_info.name.len() > 12 {
-                return Err("El nombre no puede estar vacío y debe tener menos de 50 caracteres".to_string());
+            // Comprobación de que el nombre solo contenga letras (sin caracteres especiales ni números)
+            if user_info.name.is_empty() || user_info.name.len() > 12 || !user_info.name.chars().all(|c| c.is_alphabetic()) {
+                return Err("El nombre no puede estar vacío, debe tener menos de 12 caracteres y solo contener letras".to_string());
             }
-            if user_info.lastname.is_empty() || user_info.lastname.len() > 12 {
-                return Err("El apellido no puede estar vacío y debe tener menos de 50 caracteres".to_string());
-            }
-            if user_info.dni.is_empty() || user_info.dni.len() > 10 {
-                return Err("El DNI no puede estar vacío y debe tener menos de 10 caracteres".to_string());
-            }
-            if user_info.email.is_empty() || user_info.email.len() > 20 {
-                return Err("El correo electrónico no puede estar vacío y debe tener menos de 50 caracteres".to_string());
+            
+            // Comprobación de que el apellido solo contenga letras (sin caracteres especiales ni números)
+            if user_info.lastname.is_empty() || user_info.lastname.len() > 12 || !user_info.lastname.chars().all(|c| c.is_alphabetic()) {
+                return Err("El apellido no puede estar vacío, debe tener menos de 12 caracteres y solo contener letras".to_string());
             }
         
-            // Si todas las comprobaciones pasan, inserta el usuario
+            // Comprobación de que el DNI solo contenga números (sin letras ni caracteres especiales)
+            if user_info.dni.is_empty() || user_info.dni.len() > 10 || !user_info.dni.chars().all(|c| c.is_numeric()) {
+                return Err("El DNI no puede estar vacío, debe tener menos de 10 caracteres y solo contener números".to_string());
+            }
+        
+            // Expresión regular para validar un email más complejo
+            let email_regex = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
+            if user_info.email.is_empty() || user_info.email.len() > 50 || !email_regex.is_match(&user_info.email) {
+                return Err("El correo electrónico no es válido o excede los 50 caracteres".to_string());
+            }
+        
+            // Inserta el usuario si todas las comprobaciones pasan
             self.users.insert(clave_privada, &user_info);
             Ok(())
         }

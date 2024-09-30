@@ -11,10 +11,9 @@ parity-scale-codec = { package = "parity-scale-codec", version = "3.6.12", defau
 	"derive",
 ] }
 scale-info = { version = "2.11.3", default-features = false, features = ["derive"] }
-
+regex = "1.7.1"
 [dev-dependencies]
 ink_e2e = { version = "5.0.0" }
-
 [lib]
 path = "lib.rs"
 

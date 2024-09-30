@@ -13162,6 +13162,7 @@ dependencies = [
  "ink_e2e",
  "ink_storage",
  "parity-scale-codec",
+ "regex",
  "scale-info",
 ]
 
