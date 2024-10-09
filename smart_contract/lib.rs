@@ -372,5 +372,23 @@ mod smart_contracts {
 
 
         }
+
+        #[ink::test]
+        fn test_add_user_and_user_exists() {
+            let mut access = AccessControl::default();
+            let account_id = AccountId::from([0u8; 32]);
+            let user_info = UserInfo {
+                name: String::from("Alice"),
+                lastname: String::from("Prueba"),
+                email: String::from("nxhm@gmail.com"),
+                dni: String::from("74493233"),
+            };
+
+            assert_eq!(access.user_exists(account_id.clone()), false);
+
+            let _ = access.add_user(account_id.clone(), user_info);
+
+            assert_eq!(access.user_exists(account_id.clone()), true);
+        }
     }
 }
