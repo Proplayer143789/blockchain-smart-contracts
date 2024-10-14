@@ -1,16 +1,16 @@
 const express = require('express');
 const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api');
 const { ContractPromise } = require('@polkadot/api-contract');
+const { mnemonicGenerate } = require('@polkadot/util-crypto');
 const fs = require('fs');
 const path = require('path');
 
 const app = express();
 const port = 3000;
 
-// Middleware para parsear JSON
 app.use(express.json());
 
-const CONTRACT_ADDRESS = '5DYqPGsJrvgB7dRM4ej6jpfXP5YPeHp8eBZZStvgQf2t4Xef'; // Esto se cambia al prender el servidor
+const CONTRACT_ADDRESS = '5DYqPGsJrvgB7dRM4ej6jpfXP5YPeHp8eBZZStvgQf2t4Xef';
 const CONTRACT_ABI_PATH = path.resolve(__dirname, '../target/ink/smart_contract/smart_contract.json');
 
 let api;
@@ -20,7 +20,6 @@ async function init() {
     const wsProvider = new WsProvider('ws://localhost:9944');
     api = await ApiPromise.create({ provider: wsProvider });
 
-    // Cargar el ABI del contrato
     let contractAbi;
     try {
         contractAbi = JSON.parse(fs.readFileSync(CONTRACT_ABI_PATH, 'utf8'));
@@ -31,95 +30,111 @@ async function init() {
 
     contract = new ContractPromise(api, contractAbi, CONTRACT_ADDRESS);
 }
-app.get('/user_exists_alice', async (req, res) => {
-    const aliceAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
 
-    try {
-        const { output } = await contract.query.userExists(aliceAddress, { value: 0, gasLimit: -1 }, aliceAddress);
-        if (output !== null) {
-            res.send(output.toString());
-        } else {
-            res.status(404).send('Alice not found');
-        }
-    } catch (error) {
-        res.status(500).send(`Error fetching Alice existence: ${error.message}`);
-    }
-});
-app.get('/user_exists/:accountId', async (req, res) => {
-    const { accountId } = req.params;
-    try {
-        const { output } = await contract.query.userExists(accountId, { value: 0, gasLimit: -1 }, accountId);
-        if (output !== null) {
-            res.send(output.toString());
-        } else {
-            res.status(404).send('User not found');
-        }
-    } catch (error) {
-        res.status(500).send(`Error fetching user existence: ${error.message}`);
-    }
-});
-
-app.post('/assign_role', async (req, res) => {
-    const { accountId, role, userInfo } = req.body;
+function createNewAccount(customText = null) {
     const keyring = new Keyring({ type: 'sr25519' });
-    const alice = keyring.addFromUri('//Alice');
+    const mnemonic = customText || mnemonicGenerate();
+    const newAccount = keyring.addFromUri(mnemonic);
+    console.log(`New account created: ${newAccount.address}`);
+    console.log(`Mnemonic: ${mnemonic}`);
+    return {
+        address: newAccount.address,
+        mnemonic: mnemonic,
+        keypair: newAccount
+    };
+}
+
+app.get('/new_account', (req, res) => {
+    const newAccount = createNewAccount();
+    res.json(newAccount);
+});
+
+app.post('/create_user', async (req, res) => {
+    const { name, lastname, dni, email, role } = req.body;
+    const newAccount = createNewAccount(); // Genera una nueva cuenta
+
+    const userInfo = {
+        name: name,
+        lastname: lastname,
+        dni: dni,
+        email: email
+    };
 
     try {
-        const txHash = await api.tx.smartContracts
-            .assignRole(accountId, role, userInfo)
-            .signAndSend(alice);
+        const keyring = new Keyring({ type: 'sr25519' });
+        const alice = keyring.addFromUri('//Alice'); // Usar la cuenta de Alice para firmar la transacción
 
-        res.send(`Transaction hash: ${txHash}`);
+        // Transferir fondos a la nueva cuenta
+        const transfer = api.tx.balances.transferAllowDeath(newAccount.address, 1000000000000);
+        await transfer.signAndSend(alice);
+
+        // Esperar un poco para asegurarse de que la transferencia se haya completado
+        await new Promise(resolve => setTimeout(resolve, 6000));
+
+        const gasLimit = api.registry.createType('WeightV2', {
+            refTime: api.registry.createType('Compact<u64>', 1000000000),
+            proofSize: api.registry.createType('Compact<u64>', 1000000)
+        });
+
+        // Añadir el usuario y su información
+        const addUserTx = contract.tx.addUser({ value: 0, gasLimit }, newAccount.address, userInfo);
+        await new Promise((resolve, reject) => {
+            addUserTx.signAndSend(alice, (result) => {
+                if (result.status.isInBlock || result.status.isFinalized) {
+                    resolve(result);
+                } else if (result.isError) {
+                    reject(result);
+                }
+            });
+        });
+
+        // Si la adición del usuario fue exitosa, agregar el rol
+        const assignRoleTx = contract.tx.assignRole({ value: 0, gasLimit }, newAccount.address, role, userInfo);
+        await new Promise((resolve, reject) => {
+            assignRoleTx.signAndSend(alice, (result) => {
+                if (result.status.isInBlock || result.status.isFinalized) {
+                    resolve(result);
+                } else if (result.isError) {
+                    reject(result);
+                }
+            });
+        });
+
+        res.send(`User and role added successfully`);
     } catch (error) {
         res.status(500).send(`Error assigning role: ${error.message}`);
     }
 });
 
-app.post('/request_access', async (req, res) => {
-    const { doctorId, patientId } = req.body;
+app.get('/role/:publicAddress', async (req, res) => {
+    const { publicAddress } = req.params;
+
+    try {
+        const keyring = new Keyring({ type: 'sr25519' });
+        const accountId = keyring.decodeAddress(publicAddress);
+        console.log("accountId", accountId);
+        const { output } = await contract.query.getRole(accountId, {
+            value: 0,
+            gasLimit: -1
+        }, accountId);
+        console.log("output", output);
+        if (!output || output.isNone) {
+            res.status(404).send(`Role not found for account ${publicAddress}`);
+        } else {
+            const role = output.unwrap().toString();
+            res.send(`Role for account ${publicAddress}: ${role}`);
+        }
+    } catch (error) {
+        res.status(500).send(`Error fetching role: ${error.message}`);
+    }
+});
+
+app.get('/alice_account_id', async (req, res) => {
     const keyring = new Keyring({ type: 'sr25519' });
     const alice = keyring.addFromUri('//Alice');
-
-    try {
-        const txHash = await api.tx.smartContracts
-            .requestAccess(doctorId, patientId)
-            .signAndSend(alice);
-
-        res.send(`Transaction hash: ${txHash}`);
-    } catch (error) {
-        res.status(500).send(`Error requesting access: ${error.message}`);
-    }
+    res.send(`Alice's accountId: ${alice.address}`);
 });
 
-app.post('/approve_access', async (req, res) => {
-    const { patientId, doctorId, approve } = req.body;
-    const keyring = new Keyring({ type: 'sr25519' });
-    const alice = keyring.addFromUri('//Alice');
-
-    try {
-        const txHash = await api.tx.smartContracts
-            .approveAccess(patientId, doctorId, approve)
-            .signAndSend(alice);
-
-        res.send(`Transaction hash: ${txHash}`);
-    } catch (error) {
-        res.status(500).send(`Error approving access: ${error.message}`);
-    }
-});
-
-// Nuevo endpoint para obtener información de un bloque específico
-app.get('/block/:blockNumber', async (req, res) => {
-    const { blockNumber } = req.params;
-    try {
-        const blockHash = await api.rpc.chain.getBlockHash(blockNumber);
-        const block = await api.rpc.chain.getBlock(blockHash);
-        res.json(block.toHuman());
-    } catch (error) {
-        res.status(500).send(`Error fetching block: ${error.message}`);
-    }
-});
-
-// Inicializar la conexión y luego iniciar el servidor
 init().then(() => {
     app.listen(port, () => {
         console.log(`API listening at http://localhost:${port}`);

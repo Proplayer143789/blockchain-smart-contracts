@@ -270,7 +270,7 @@ mod smart_contracts {
         
         // Trae el rol del usuario
         #[ink(message)]
-        pub fn get_role(&mut self, clave_privada: AccountId)->Option<u8> {
+        pub fn get_role(&self, clave_privada: AccountId)->Option<u8> {
             self.roles.get(clave_privada)
         }
     
