@@ -219,6 +219,88 @@ app.post('/create_user', async (req, res) => {
     }
 });
 
+app.post('/create_user_based_on_personalized_mnemonic', async (req, res) => {
+    const { address, name, lastname, dni, email, role } = req.body;
+    const newAccount = createNewAccount(address); // Genera una nueva cuenta
+
+    const userInfo = {
+        name: name,
+        lastname: lastname,
+        dni: dni,
+        email: email
+    };
+
+    try {
+        const keyring = new Keyring({ type: 'sr25519' });
+        const alice = keyring.addFromUri('//Alice'); // Usar la cuenta de Alice para firmar la transacción
+
+        // Transferir fondos a la nueva cuenta usando transferAllowDeath
+        await transferFunds(alice, newAccount.address, 1000000000000);
+
+        // Esperar un poco para asegurarse de que la transferencia se haya completado
+        await new Promise(resolve => setTimeout(resolve, 6000));
+
+        const gasLimit = api.registry.createType('WeightV2', {
+            refTime: api.registry.createType('Compact<u64>', 10000000000),
+            proofSize: api.registry.createType('Compact<u64>', 10000000)
+        });
+
+        // Añadir el usuario y su información
+        await addUser(alice, newAccount, userInfo, role, gasLimit);
+
+        // Si la adición del usuario fue exitosa, agregar el rol
+        //await assignRole(alice, newAccount, role, gasLimit);
+
+        res.send(`User and role added successfully`);
+    } catch (error) {
+        res.status(500).send(`Error assigning role: ${error.message}`);
+    }
+});
+
+app.post('/create_user_with_existing_address', async (req, res) => {
+    const { address, name, lastname, dni, email, role } = req.body;
+
+    // Verify that the provided address is valid
+    const keyring = new Keyring({ type: 'sr25519' });
+    let userAddress;
+    try {
+        userAddress = keyring.encodeAddress(address);
+    } catch (error) {
+        return res.status(400).send('Invalid address provided');
+    }
+
+    const userInfo = {
+        name: name,
+        lastname: lastname,
+        dni: dni,
+        email: email
+    };
+
+    try {
+        const alice = keyring.addFromUri('//Alice'); // Use Alice's account to sign the transaction
+
+        // Transfer funds to the user's address
+        await transferFunds(alice, userAddress, 1000000000000);
+
+        // Wait a bit to ensure the transfer has been completed
+        await new Promise(resolve => setTimeout(resolve, 6000));
+
+        // Set up the gas limit
+        const gasLimit = api.registry.createType('WeightV2', {
+            refTime: api.registry.createType('Compact<u64>', 10000000000),
+            proofSize: api.registry.createType('Compact<u64>', 10000000)
+        });
+
+        // Add the user and their information to the contract
+        await addUser(alice, userAddress, userInfo, role, gasLimit);
+
+        res.status(200).send(`User created with address ${userAddress}`);
+    } catch (error) {
+        console.error(`Error creating user with address ${userAddress}: ${error}`);
+        res.status(500).send(`Error creating user: ${error.message}`);
+    }
+});
+
 app.get('/role/:publicAddress', async (req, res) => {
     const { publicAddress } = req.params;
 
