@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api');
 const { ContractPromise } = require('@polkadot/api-contract');
 const { mnemonicGenerate } = require('@polkadot/util-crypto');
@@ -8,6 +9,13 @@ const path = require('path');
 const app = express();
 const port = 3000;
 
+// CORS configuration
+const corsOptions = {
+  origin: process.env.ALLOWED_ORIGIN || '*', 
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const CONTRACT_ADDRESS = '5FVr1aLwr5addVSptg9FdFE8akRcVBGv9NEchF5onRzLBGHr';
@@ -349,9 +357,10 @@ app.get('/alice_account_id', async (req, res) => {
 });
 
 init().then(() => {
-    app.listen(port, () => {
-        console.log(`API listening at http://localhost:${port}`);
+    const host = process.env.HOST || '0.0.0.0'; // Listen on all network interfaces by default
+    app.listen(port, host, () => {
+      console.log(`API listening at http://${host}:${port}`);
     });
-}).catch((error) => {
+  }).catch((error) => {
     console.error(`Failed to initialize API: ${error.message}`);
-});
+  });
