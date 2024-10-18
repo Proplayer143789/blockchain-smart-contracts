@@ -5,11 +5,12 @@ const { ContractPromise } = require('@polkadot/api-contract');
 const { mnemonicGenerate } = require('@polkadot/util-crypto');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const app = express();
 const port = 3000;
 
-// CORS configuration
+// Configuración del CORS
 const corsOptions = {
   origin: process.env.ALLOWED_ORIGIN || '*', 
   optionsSuccessStatus: 200
@@ -18,9 +19,54 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// Contract Dirección y ABI
 const CONTRACT_ADDRESS = '5FVr1aLwr5addVSptg9FdFE8akRcVBGv9NEchF5onRzLBGHr';
 const CONTRACT_ABI_PATH = path.resolve(__dirname, '../target/ink/smart_contract/smart_contract.json');
 
+// Performance monitoring configuration
+const ENABLE_PERFORMANCE_MONITORING = process.env.ENABLE_PERFORMANCE_MONITORING === 'true';
+const LOG_FILE_PATH = path.join(__dirname, 'performance_log.txt');
+
+// Utility function to get current CPU and RAM usage
+function getSystemUsage() {
+    const cpuUsage = os.loadavg()[0]; // 1 minute load average
+    const totalMem = os.totalmem();
+    const freeMem = os.freemem();
+    const usedMem = totalMem - freeMem;
+    const memUsage = (usedMem / totalMem) * 100;
+  
+    return { cpuUsage, memUsage };
+  }
+
+// Middleware to measure request duration and system usage
+app.use((req, res, next) => {
+    if (!ENABLE_PERFORMANCE_MONITORING) {
+      return next();
+    }
+  
+    const start = Date.now();
+    const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage();
+  
+    res.on('finish', () => {
+      const duration = Date.now() - start;
+      const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage();
+  
+      const logEntry = `
+        Time: ${new Date().toISOString()}
+        Route: ${req.method} ${req.originalUrl}
+        Duration: ${duration}ms
+        CPU Usage: ${endCpu.toFixed(2)}% (change: ${(endCpu - startCpu).toFixed(2)}%)
+        Memory Usage: ${endMem.toFixed(2)}% (change: ${(endMem - startMem).toFixed(2)}%)
+        ---
+      `;
+  
+      fs.appendFile(LOG_FILE_PATH, logEntry, (err) => {
+        if (err) console.error('Error writing to performance log:', err);
+      });
+    });
+  
+    next();
+  });
 let api;
 let contract;
 
@@ -357,9 +403,12 @@ app.get('/alice_account_id', async (req, res) => {
 });
 
 init().then(() => {
-    const host = process.env.HOST || '0.0.0.0'; // Listen on all network interfaces by default
+    const host = process.env.HOST || '0.0.0.0';
     app.listen(port, host, () => {
       console.log(`API listening at http://${host}:${port}`);
+      if (ENABLE_PERFORMANCE_MONITORING) {
+        console.log(`Performance monitoring enabled. Logs will be written to ${LOG_FILE_PATH}`);
+      }
     });
   }).catch((error) => {
     console.error(`Failed to initialize API: ${error.message}`);
