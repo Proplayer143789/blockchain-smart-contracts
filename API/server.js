@@ -10,7 +10,7 @@ const port = 3000;
 
 app.use(express.json());
 
-const CONTRACT_ADDRESS = '5FsNfkpkCEiN78naicQW2tMA6cGaeFgLGRmZXt7P3GzhxqYT';
+const CONTRACT_ADDRESS = '5FVr1aLwr5addVSptg9FdFE8akRcVBGv9NEchF5onRzLBGHr';
 const CONTRACT_ABI_PATH = path.resolve(__dirname, '../target/ink/smart_contract/smart_contract.json');
 
 let api;
@@ -90,9 +90,9 @@ async function transferFunds(sender, recipient, amount) {
     });
 }
 
-async function addUser(alice, newAccount, userInfo, gasLimit) {
+async function addUser(alice, newAccount, userInfo, role, gasLimit) {
     console.log(`Attempting to add user: ${JSON.stringify(userInfo)}`);
-    const addUserTx = contract.tx.addUser({ value: 0, gasLimit }, newAccount.address, userInfo);
+    const addUserTx = contract.tx.addUser({ value: 0, gasLimit }, newAccount.address, userInfo,role);
     return new Promise((resolve, reject) => {
         addUserTx.signAndSend(alice, ({ events = [], status }) => {
             if (status.isInBlock) {
@@ -136,6 +136,27 @@ async function assignRole(alice, newAccount, role, userInfo, gasLimit) {
         });
     });
 }
+
+// Ruta para obtener las cuentas asociadas a un dni - Falta implementar en servidor
+app.get('/get_accounts/:dni', async (req, res) => {
+    const { dni } = req.params;
+
+    try {
+        // Llama a la función get_accounts del contrato inteligente
+        const { output } = await contract.query.getAccounts(api.createType('AccountId', CONTRACT_ADDRESS), { value: 0, gasLimit: -1 }, dni);
+
+        if (output.isNone) {
+            return res.status(404).send(`No accounts found for dni ${dni}`);
+        }
+
+        // Devuelve las cuentas asociadas al dni
+        res.json(output.toHuman());
+    } catch (error) {
+        console.error(`Error fetching accounts for dni ${dni}: ${error}`);
+        res.status(500).send('Error fetching accounts');
+    }
+});
+
 app.post('/create_user', async (req, res) => {
     const { name, lastname, dni, email, role } = req.body;
     const newAccount = createNewAccount(); // Genera una nueva cuenta
@@ -163,10 +184,10 @@ app.post('/create_user', async (req, res) => {
         });
 
         // Añadir el usuario y su información
-        await addUser(alice, newAccount, userInfo, gasLimit);
+        await addUser(alice, newAccount, userInfo, role, gasLimit);
 
         // Si la adición del usuario fue exitosa, agregar el rol
-        await assignRole(alice, newAccount, role, userInfo, gasLimit);
+        //await assignRole(alice, newAccount, role, gasLimit);
 
         res.send(`User and role added successfully`);
     } catch (error) {

@@ -49,9 +49,10 @@ mod access_control {
         name: String,
         lastname: String,
         dni: String,
-        email: String,
+        email: String, 
     }
-
+    //Roles
+    // 1 pa medico, 0 pa paciente
     #[ink(storage)]
     pub struct AccessControl {
         accounts: Mapping<String, [Option<AccountId>; 2]>,
@@ -80,25 +81,67 @@ mod access_control {
             &mut self,
             account_id: AccountId,
             user_info: UserInfo,
+            role: u8,
         ) -> Result<(), String> {
+            // Control Secundario de Datos
             if user_info.name.is_empty() || user_info.name.len() > 12 {
                 return Err("Nombre no válido".to_string());
             }
+            if user_info.lastname.is_empty() || user_info.lastname.len() > 12 {
+                return Err("Apellido no válido".to_string());
+            }
+            if user_info.dni.is_empty() || user_info.dni.len() != 8 {
+                return Err("DNI no válido".to_string());
+            }
+            if user_info.email.is_empty() || !user_info.email.contains('@') {
+                return Err("Email no válido".to_string());
+            }
             
-            self.users.insert(account_id, &user_info);
+
+            // Verificar si el dni ya tiene dos account_id asociados
+            let accounts = self.accounts.get(&user_info.dni).unwrap_or([None, None]);
+            let account_count = accounts.iter().filter(|acc| acc.is_some()).count();
+            if account_count >= 2 {
+                return Err("El DNI ya tiene dos cuentas asociadas".to_string());
+            }
+
+            // Verificar que los roles sean distintos
+            for acc in accounts.iter().filter_map(|acc| acc.as_ref()) {
+                let existing_role = self.roles.get(acc).unwrap_or(2); // 2 indica rol no definido
+                if existing_role == role {
+                    return Err("Ambos account_id no pueden tener el mismo rol".to_string());
+                }
+            }
+
+            // Agregar el account_id al vector asociado con el dni
+            let mut new_accounts = accounts;
+            if new_accounts[0].is_none() {
+                new_accounts[0] = Some(account_id);
+            } else {
+                new_accounts[1] = Some(account_id);
+            }
+            self.accounts.insert(&user_info.dni, &new_accounts);
+
+            // Agregar el usuario al mapa de usuarios
+            self.users.insert(&account_id, &user_info);
+
+            // Agregar el rol al mapa de roles
+            self.roles.insert(&account_id, &role);
+            self.env().emit_event(RoleAssigned { account: account_id, role:role });
+            // Emitir evento de usuario agregado
             self.env().emit_event(UserAdded { account: account_id });
+
             Ok(())
         }
+    
 
         #[ink(message)]
         pub fn assign_role(
             &mut self,
             account_id: AccountId,
-            role: u8,
-            user_info: UserInfo,
+            role: u8
         ) -> String {
             self.roles.insert(account_id, &role);
-            self.users.insert(account_id, &user_info);
             self.env().emit_event(RoleAssigned { account: account_id, role });
             format!("Rol {} asignado a la cuenta {:?}", role, account_id)
         }
@@ -110,7 +153,7 @@ mod access_control {
             self.access_requests.insert(requester, &requests);
             self.env().emit_event(AccessRequested { requester, target });
         }
-
+    
         #[ink(message)]
         pub fn grant_permission(
             &mut self,
@@ -129,6 +172,16 @@ mod access_control {
         }
 
         // === NUEVAS FUNCIONES DE CONSULTA ===
+
+        /// Obtiene la información de un usuario por su AccountId.
+        #[ink(message)]
+        pub fn get_accounts(&self, dni: String) -> Vec<AccountId> {
+            // Recuperar las cuentas asociadas al dni
+            let accounts = self.accounts.get(&dni).unwrap_or([None, None]);
+
+            // Filtrar las cuentas que no son None y devolverlas como un vector
+            accounts.iter().filter_map(|&acc| acc).collect()
+        }
 
         /// Obtiene la información de un usuario por su AccountId.
         #[ink(message)]
