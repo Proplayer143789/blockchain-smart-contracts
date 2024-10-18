@@ -142,18 +142,42 @@ app.get('/get_accounts/:dni', async (req, res) => {
     const { dni } = req.params;
 
     try {
-        // Llama a la función get_accounts del contrato inteligente
-        const { output } = await contract.query.getAccounts(api.createType('AccountId', CONTRACT_ADDRESS), { value: 0, gasLimit: -1 }, dni);
+        console.log(`Attempting to fetch accounts for DNI: ${dni}`);
 
-        if (output.isNone) {
-            return res.status(404).send(`No accounts found for dni ${dni}`);
+        const gasLimit = api.registry.createType('WeightV2', {
+            refTime: api.registry.createType('Compact<u64>', 10000000000),
+            proofSize: api.registry.createType('Compact<u64>', 10000000)
+        });
+
+        console.log('Querying contract...');
+        const { result, output } = await contract.query.getAccounts(api.createType('AccountId', CONTRACT_ADDRESS), { value: 0, gasLimit }, dni);
+
+        console.log('Query result:', result.toHuman());
+        console.log('Query output:', output ? output.toHuman() : 'No output');
+
+        if (result.isOk) {
+            if (output) {
+                const accounts = output.toJSON();
+                console.log('Parsed accounts:', accounts);
+                
+                if (accounts && accounts.ok && Array.isArray(accounts.ok) && accounts.ok.length > 0) {
+                    console.log(`Found ${accounts.ok.length} accounts for DNI ${dni}`);
+                    res.json(accounts.ok);
+                } else {
+                    console.log(`No accounts found for DNI ${dni}`);
+                    res.status(404).send(`No accounts found for dni ${dni}`);
+                }
+            } else {
+                console.log('Query successful but no output returned');
+                res.status(404).send(`No accounts found for dni ${dni}`);
+            }
+        } else {
+            console.error('Contract call failed:', result.asErr.toHuman());
+            res.status(500).send('Error fetching accounts: Contract call failed');
         }
-
-        // Devuelve las cuentas asociadas al dni
-        res.json(output.toHuman());
     } catch (error) {
-        console.error(`Error fetching accounts for dni ${dni}: ${error}`);
-        res.status(500).send('Error fetching accounts');
+        console.error(`Error fetching accounts for dni ${dni}:`, error);
+        res.status(500).send(`Error fetching accounts: ${error.message}`);
     }
 });
 
