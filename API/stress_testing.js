@@ -21,7 +21,7 @@ function generateTestData() {
         lastname: faker.name.lastName(),
         dni: faker.datatype.number({ min: 10000000, max: 99999999 }).toString(),
         email: faker.internet.email(),
-        role: 'user'
+        role: faker.datatype.number({ min: 0, max: 1 })
     };
 }
 
