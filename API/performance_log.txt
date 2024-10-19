@@ -1,0 +1,15 @@
+
+        Time: 2024-10-19T17:26:18.512Z
+        Route: GET /get_accounts/12345678
+        Duration: 13ms
+        CPU Usage: 0.33% (change: 0.00%)
+        Memory Usage: 13.85% (change: 0.00%)
+        ---
+      
+        Time: 2024-10-19T17:47:24.978Z
+        Route: GET /get_accounts/12345678
+        Duration: 28ms
+        CPU Usage: 0.06% (change: 0.00%)
+        Memory Usage: 14.31% (change: -0.00%)
+        ---
+      

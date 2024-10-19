@@ -6,7 +6,7 @@ const { mnemonicGenerate } = require('@polkadot/util-crypto');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-
+require('dotenv').config();
 const app = express();
 const port = 3000;
 
@@ -20,12 +20,13 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Contract Dirección y ABI
-const CONTRACT_ADDRESS = '5FVr1aLwr5addVSptg9FdFE8akRcVBGv9NEchF5onRzLBGHr';
+const CONTRACT_ADDRESS = '5GNbWX6CrRmfGjaB6Z7VdJFYsbNxK7zn2RZmiUoqXTmFoEQm';
 const CONTRACT_ABI_PATH = path.resolve(__dirname, '../target/ink/smart_contract/smart_contract.json');
 
 // Performance monitoring configuration
 const ENABLE_PERFORMANCE_MONITORING = process.env.ENABLE_PERFORMANCE_MONITORING === 'true';
 const LOG_FILE_PATH = path.join(__dirname, 'performance_log.txt');
+const logFileJsonPath = path.join(__dirname, 'performance_log.json');
 
 // Utility function to get current CPU and RAM usage
 function getSystemUsage() {
@@ -38,7 +39,7 @@ function getSystemUsage() {
     return { cpuUsage, memUsage };
   }
 
-// Middleware to measure request duration and system usage
+// Middleware to measure request duration and system usage in txt format
 app.use((req, res, next) => {
     if (!ENABLE_PERFORMANCE_MONITORING) {
       return next();
@@ -67,6 +68,46 @@ app.use((req, res, next) => {
   
     next();
   });
+
+// Middleware to measure request duration and system usage in json format
+app.use((req, res, next) => {
+    if (!ENABLE_PERFORMANCE_MONITORING) {
+        return next();
+    }
+  
+    const start = Date.now();
+    const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage();
+  
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage();
+  
+        const logEntry = {
+            time: new Date().toISOString(),
+            route: `${req.method} ${req.originalUrl}`,
+            duration: duration,
+            cpuUsage: endCpu.toFixed(2),
+            cpuChange: (endCpu - startCpu).toFixed(2),
+            memUsage: endMem.toFixed(2),
+            memChange: (endMem - startMem).toFixed(2)
+        };
+  
+        // Save log as JSON for later use
+        fs.readFile(logFileJsonPath, 'utf8', (err, data) => {
+            let logs = [];
+            if (!err && data) {
+                logs = JSON.parse(data);
+            }
+            logs.push(logEntry);
+            fs.writeFile(logFileJsonPath, JSON.stringify(logs, null, 2), (err) => {
+                if (err) console.error('Error writing to performance log JSON:', err);
+            });
+        });
+    });
+  
+    next();
+});
+
 let api;
 let contract;
 

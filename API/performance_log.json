@@ -1,0 +1,11 @@
+[
+  {
+    "time": "2024-10-19T17:47:24.978Z",
+    "route": "GET /get_accounts/12345678",
+    "duration": 29,
+    "cpuUsage": "0.06",
+    "cpuChange": "0.00",
+    "memUsage": "14.31",
+    "memChange": "-0.00"
+  }
+]

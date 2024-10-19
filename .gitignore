@@ -8,3 +8,4 @@
 rls*.log
 runtime/Cargo.lock
 API/node_modules
+API/graphs/venv
