@@ -1817,3 +1817,48 @@
         Memory Usage: 34.15% (change: 0.04%)
         ---
       
+        Time: 2024-10-20T00:40:20.158Z
+        Route: POST /create_user
+        Duration: 7931ms
+        Total Requests: 100
+        Test Type: sequential
+        CPU Usage: 0.24% (change: -0.03%)
+        Memory Usage: 34.12% (change: 0.12%)
+        ---
+      
+        Time: 2024-10-20T04:45:00.750Z
+        Route: POST /create_user_with_dynamic_gas
+        Duration: 6530ms
+        Total Requests: 100
+        Test Type: sequential
+        CPU Usage: 0.93% (change: 0.01%)
+        Memory Usage: 31.44% (change: -0.18%)
+        ---
+      
+        Time: 2024-10-20T04:47:04.234Z
+        Route: POST /create_user_with_dynamic_gas
+        Duration: 6560ms
+        Total Requests: 100
+        Test Type: sequential
+        CPU Usage: 0.54% (change: -0.05%)
+        Memory Usage: 31.20% (change: 0.15%)
+        ---
+      
+        Time: 2024-10-20T04:54:18.111Z
+        Route: POST /create_user_with_dynamic_gas
+        Duration: 6470ms
+        Total Requests: 100
+        Test Type: sequential
+        CPU Usage: 0.48% (change: -0.04%)
+        Memory Usage: 32.20% (change: 0.18%)
+        ---
+      
+        Time: 2024-10-20T04:56:17.590Z
+        Route: POST /create_user_with_dynamic_gas
+        Duration: 7718ms
+        Total Requests: 100
+        Test Type: sequential
+        CPU Usage: 0.29% (change: -0.05%)
+        Memory Usage: 31.74% (change: 0.12%)
+        ---
+      

@@ -20,7 +20,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Contract Dirección y ABI
-const CONTRACT_ADDRESS = '5EwSQaB2gF4h5NfjPJdVHPLKVBZEthjM7FuYC6sMET3eATVt';
+const CONTRACT_ADDRESS = '5GkydDDn1dSXqkTzLZxi89bbyFv3vYTwWxabc6e7QPBjmsAi';
 const CONTRACT_ABI_PATH = path.resolve(__dirname, '../target/ink/smart_contract/smart_contract.json');
 
 // Performance monitoring configuration
@@ -513,6 +513,97 @@ app.get('/alice_account_id', async (req, res) => {
     const alice = keyring.addFromUri('//Alice');
     res.status(200).send(`Alice's account: ${alice.address}`);
 });
+
+// Función para ejecutar el contrato y obtener el gas consumido después de la ejecución
+async function executeContractAndGetGas(contract, signer, ...params) {
+    try {
+        // Definir un límite de gas alto para asegurar la ejecución (sin estimación previa)
+        const gasLimit = api.registry.createType('WeightV2', {
+            refTime: api.registry.createType('Compact<u64>', 20000000000), // Ajusta este valor según lo necesario
+            proofSize: api.registry.createType('Compact<u64>', 10000000)
+        });
+
+        // Llamada directa al método addUser del contrato
+        const tx = contract.tx.addUser(
+            { value: 0, gasLimit }, // Asigna un gas límite alto
+            ...params // Los parámetros del método
+        );
+
+        // Enviar la transacción y esperar a la finalización
+        return new Promise((resolve, reject) => {
+            tx.signAndSend(signer, (result) => {
+                if (result.status.isFinalized) {
+                    console.log('Transacción finalizada en bloque:', result.status.asFinalized);
+
+                    // Iterar sobre los eventos para encontrar el peso (gas) consumido
+                    let gasUsed = null;
+                    result.events.forEach(({ event: { data, method, section } }) => {
+                        console.log(`Event: ${section}.${method} - ${data}`);
+                        
+                        if (section === 'system' && method === 'ExtrinsicSuccess') {
+                            // Obtener el gas consumido del evento ExtrinsicSuccess
+                            gasUsed = data[0].weight;
+                            console.log(`Gas (weight) consumido: ${gasUsed}`);
+                        }
+                    });
+
+                    resolve({
+                        blockHash: result.status.asFinalized.toString(),
+                        gasUsed: gasUsed ? gasUsed.toHuman() : 'No se encontró el consumo de gas'
+                    });
+                } else if (result.isError) {
+                    console.error('Error en la transacción:', result);
+                    reject(new Error('Error en la transacción.'));
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error(`Error al ejecutar la transacción: ${error.message}`);
+        throw error;
+    }
+}
+
+
+
+app.post('/create_user_with_dynamic_gas', async (req, res) => {
+    const { name, lastname, dni, email, role } = req.body;
+
+    try {
+        const keyring = new Keyring({ type: 'sr25519' });
+        const alice = keyring.addFromUri('//Alice'); // Usar la cuenta de Alice para firmar la transacción
+
+        const newAccount = createNewAccount(); // Genera una nueva cuenta
+
+        const userInfo = {
+            name: name,
+            lastname: lastname,
+            dni: dni,
+            email: email
+        };
+
+        // Transferir fondos a la nueva cuenta usando transferKeepAlive
+        await transferFunds(alice, newAccount.address, 1000000000000);
+
+        // Esperar un poco para asegurarse de que la transferencia se haya completado
+        await new Promise(resolve => setTimeout(resolve, 6000));
+
+        // Ejecutar la transacción directamente y recuperar el gas consumido
+        const result = await executeContractAndGetGas(contract, alice, newAccount.address, userInfo, role);
+
+        res.status(200).json({
+            message: 'Usuario creado con éxito',
+            blockHash: result.blockHash,
+            gasUsed: result.gasUsed
+        });
+
+    } catch (error) {
+        console.error('Error al crear el usuario:', error);
+        res.status(500).json({ error: `Error al crear el usuario: ${error.message}` });
+    }
+});
+
+
 
 // Iniciar el servidor
 init().then(() => {
