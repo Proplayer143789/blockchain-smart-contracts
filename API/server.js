@@ -42,120 +42,101 @@ function getSystemUsage() {
     return { cpuUsage, memUsage };
 }
 
-// Middleware to measure request duration and system usage in txt format
+// Middleware para medir la duración de la solicitud y registrar logs en formato txt
 app.use((req, res, next) => {
-    if (!ENABLE_PERFORMANCE_MONITORING) {
-        return next();
-    }
-
-    const start = Date.now();
-    const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage();
+    const startTime = Date.now(); // Tiempo de inicio de la transacción
+    const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage(); // Obtener el uso de CPU y RAM al inicio
 
     res.on('finish', () => {
-        const duration = Date.now() - start;
-        const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage();
+        const duration = Date.now() - startTime; // Calcular la duración de la transacción
+        const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage(); // Obtener el uso de CPU y RAM al finalizar
 
+        // Registrar el log, ya sea que la transacción haya sido exitosa o no
         const logEntry = `
         Time: ${new Date().toISOString()}
+        Request Number: ${res.locals.transactionCount}
         Route: ${req.method} ${req.originalUrl}
-        Duration: ${duration}ms
-        Total Requests: ${total_request}
+        Method: ${req.method}
+        RefTime (Gas Computacional): ${res.locals.refTime || 'N/A'}
+        Duration: ${duration} ms
+        CPU Usage (start): ${startCpu.toFixed(2)}%, CPU Usage (end): ${endCpu.toFixed(2)}%
+        RAM Usage (start): ${startMem.toFixed(2)}%, RAM Usage (end): ${endMem.toFixed(2)}%
+        Transaction Success: ${res.locals.transactionSuccess ? 'Yes' : 'No'}
         Test Type: ${test_type}
-        CPU Usage: ${endCpu.toFixed(2)}% (change: ${(endCpu - startCpu).toFixed(2)}%)
-        Memory Usage: ${endMem.toFixed(2)}% (change: ${(endMem - startMem).toFixed(2)}%)
         ---
-      `;
+        `;
 
-        // Envolvemos la operación de escritura en un bloque try-catch
-        try {
-            fs.appendFile(LOG_FILE_PATH, logEntry, (err) => {
-                if (err) {
-                    throw new Error(`Error writing to performance log: ${err.message}`);
-                }
-            });
-        } catch (error) {
-            console.error(error.message);
-        }
+        // Escribimos el log al archivo de texto
+        fs.appendFile(LOG_FILE_PATH, logEntry, (err) => {
+            if (err) throw new Error(`Error al escribir en el log: ${err.message}`);
+        });
     });
 
     next();
 });
 
-// Middleware to measure request duration and system usage in JSON format
+// Middleware para medir la duración de la solicitud y registrar logs en formato JSON
 app.use((req, res, next) => {
-    if (!ENABLE_PERFORMANCE_MONITORING) {
-        return next();
-    }
-
-    const start = Date.now();
-    const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage();
+    const startTime = Date.now(); // Tiempo de inicio de la transacción
+    const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage(); // Obtener el uso de CPU y RAM al inicio
 
     res.on('finish', () => {
-        const duration = Date.now() - start;
-        const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage();
+        const duration = Date.now() - startTime; // Calcular la duración de la transacción
+        const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage(); // Obtener el uso de CPU y RAM al finalizar
 
+        // Registrar el log, ya sea que la transacción haya sido exitosa o no
         const logEntry = {
             time: new Date().toISOString(),
-            total_request: total_request,
-            test_type: test_type,
+            requestNumber: res.locals.transactionCount,
             route: `${req.method} ${req.originalUrl}`,
-            duration: duration,
-            cpuUsage: endCpu.toFixed(2),
-            cpuChange: (endCpu - startCpu).toFixed(2),
-            memUsage: endMem.toFixed(2),
-            memChange: (endMem - startMem).toFixed(2)
+            method: req.method,
+            refTime: res.locals.refTime || 'N/A', // Añadir `refTime` incluso si la transacción falla
+            duration: `${duration} ms`,
+            cpuUsageStart: `${startCpu.toFixed(2)}%`,
+            cpuUsageEnd: `${endCpu.toFixed(2)}%`,
+            ramUsageStart: `${startMem.toFixed(2)}%`,
+            ramUsageEnd: `${endMem.toFixed(2)}%`,
+            transactionSuccess: res.locals.transactionSuccess ? 'Yes' : 'No', // Registrar si la transacción fue exitosa o no
+            testType: test_type // Añadir el tipo de prueba
         };
 
         const logEntryString = JSON.stringify(logEntry);
 
-        // Si el archivo no existe, lo creamos con el array inicial
         if (!fileExists) {
             try {
-                const initialContent = `[${logEntryString}]`; // Primer registro dentro del array
-                fs.writeFileSync(logFileJsonPath, initialContent); // Crea el archivo
-                fileExists = true; // Actualizamos la variable para evitar la creación repetida
-                console.log('Performance log created and first entry added.');
+                const initialContent = `[${logEntryString}]`;
+                fs.writeFileSync(logFileJsonPath, initialContent); // Crear el archivo
+                fileExists = true;
             } catch (err) {
-                console.error(`Error creating performance log file: ${err.message}`);
+                console.error(`Error al crear el archivo de log JSON: ${err.message}`);
             }
         } else {
-            // Si el archivo ya existe, añadimos el nuevo log al final del array
             try {
                 fs.readFile(logFileJsonPath, 'utf8', (err, data) => {
-                    if (err) {
-                        console.error(`Error reading performance log file: ${err.message}`);
-                        return;
-                    }
+                    if (err) return console.error(`Error al leer el archivo de log JSON: ${err.message}`);
 
                     let newData = data.trim();
 
-                    // Verificar si el archivo tiene contenido
                     if (newData.length === 0 || newData === '[]') {
-                        // Archivo vacío o solo con corchetes vacíos
                         newData = `[${logEntryString}]`;
                     } else {
-                        // Remover el último corchete del array para agregar el nuevo registro
                         newData = newData.slice(0, -1);
                         newData += `,${logEntryString}]`;
                     }
 
-                    // Escribimos el nuevo contenido con el nuevo log
                     fs.writeFile(logFileJsonPath, newData, (err) => {
-                        if (err) {
-                            console.error(`Error writing to performance log file: ${err.message}`);
-                        } else {
-                            console.log('Performance log updated successfully.');
-                        }
+                        if (err) return console.error(`Error al escribir en el archivo de log JSON: ${err.message}`);
                     });
                 });
             } catch (err) {
-                console.error(`Error updating performance log file: ${err.message}`);
+                console.error(`Error al actualizar el archivo de log JSON: ${err.message}`);
             }
         }
     });
 
     next();
 });
+
 
 let api;
 let contract;
@@ -209,6 +190,24 @@ async function init() {
     });
 }
 
+let transactionCount = 0; // Contador global de transacciones
+let lastTransactionTime = Date.now(); // Tiempo de la última transacción
+const resetInterval = 5000; // Intervalo de 5 segundos para reiniciar el contador
+
+// Función para actualizar el contador de transacciones y reiniciarlo si pasan 5s
+function updateTransactionCount() {
+    const currentTime = Date.now();
+    
+    // Si ha pasado más de 5 segundos desde la última transacción, reiniciamos el contador
+    if (currentTime - lastTransactionTime > resetInterval) {
+        transactionCount = 0;
+    }
+
+    // Incrementamos el contador
+    transactionCount += 1;
+    lastTransactionTime = currentTime; // Actualizamos el tiempo de la última transacción
+}
+
 // Contador inicial de transacciones pendientes
 let pendingTransactions = parseInt(total_request); 
 let tip = pendingTransactions; // Variable global para el tip, que comienza en el total de transacciones
@@ -239,16 +238,26 @@ function createNewAccount(customText = null) {
 async function transferFunds(sender, recipient, amount) {
     decrementTip(); // Disminuye el tip antes de la transacción
     const transfer = api.tx.balances.transferKeepAlive(recipient, amount);
+
     return new Promise((resolve, reject) => {
         transfer.signAndSend(sender, { tip }, (result) => {
-            if (result.status.isInBlock || result.status.isFinalized) {
-                resolve(result);
-            } else if (result.isError) {
-                reject(result);
+            if (result.status.isInBlock) {
+                console.log(`Transferencia incluida en el bloque: ${result.status.asInBlock}`);
             }
+            if (result.status.isFinalized) {
+                console.log(`Transferencia finalizada en el bloque: ${result.status.asFinalized}`);
+                resolve(result); // La transacción ha sido finalizada correctamente, continuar con las siguientes funciones
+            }
+            if (result.isError) {
+                console.error('Error en la transferencia:', result);
+                reject(new Error('Error en la transferencia.')); // Rechazar si hay un error
+            }
+        }).catch((error) => {
+            reject(new Error(`Error en la transferencia: ${error.message}`)); // Capturar errores inesperados
         });
     });
 }
+
 
 // Modificar la función addUser para incluir el tip en la transacción
 async function addUser(alice, newAccount, userInfo, role, gasLimit) {
@@ -515,13 +524,18 @@ app.get('/alice_account_id', async (req, res) => {
 });
 
 // Función para ejecutar el contrato y obtener el gas consumido después de la ejecución
-async function executeContractAndGetGas(contract, signer, ...params) {
+async function executeContractAndGetGas(contract, signer, res, ...params) {
     try {
+        updateTransactionCount(); // Actualizar el contador de transacciones
+
         // Definir un límite de gas alto para asegurar la ejecución (sin estimación previa)
         const gasLimit = api.registry.createType('WeightV2', {
             refTime: api.registry.createType('Compact<u64>', 20000000000), // Ajusta este valor según lo necesario
             proofSize: api.registry.createType('Compact<u64>', 10000000)
         });
+
+        // Inicializamos refTime fuera del contexto de los eventos
+        let refTime = null;
 
         // Llamada directa al método addUser del contrato
         const tx = contract.tx.addUser(
@@ -536,23 +550,34 @@ async function executeContractAndGetGas(contract, signer, ...params) {
                     console.log('Transacción finalizada en bloque:', result.status.asFinalized);
 
                     // Iterar sobre los eventos para encontrar el peso (gas) consumido
-                    let gasUsed = null;
                     result.events.forEach(({ event: { data, method, section } }) => {
-                        console.log(`Event: ${section}.${method} - ${data}`);
-                        
+                        console.log(`Event: ${section}.${method} - ${JSON.stringify(data.toHuman())}`);
+
                         if (section === 'system' && method === 'ExtrinsicSuccess') {
-                            // Obtener el gas consumido del evento ExtrinsicSuccess
-                            gasUsed = data[0].weight;
-                            console.log(`Gas (weight) consumido: ${gasUsed}`);
+                            // Obtener el gas computacional (refTime) del evento ExtrinsicSuccess
+                            if (data && data.length > 0 && data[0].weight) {
+                                refTime = data[0].weight.refTime;
+                                console.log(`Gas (refTime) consumido: ${refTime}`);
+                            }
                         }
                     });
 
+                    // Guardar refTime y el estado de éxito en res.locals
+                    res.locals.refTime = refTime || 'N/A'; // Si no se encuentra, asignar 'N/A'
+                    res.locals.transactionSuccess = true; // Transacción exitosa
+                    res.locals.transactionCount = transactionCount; // Guardamos el contador de la transacción
+
                     resolve({
                         blockHash: result.status.asFinalized.toString(),
-                        gasUsed: gasUsed ? gasUsed.toHuman() : 'No se encontró el consumo de gas'
+                        gasUsed: refTime ? refTime.toHuman() : 'No se encontró el consumo de gas'
                     });
                 } else if (result.isError) {
                     console.error('Error en la transacción:', result);
+
+                    // Guardar el estado de fallo en res.locals
+                    res.locals.transactionSuccess = false; // Transacción fallida
+                    res.locals.refTime = 0; // Gas 0 cuando falla la transacción
+
                     reject(new Error('Error en la transacción.'));
                 }
             });
@@ -560,10 +585,11 @@ async function executeContractAndGetGas(contract, signer, ...params) {
 
     } catch (error) {
         console.error(`Error al ejecutar la transacción: ${error.message}`);
+        res.locals.transactionSuccess = false; // Transacción fallida
+        res.locals.refTime = 0; // Gas 0 cuando falla la transacción
         throw error;
     }
 }
-
 
 
 app.post('/create_user_with_dynamic_gas', async (req, res) => {
@@ -582,19 +608,21 @@ app.post('/create_user_with_dynamic_gas', async (req, res) => {
             email: email
         };
 
-        // Transferir fondos a la nueva cuenta usando transferKeepAlive
+        // Transferir fondos a la nueva cuenta y esperar hasta que la transacción sea finalizada
         await transferFunds(alice, newAccount.address, 1000000000000);
 
-        // Esperar un poco para asegurarse de que la transferencia se haya completado
-        await new Promise(resolve => setTimeout(resolve, 6000));
+        // Ejecutar la transacción del contrato (addUser) y recuperar el gas consumido
+        const result = await executeContractAndGetGas(contract, alice, res, newAccount.address, userInfo, role);
 
-        // Ejecutar la transacción directamente y recuperar el gas consumido
-        const result = await executeContractAndGetGas(contract, alice, newAccount.address, userInfo, role);
-
+        // Responder con éxito
         res.status(200).json({
             message: 'Usuario creado con éxito',
             blockHash: result.blockHash,
-            gasUsed: result.gasUsed
+            gasUsed: result.gasUsed,
+            cpuUsageStart: res.locals.cpuUsageStart,
+            cpuUsageEnd: res.locals.cpuUsageEnd,
+            ramUsageStart: res.locals.ramUsageStart,
+            ramUsageEnd: res.locals.ramUsageEnd
         });
 
     } catch (error) {
@@ -602,6 +630,8 @@ app.post('/create_user_with_dynamic_gas', async (req, res) => {
         res.status(500).json({ error: `Error al crear el usuario: ${error.message}` });
     }
 });
+
+
 
 
 
