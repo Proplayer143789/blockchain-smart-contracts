@@ -27,6 +27,9 @@ const CONTRACT_ABI_PATH = path.resolve(__dirname, '../target/ink/smart_contract/
 const ENABLE_PERFORMANCE_MONITORING = process.env.ENABLE_PERFORMANCE_MONITORING === 'true';
 const LOG_FILE_PATH = path.join(__dirname, 'performance_log.txt');
 const logFileJsonPath = path.join(__dirname, 'performance_log.json');
+let fileExists = fs.existsSync(logFileJsonPath);
+const total_request = process.env.TOTAL_REQUESTS || "100";
+const test_type = process.env.TEST_TYPE || 'sequential';
 
 // Utility function to get current CPU and RAM usage
 function getSystemUsage() {
@@ -37,53 +40,64 @@ function getSystemUsage() {
     const memUsage = (usedMem / totalMem) * 100;
   
     return { cpuUsage, memUsage };
-  }
+}
 
 // Middleware to measure request duration and system usage in txt format
 app.use((req, res, next) => {
     if (!ENABLE_PERFORMANCE_MONITORING) {
-      return next();
+        return next();
     }
-  
+
     const start = Date.now();
     const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage();
-  
+
     res.on('finish', () => {
-      const duration = Date.now() - start;
-      const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage();
-  
-      const logEntry = `
+        const duration = Date.now() - start;
+        const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage();
+
+        const logEntry = `
         Time: ${new Date().toISOString()}
         Route: ${req.method} ${req.originalUrl}
         Duration: ${duration}ms
+        Total Requests: ${total_request}
+        Test Type: ${test_type}
         CPU Usage: ${endCpu.toFixed(2)}% (change: ${(endCpu - startCpu).toFixed(2)}%)
         Memory Usage: ${endMem.toFixed(2)}% (change: ${(endMem - startMem).toFixed(2)}%)
         ---
       `;
-  
-      fs.appendFile(LOG_FILE_PATH, logEntry, (err) => {
-        if (err) console.error('Error writing to performance log:', err);
-      });
-    });
-  
-    next();
-  });
 
-// Middleware to measure request duration and system usage in json format
+        // Envolvemos la operación de escritura en un bloque try-catch
+        try {
+            fs.appendFile(LOG_FILE_PATH, logEntry, (err) => {
+                if (err) {
+                    throw new Error(`Error writing to performance log: ${err.message}`);
+                }
+            });
+        } catch (error) {
+            console.error(error.message);
+        }
+    });
+
+    next();
+});
+
+// Middleware to measure request duration and system usage in JSON format
 app.use((req, res, next) => {
     if (!ENABLE_PERFORMANCE_MONITORING) {
         return next();
     }
-  
+
     const start = Date.now();
     const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage();
-  
+
     res.on('finish', () => {
         const duration = Date.now() - start;
         const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage();
-  
+
         const logEntry = {
             time: new Date().toISOString(),
+            total_request: total_request,
+            test_type: test_type,
             route: `${req.method} ${req.originalUrl}`,
             duration: duration,
             cpuUsage: endCpu.toFixed(2),
@@ -91,20 +105,55 @@ app.use((req, res, next) => {
             memUsage: endMem.toFixed(2),
             memChange: (endMem - startMem).toFixed(2)
         };
-  
-        // Save log as JSON for later use
-        fs.readFile(logFileJsonPath, 'utf8', (err, data) => {
-            let logs = [];
-            if (!err && data) {
-                logs = JSON.parse(data);
+
+        const logEntryString = JSON.stringify(logEntry);
+
+        // Si el archivo no existe, lo creamos con el array inicial
+        if (!fileExists) {
+            try {
+                const initialContent = `[${logEntryString}]`; // Primer registro dentro del array
+                fs.writeFileSync(logFileJsonPath, initialContent); // Crea el archivo
+                fileExists = true; // Actualizamos la variable para evitar la creación repetida
+                console.log('Performance log created and first entry added.');
+            } catch (err) {
+                console.error(`Error creating performance log file: ${err.message}`);
             }
-            logs.push(logEntry);
-            fs.writeFile(logFileJsonPath, JSON.stringify(logs, null, 2), (err) => {
-                if (err) console.error('Error writing to performance log JSON:', err);
-            });
-        });
+        } else {
+            // Si el archivo ya existe, añadimos el nuevo log al final del array
+            try {
+                fs.readFile(logFileJsonPath, 'utf8', (err, data) => {
+                    if (err) {
+                        console.error(`Error reading performance log file: ${err.message}`);
+                        return;
+                    }
+
+                    let newData = data.trim();
+
+                    // Verificar si el archivo tiene contenido
+                    if (newData.length === 0 || newData === '[]') {
+                        // Archivo vacío o solo con corchetes vacíos
+                        newData = `[${logEntryString}]`;
+                    } else {
+                        // Remover el último corchete del array para agregar el nuevo registro
+                        newData = newData.slice(0, -1);
+                        newData += `,${logEntryString}]`;
+                    }
+
+                    // Escribimos el nuevo contenido con el nuevo log
+                    fs.writeFile(logFileJsonPath, newData, (err) => {
+                        if (err) {
+                            console.error(`Error writing to performance log file: ${err.message}`);
+                        } else {
+                            console.log('Performance log updated successfully.');
+                        }
+                    });
+                });
+            } catch (err) {
+                console.error(`Error updating performance log file: ${err.message}`);
+            }
+        }
     });
-  
+
     next();
 });
 
@@ -159,6 +208,20 @@ async function init() {
         });
     });
 }
+
+// Contador inicial de transacciones pendientes
+let pendingTransactions = parseInt(total_request); 
+let tip = pendingTransactions; // Variable global para el tip, que comienza en el total de transacciones
+
+// Función para manejar el tip: disminuye con cada transacción
+function decrementTip() {
+    if (tip > 0) {
+        tip -= 1;
+    }
+
+    console.log(`Tip set to: ${tip}`);
+}
+
 function createNewAccount(customText = null) {
     const keyring = new Keyring({ type: 'sr25519' });
     const mnemonic = customText || mnemonicGenerate();
@@ -172,10 +235,12 @@ function createNewAccount(customText = null) {
     };
 }
 
+// Función para transferir fondos con tip incluido usando transferKeepAlive
 async function transferFunds(sender, recipient, amount) {
-    const transfer = api.tx.balances.transferAllowDeath(recipient, amount);
+    decrementTip(); // Disminuye el tip antes de la transacción
+    const transfer = api.tx.balances.transferKeepAlive(recipient, amount);
     return new Promise((resolve, reject) => {
-        transfer.signAndSend(sender, (result) => {
+        transfer.signAndSend(sender, { tip }, (result) => {
             if (result.status.isInBlock || result.status.isFinalized) {
                 resolve(result);
             } else if (result.isError) {
@@ -185,11 +250,12 @@ async function transferFunds(sender, recipient, amount) {
     });
 }
 
+// Modificar la función addUser para incluir el tip en la transacción
 async function addUser(alice, newAccount, userInfo, role, gasLimit) {
-    console.log(`Attempting to add user: ${JSON.stringify(userInfo)}`);
-    const addUserTx = contract.tx.addUser({ value: 0, gasLimit }, newAccount.address, userInfo,role);
+    decrementTip(); // Disminuye el tip antes de la transacción
+    const addUserTx = contract.tx.addUser({ value: 0, gasLimit }, newAccount.address, userInfo, role);
     return new Promise((resolve, reject) => {
-        addUserTx.signAndSend(alice, ({ events = [], status }) => {
+        addUserTx.signAndSend(alice, { tip }, ({ events = [], status }) => {
             if (status.isInBlock) {
                 console.log(`Transaction included at blockHash ${status.asInBlock}`);
                 events.forEach(({ event: { data, method, section } }) => {
@@ -214,11 +280,12 @@ async function addUser(alice, newAccount, userInfo, role, gasLimit) {
     });
 }
 
+// Modificar la función assignRole para incluir el tip en la transacción
 async function assignRole(alice, newAccount, role, userInfo, gasLimit) {
-    console.log(`Attempting to assign role ${role} to user: ${JSON.stringify(userInfo)}`);
+    decrementTip(); // Disminuye el tip antes de la transacción
     const assignRoleTx = contract.tx.assignRole({ value: 0, gasLimit }, newAccount.address, role, userInfo);
     return new Promise((resolve, reject) => {
-        assignRoleTx.signAndSend(alice, (result) => {
+        assignRoleTx.signAndSend(alice, { tip }, (result) => {
             if (result.status.isInBlock) {
                 console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
             } else if (result.status.isFinalized) {
@@ -232,7 +299,7 @@ async function assignRole(alice, newAccount, role, userInfo, gasLimit) {
     });
 }
 
-// Ruta para obtener las cuentas asociadas a un dni - Falta implementar en servidor
+// Ruta para obtener las cuentas asociadas a un dni
 app.get('/get_accounts/:dni', async (req, res) => {
     const { dni } = req.params;
 
@@ -276,6 +343,7 @@ app.get('/get_accounts/:dni', async (req, res) => {
     }
 });
 
+// Endpoint para crear un usuario
 app.post('/create_user', async (req, res) => {
     const { name, lastname, dni, email, role } = req.body;
     const newAccount = createNewAccount(); // Genera una nueva cuenta
@@ -291,7 +359,7 @@ app.post('/create_user', async (req, res) => {
         const keyring = new Keyring({ type: 'sr25519' });
         const alice = keyring.addFromUri('//Alice'); // Usar la cuenta de Alice para firmar la transacción
 
-        // Transferir fondos a la nueva cuenta usando transferAllowDeath
+        // Transferir fondos a la nueva cuenta usando transferKeepAlive
         await transferFunds(alice, newAccount.address, 1000000000000);
 
         // Esperar un poco para asegurarse de que la transferencia se haya completado
@@ -305,15 +373,16 @@ app.post('/create_user', async (req, res) => {
         // Añadir el usuario y su información
         await addUser(alice, newAccount, userInfo, role, gasLimit);
 
-        // Si la adición del usuario fue exitosa, agregar el rol
-        //await assignRole(alice, newAccount, role, gasLimit);
+        // Si la adición del usuario fue exitosa, agregar el rol (si es necesario)
+        // await assignRole(alice, newAccount, role, userInfo, gasLimit);
 
-        res.send(`User and role added successfully`);
+        res.status(200).send(`User and role added successfully`);
     } catch (error) {
         res.status(500).send(`Error assigning role: ${error.message}`);
     }
 });
 
+// Endpoint para crear un usuario basado en un mnemonic personalizado
 app.post('/create_user_based_on_personalized_mnemonic', async (req, res) => {
     const { address, name, lastname, dni, email, role } = req.body;
     const newAccount = createNewAccount(address); // Genera una nueva cuenta
@@ -329,7 +398,7 @@ app.post('/create_user_based_on_personalized_mnemonic', async (req, res) => {
         const keyring = new Keyring({ type: 'sr25519' });
         const alice = keyring.addFromUri('//Alice'); // Usar la cuenta de Alice para firmar la transacción
 
-        // Transferir fondos a la nueva cuenta usando transferAllowDeath
+        // Transferir fondos a la nueva cuenta usando transferKeepAlive
         await transferFunds(alice, newAccount.address, 1000000000000);
 
         // Esperar un poco para asegurarse de que la transferencia se haya completado
@@ -343,15 +412,16 @@ app.post('/create_user_based_on_personalized_mnemonic', async (req, res) => {
         // Añadir el usuario y su información
         await addUser(alice, newAccount, userInfo, role, gasLimit);
 
-        // Si la adición del usuario fue exitosa, agregar el rol
-        //await assignRole(alice, newAccount, role, gasLimit);
+        // Si la adición del usuario fue exitosa, agregar el rol (si es necesario)
+        // await assignRole(alice, newAccount, role, userInfo, gasLimit);
 
-        res.send(`User and role added successfully`);
+        res.status(200).send(`User and role added successfully`);
     } catch (error) {
         res.status(500).send(`Error assigning role: ${error.message}`);
     }
 });
 
+// Endpoint para crear un usuario con una dirección existente
 app.post('/create_user_with_existing_address', async (req, res) => {
     const { address, name, lastname, dni, email, role } = req.body;
 
@@ -374,7 +444,7 @@ app.post('/create_user_with_existing_address', async (req, res) => {
     try {
         const alice = keyring.addFromUri('//Alice'); // Use Alice's account to sign the transaction
 
-        // Transfer funds to the user's address
+        // Transfer funds to the user's address using transferKeepAlive
         await transferFunds(alice, userAddress, 1000000000000);
 
         // Wait a bit to ensure the transfer has been completed
@@ -396,6 +466,7 @@ app.post('/create_user_with_existing_address', async (req, res) => {
     }
 });
 
+// Endpoint para obtener el rol de un usuario
 app.get('/role/:publicAddress', async (req, res) => {
     const { publicAddress } = req.params;
 
@@ -414,7 +485,7 @@ app.get('/role/:publicAddress', async (req, res) => {
         const gasLimit = api.registry.createType('WeightV2', {
             refTime: api.registry.createType('Compact<u64>', 10000000000),
             proofSize: api.registry.createType('Compact<u64>', 10000000)
-        });// Ajusta si es necesario.
+        });
         const { output } = await contract.query.getRole(accountId, { value: 0, gasLimit }, accountId);
 
         console.log("Contract query response:", output ? output.toHuman() : "No output");
@@ -426,7 +497,7 @@ app.get('/role/:publicAddress', async (req, res) => {
         // Verifica si output tiene la propiedad value y maneja Option<u8>
         if (output && output.value !== undefined) {
             const role = output.value !== null ? output.value.toString() : 'None';
-            res.send(`Role for account ${publicAddress}: ${role}`);
+            res.status(200).send(`Role for account ${publicAddress}: ${role}`);
         } else {
             res.status(500).send('Error fetching role: Invalid output format');
         }
@@ -436,13 +507,14 @@ app.get('/role/:publicAddress', async (req, res) => {
     }
 });
 
-
+// Endpoint para obtener la dirección de Alice
 app.get('/alice_account_id', async (req, res) => {
     const keyring = new Keyring({ type: 'sr25519' });
-    const alice = keyring.addFromUri('//');
-    res.send(`Alice's account: ${alice.address}`);
+    const alice = keyring.addFromUri('//Alice');
+    res.status(200).send(`Alice's account: ${alice.address}`);
 });
 
+// Iniciar el servidor
 init().then(() => {
     const host = process.env.HOST || '0.0.0.0';
     app.listen(port, host, () => {
@@ -451,6 +523,6 @@ init().then(() => {
         console.log(`Performance monitoring enabled. Logs will be written to ${LOG_FILE_PATH}`);
       }
     });
-  }).catch((error) => {
+}).catch((error) => {
     console.error(`Failed to initialize API: ${error.message}`);
-  });
+});

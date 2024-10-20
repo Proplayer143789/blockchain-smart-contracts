@@ -7,9 +7,9 @@ const fs = require('fs');
 // Cargar variables del archivo .env
 const HOST = process.env.HOST === '0.0.0.0' ? 'localhost' : process.env.HOST; // Si es 0.0.0.0, usar localhost para las solicitudes
 const PORT = process.env.PORT || 3000; // El puerto en el que corre el servidor
-const TOTAL_REQUESTS = 100; // Cantidad de solicitudes totales
+const TOTAL_REQUESTS =  process.env.TOTAL_REQUESTS ||50; // Cantidad de solicitudes totales
 const SIMULTANEOUS_REQUESTS = 10; // Cantidad de solicitudes simultáneas por lote
-const MODE = 'concurrent'; // Puede ser 'sequential', 'concurrent', o 'batch'
+const MODE = process.env.TEST_TYPE || 'concurrent'; // Puede ser 'sequential', 'concurrent', o 'batch'
 
 // URL completa de tu API (basada en HOST y PORT)
 const FULL_URL = `http://${HOST}:${PORT}`;  // Construir correctamente el URL
