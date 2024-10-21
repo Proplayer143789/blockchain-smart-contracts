@@ -26,12 +26,26 @@ def leer_txt(ruta_archivo):
                 if log_actual:
                     logs.append(log_actual)
                 log_actual = {"time": linea.split(": ", 1)[1]}
+            elif linea.startswith("Request Number:"):
+                log_actual["requestNumber"] = int(linea.split(": ", 1)[1])
+            elif linea.startswith("Route:"):
+                log_actual["route"] = linea.split(": ", 1)[1]
+            elif linea.startswith("Method:"):
+                log_actual["method"] = linea.split(": ", 1)[1]
+            elif linea.startswith("RefTime (Gas Computacional):"):
+                log_actual["refTime"] = int(linea.split(": ", 1)[1])
             elif linea.startswith("Duration:"):
                 log_actual["duration"] = int(linea.split(": ", 1)[1].replace("ms", ""))
-            elif linea.startswith("CPU Usage:"):
-                log_actual["cpuUsage"] = linea.split(": ", 1)[1].split("%")[0]
-            elif linea.startswith("Memory Usage:"):
-                log_actual["memUsage"] = linea.split(": ", 1)[1].split("%")[0]
+            elif linea.startswith("CPU Usage (start):"):
+                log_actual["cpuUsageStart"] = float(linea.split(": ", 1)[1].replace("%", ""))
+            elif linea.startswith("CPU Usage (end):"):
+                log_actual["cpuUsageEnd"] = float(linea.split(": ", 1)[1].replace("%", ""))
+            elif linea.startswith("RAM Usage (start):"):
+                log_actual["ramUsageStart"] = float(linea.split(": ", 1)[1].replace("%", ""))
+            elif linea.startswith("RAM Usage (end):"):
+                log_actual["ramUsageEnd"] = float(linea.split(": ", 1)[1].replace("%", ""))
+            elif linea.startswith("Transaction Success:"):
+                log_actual["transactionSuccess"] = linea.split(": ", 1)[1]
             elif linea.startswith("Test Type:"):
                 log_actual["test_type"] = linea.split(": ", 1)[1]
         if log_actual:
@@ -54,60 +68,98 @@ ruta_archivo = '../performance_log.txt'
 # Leer los logs
 logs = leer_archivo(ruta_archivo)
 
-# Extraer los datos por tipo de prueba
-logs_por_tipo = {}
+# Convertir test_type a su equivalente en español
+def traducir_tipo_test(test_type):
+    if test_type == "sequential":
+        return "Secuencial"
+    elif test_type == "concurrent":
+        return "Concurrente"
+    elif test_type == "batch":
+        return "Por Lotes"
+    else:
+        return test_type
+
+# Extraer los datos por tipo de prueba y por ruta
+logs_por_ruta_y_tipo = {}
 for log in logs:
     test_type = log.get('test_type', 'default')
-    if test_type not in logs_por_tipo:
-        logs_por_tipo[test_type] = []
-    logs_por_tipo[test_type].append(log)
+    route = log.get('route', 'default')
+    key = (route, test_type)
+    if key not in logs_por_ruta_y_tipo:
+        logs_por_ruta_y_tipo[key] = []
+    logs_por_ruta_y_tipo[key].append(log)
+
+# Función para calcular transacciones por segundo
+def calcular_tps(logs):
+    total_duration = (max([datetime.strptime(log['time'], "%Y-%m-%dT%H:%M:%S.%fZ") for log in logs]) -
+                      min([datetime.strptime(log['time'], "%Y-%m-%dT%H:%M:%S.%fZ") for log in logs])).total_seconds()
+    return len(logs) / total_duration if total_duration > 0 else 0
 
 # Función para generar gráficos y tablas
-def generar_graficos_y_tablas(logs, test_type):
+def generar_graficos_y_tablas(logs, route, test_type):
     # Extraer datos
     times = [datetime.strptime(log['time'], "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%H:%M") for log in logs]
     durations = [log['duration'] for log in logs]
-    cpu_usages = [float(log['cpuUsage']) for log in logs]
-    mem_usages = [float(log['memUsage']) for log in logs]
-    
+    cpu_usages_start = [log['cpuUsageStart'] for log in logs]
+    cpu_usages_end = [log['cpuUsageEnd'] for log in logs]
+    ram_usages_start = [log['ramUsageStart'] for log in logs]
+    ram_usages_end = [log['ramUsageEnd'] for log in logs]
+    ref_times = [log['refTime'] for log in logs]
+
     # Duración vs Tiempo
     plt.figure(figsize=(10, 5))
-    plt.plot(times, durations, label=f'Duración (ms) - {test_type}', color='blue')
+    plt.plot(times, durations, label=f'Duración (ms) - {traducir_tipo_test(test_type)}', color='blue')
     plt.xticks(rotation=45)
     plt.xlabel('Tiempo (HH:MM)')
     plt.ylabel('Duración (ms)')
-    plt.title(f'Duración de Solicitudes en el Tiempo - {test_type}')
+    plt.title(f'Duración de Solicitudes en el Tiempo - {route} ({traducir_tipo_test(test_type)})')
     plt.legend()
     plt.tight_layout()
-    plt.savefig(f"Duración_vs_Tiempo_{test_type}.png")
+    plt.savefig(f"Duración_vs_Tiempo_{route}_{test_type}.png")
 
     # CPU Usage vs Tiempo
     plt.figure(figsize=(10, 5))
-    plt.plot(times, cpu_usages, label=f'CPU Usage (%) - {test_type}', color='red')
+    plt.plot(times, cpu_usages_start, label=f'CPU Start (%) - {traducir_tipo_test(test_type)}', color='red')
+    plt.plot(times, cpu_usages_end, label=f'CPU End (%) - {traducir_tipo_test(test_type)}', color='orange')
     plt.xticks(rotation=45)
     plt.xlabel('Tiempo (HH:MM)')
     plt.ylabel('Uso de CPU (%)')
-    plt.title(f'Uso de CPU en el Tiempo - {test_type}')
+    plt.title(f'Uso de CPU en el Tiempo - {route} ({traducir_tipo_test(test_type)})')
     plt.legend()
     plt.tight_layout()
-    plt.savefig(f"Uso_de_CPU_vs_Tiempo_{test_type}.png")
+    plt.savefig(f"Uso_de_CPU_vs_Tiempo_{route}_{test_type}.png")
 
-    # Mem Usage vs Tiempo
+    # RAM Usage vs Tiempo
     plt.figure(figsize=(10, 5))
-    plt.plot(times, mem_usages, label=f'Mem Usage (%) - {test_type}', color='green')
+    plt.plot(times, ram_usages_start, label=f'RAM Start (%) - {traducir_tipo_test(test_type)}', color='green')
+    plt.plot(times, ram_usages_end, label=f'RAM End (%) - {traducir_tipo_test(test_type)}', color='lightgreen')
     plt.xticks(rotation=45)
     plt.xlabel('Tiempo (HH:MM)')
     plt.ylabel('Uso de Memoria (%)')
-    plt.title(f'Uso de Memoria en el Tiempo - {test_type}')
+    plt.title(f'Uso de RAM en el Tiempo - {route} ({traducir_tipo_test(test_type)})')
     plt.legend()
     plt.tight_layout()
-    plt.savefig(f"Uso_de_Memoria_vs_Tiempo_{test_type}.png")
+    plt.savefig(f"Uso_de_RAM_vs_Tiempo_{route}_{test_type}.png")
+
+    # RefTime (Gas Computacional) vs Tiempo
+    plt.figure(figsize=(10, 5))
+    plt.plot(times, ref_times, label=f'Gas Computacional - {traducir_tipo_test(test_type)}', color='purple')
+    plt.xticks(rotation=45)
+    plt.xlabel('Tiempo (HH:MM)')
+    plt.ylabel('Gas Computacional')
+    plt.title(f'Gas Computacional en el Tiempo - {route} ({traducir_tipo_test(test_type)})')
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"Gas_Computacional_vs_Tiempo_{route}_{test_type}.png")
 
     # Calcular estadísticas y generar tabla
     data = {
         'Duración (ms)': durations,
-        'Uso de CPU (%)': cpu_usages,
-        'Uso de Memoria (%)': mem_usages
+        'CPU Start (%)': cpu_usages_start,
+        'CPU End (%)': cpu_usages_end,
+        'RAM Start (%)': ram_usages_start,
+        'RAM End (%)': ram_usages_end,
+        'Gas Computacional': ref_times
     }
 
     estadisticas = {
@@ -119,14 +171,18 @@ def generar_graficos_y_tablas(logs, test_type):
     df_estadisticas = pd.DataFrame(estadisticas)
     df_estadisticas.index.name = 'Métrica'
     
-    print(f"Tabla de estadísticas para {test_type}:")
+    print(f"Tabla de estadísticas para {route} - {traducir_tipo_test(test_type)}:")
     print(df_estadisticas)
 
-    # Guardar la tabla en archivo CSV o mostrarla en formato de tabla en otros formatos
-    df_estadisticas.to_csv(f'Estadisticas_{test_type}.csv')
-    
-# Generar gráficos y tablas por cada tipo de prueba
-for test_type, logs_tipo in logs_por_tipo.items():
-    generar_graficos_y_tablas(logs_tipo, test_type)
+    # Guardar la tabla en archivo CSV
+    df_estadisticas.to_csv(f'Estadisticas_{route}_{test_type}.csv')
+
+    # Calcular transacciones por segundo (TPS)
+    tps = calcular_tps(logs)
+    print(f"Transacciones por segundo (TPS) para {route} - {traducir_tipo_test(test_type)}: {tps:.2f}")
+
+# Generar gráficos y tablas por cada ruta y tipo de prueba
+for (route, test_type), logs_ruta_tipo in logs_por_ruta_y_tipo.items():
+    generar_graficos_y_tablas(logs_ruta_tipo, route, test_type)
 
 print("Gráficos y tablas generados correctamente.")
