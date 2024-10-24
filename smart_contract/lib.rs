@@ -31,6 +31,7 @@ mod access_control {
         #[ink(topic)]
         granter: AccountId,
         grantee: AccountId,
+        state: bool,
     }
 
     #[ink::event]
@@ -160,14 +161,56 @@ mod access_control {
             granter: AccountId,
             grantee: AccountId,
         ) -> Result<(), String> {
+            // Verificar si el permiso ya ha sido concedido
             if self.permissions.get((granter, grantee)).unwrap_or(false) {
                 return Err("Permiso ya concedido".to_string());
             }
+
+            // Insertar el permiso como true
             self.permissions.insert((granter, grantee), &true);
-            let mut grantees = self.grantees.get(granter).unwrap_or_default();
-            grantees.push(grantee);
-            self.grantees.insert(granter, &grantees);
-            self.env().emit_event(PermissionGranted { granter, grantee });
+
+            // Actualizar la lista de grantees del granter
+            let mut grantees_list = self.grantees.get(granter).unwrap_or_default();
+
+            // Agregar al grantee si no está ya en la lista
+            if !grantees_list.contains(&grantee) {
+                grantees_list.push(grantee);
+                self.grantees.insert(granter, &grantees_list);
+            }
+
+            // Emitir evento de permiso concedido
+            self.env().emit_event(PermissionGranted { granter, grantee, state: true });
+
+            Ok(())
+        }
+
+
+        #[ink(message)]
+        pub fn revoke_permission(
+            &mut self,
+            granter: AccountId,
+            grantee: AccountId,
+        ) -> Result<(), String> {
+            // Verificar si el permiso existe
+            if !self.permissions.get((granter, grantee)).unwrap_or(false) {
+                return Err("No existe permiso para revocar".to_string());
+            }
+
+            // Eliminar el permiso del mapping
+            self.permissions.insert((granter, grantee), &false);
+
+            // Actualizar la lista de grantees del granter
+            let mut grantees_list = self.grantees.get(granter).unwrap_or_default();
+
+            // Remover al grantee de la lista si está presente
+            if let Some(pos) = grantees_list.iter().position(|&id| id == grantee) {
+                grantees_list.remove(pos);
+                self.grantees.insert(granter, &grantees_list);
+            }
+
+            // Emitir un evento para registrar que se ha revocado el permiso
+            self.env().emit_event(PermissionGranted { granter, grantee, state: false });
+
             Ok(())
         }
 
