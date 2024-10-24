@@ -156,6 +156,8 @@ async function transferFunds(sender, recipient, amount) {
 // Modificar la función addUser para incluir el tip en la transacción
 // Modificar la función addUser para incluir el tip en la transacción y guardar el gas consumido
 async function addUser(alice, newAccount, userInfo, role, gasLimit, res) {
+    updateTransactionCount();
+    const numberTransaction = transactionCount;
     const tip = getTip(); // Obtener el tip usando la función getTip
     const addUserTx = contract.tx.addUser({ value: 0, gasLimit }, newAccount.address, userInfo, role);
 
@@ -201,7 +203,7 @@ async function addUser(alice, newAccount, userInfo, role, gasLimit, res) {
                 res.locals.proofSize = proofSize || 'N/A'; // Si no se encuentra, asignar 'N/A'
                 res.locals.tip = tip.toString(); // Guardar el valor del tip
                 res.locals.transactionSuccess = true; // Transacción exitosa
-
+                res.locals.transactionCount = numberTransaction; // Guardamos el contador de la transacción
                 resolve(status);
             }
         }).catch(error => {
@@ -212,7 +214,7 @@ async function addUser(alice, newAccount, userInfo, role, gasLimit, res) {
             res.locals.refTime = 0; // Gas 0 cuando falla la transacción
             res.locals.proofSize = 0; // ProofSize 0 cuando falla la transacción
             res.locals.tip = '0'; // Tip 0 cuando falla la transacción
-
+            res.locals.transactionCount = 0; // Contador de transacciones 0 cuando falla la transacción
             reject(error);
         });
     });
