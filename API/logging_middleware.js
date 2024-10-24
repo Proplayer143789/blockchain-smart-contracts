@@ -31,16 +31,6 @@ function getParamsLength(req) {
         length += JSON.stringify(req.body).length;
     }
 
-    /*// Longitud de parámetros de la URL
-    if (req.params && typeof req.params === 'object') {
-        length += JSON.stringify(req.params).length;
-    }
-
-    // Longitud de parámetros de consulta (query)
-    if (req.query && typeof req.query === 'object') {
-        length += JSON.stringify(req.query).length;
-    }*/
-
     return length;
 }
 
@@ -60,6 +50,8 @@ function logRequestToTxt(req, res, next) {
         Route: ${req.method} ${req.originalUrl}
         Method: ${req.method}
         RefTime (Gas Computacional): ${res.locals.refTime || 'N/A'}
+        ProofSize: ${res.locals.proofSize || 'N/A'}
+        Tip: ${res.locals.tip || 'N/A'}
         Duration: ${duration} ms
         CPU Usage (start): ${startCpu.toFixed(2)}%, CPU Usage (end): ${endCpu.toFixed(2)}%
         RAM Usage (start): ${startMem.toFixed(2)}%, RAM Usage (end): ${endMem.toFixed(2)}%
@@ -94,6 +86,8 @@ function logRequestToJson(req, res, next) {
             route: `${req.method} ${req.originalUrl}`,
             method: req.method,
             refTime: res.locals.refTime || 'N/A',
+            proofSize: res.locals.proofSize || 'N/A',
+            tip: res.locals.tip || 'N/A',
             duration: `${duration} ms`,
             cpuUsageStart: `${startCpu.toFixed(2)}%`,
             cpuUsageEnd: `${endCpu.toFixed(2)}%`,

@@ -154,13 +154,21 @@ async function transferFunds(sender, recipient, amount) {
 
 
 // Modificar la función addUser para incluir el tip en la transacción
-async function addUser(alice, newAccount, userInfo, role, gasLimit) {
+// Modificar la función addUser para incluir el tip en la transacción y guardar el gas consumido
+async function addUser(alice, newAccount, userInfo, role, gasLimit, res) {
     const tip = getTip(); // Obtener el tip usando la función getTip
     const addUserTx = contract.tx.addUser({ value: 0, gasLimit }, newAccount.address, userInfo, role);
+
+    // Inicializar variables para el gas
+    let refTime = null;
+    let proofSize = null;
+
     return new Promise((resolve, reject) => {
         addUserTx.signAndSend(alice, { tip }, ({ events = [], status }) => {
             if (status.isInBlock) {
                 console.log(`Transaction included at blockHash ${status.asInBlock}`);
+
+                // Iterar sobre los eventos para capturar errores, si los hay
                 events.forEach(({ event: { data, method, section } }) => {
                     if (section === 'system' && method === 'ExtrinsicFailed') {
                         const [dispatchError] = data;
@@ -174,14 +182,42 @@ async function addUser(alice, newAccount, userInfo, role, gasLimit) {
                 });
             } else if (status.isFinalized) {
                 console.log(`Transaction finalized at blockHash ${status.asFinalized}`);
+
+                // Iterar sobre los eventos para capturar refTime y proofSize
+                events.forEach(({ event: { data, method, section } }) => {
+                    if (section === 'system' && method === 'ExtrinsicSuccess') {
+                        // Obtener el gas computacional (refTime) y el proofSize del evento ExtrinsicSuccess
+                        if (data && data.length > 0 && data[0].weight) {
+                            refTime = data[0].weight.refTime;
+                            proofSize = data[0].weight.proofSize;
+                            console.log(`Gas (refTime) consumido: ${refTime}`);
+                            console.log(`ProofSize consumido: ${proofSize}`);
+                        }
+                    }
+                });
+
+                // Guardar refTime, proofSize, y el tip en res.locals
+                res.locals.refTime = refTime || 'N/A'; // Si no se encuentra, asignar 'N/A'
+                res.locals.proofSize = proofSize || 'N/A'; // Si no se encuentra, asignar 'N/A'
+                res.locals.tip = tip.toString(); // Guardar el valor del tip
+                res.locals.transactionSuccess = true; // Transacción exitosa
+
                 resolve(status);
             }
         }).catch(error => {
             console.error(`Transaction failed: ${error}`);
+            
+            // Guardar el estado de fallo y asignar valores predeterminados
+            res.locals.transactionSuccess = false; // Transacción fallida
+            res.locals.refTime = 0; // Gas 0 cuando falla la transacción
+            res.locals.proofSize = 0; // ProofSize 0 cuando falla la transacción
+            res.locals.tip = '0'; // Tip 0 cuando falla la transacción
+
             reject(error);
         });
     });
 }
+
 
 // Modificar la función assignRole para incluir el tip en la transacción
 async function assignRole(alice, newAccount, role, userInfo, gasLimit) {
@@ -263,7 +299,7 @@ app.post('/create_user', async (req, res) => {
         const alice = keyring.addFromUri('//Alice'); // Usar la cuenta de Alice para firmar la transacción
 
         // Transferir fondos a la nueva cuenta usando transferKeepAlive
-        await transferFunds(alice, newAccount.address, 1000000000000);
+        //await transferFunds(alice, newAccount.address, 1000000000000);
 
         // Esperar un poco para asegurarse de que la transferencia se haya completado
         await new Promise(resolve => setTimeout(resolve, 6000));
@@ -305,7 +341,7 @@ app.post('/create_user_based_on_personalized_mnemonic', async (req, res) => {
         await transferFunds(alice, newAccount.address, 1000000000000);
 
         // Esperar un poco para asegurarse de que la transferencia se haya completado
-        await new Promise(resolve => setTimeout(resolve, 6000));
+        //await new Promise(resolve => setTimeout(resolve, 6000));
 
         const gasLimit = api.registry.createType('WeightV2', {
             refTime: api.registry.createType('Compact<u64>', 10000000000),
@@ -351,7 +387,7 @@ app.post('/create_user_with_existing_address', async (req, res) => {
         await transferFunds(alice, userAddress, 1000000000000);
 
         // Wait a bit to ensure the transfer has been completed
-        await new Promise(resolve => setTimeout(resolve, 6000));
+        //await new Promise(resolve => setTimeout(resolve, 6000));
 
         // Set up the gas limit
         const gasLimit = api.registry.createType('WeightV2', {
@@ -421,19 +457,23 @@ app.get('/alice_account_id', async (req, res) => {
 async function executeContractAndGetGas(contract, signer, res, ...params) {
     try {
         updateTransactionCount(); // Actualizar el contador de transacciones
-
+        const tip = getTip();
         // Definir un límite de gas alto para asegurar la ejecución (sin estimación previa)
         const gasLimit = api.registry.createType('WeightV2', {
             refTime: api.registry.createType('Compact<u64>', 20000000000), // Ajusta este valor según lo necesario
             proofSize: api.registry.createType('Compact<u64>', 10000000)
         });
 
-        // Inicializamos refTime fuera del contexto de los eventos
+        // Definir el valor del tip (puedes ajustar según tus necesidades)
+        //const tip = api.registry.createType('Compact<Balance>', 1000000000); // Asume un valor fijo de 1 unidad (ajústalo según el token)
+
+        // Inicializamos refTime y proofSize fuera del contexto de los eventos
         let refTime = null;
+        let proofSize = null;
 
         // Llamada directa al método addUser del contrato
         const tx = contract.tx.addUser(
-            { value: 0, gasLimit }, // Asigna un gas límite alto
+            { value: 0, gasLimit, tip }, // Incluye el tip junto con el límite de gas
             ...params // Los parámetros del método
         );
 
@@ -448,22 +488,28 @@ async function executeContractAndGetGas(contract, signer, res, ...params) {
                         console.log(`Event: ${section}.${method} - ${JSON.stringify(data.toHuman())}`);
 
                         if (section === 'system' && method === 'ExtrinsicSuccess') {
-                            // Obtener el gas computacional (refTime) del evento ExtrinsicSuccess
+                            // Obtener el gas computacional (refTime) y el proofSize del evento ExtrinsicSuccess
                             if (data && data.length > 0 && data[0].weight) {
                                 refTime = data[0].weight.refTime;
+                                proofSize = data[0].weight.proofSize;
                                 console.log(`Gas (refTime) consumido: ${refTime}`);
+                                console.log(`ProofSize consumido: ${proofSize}`);
                             }
                         }
                     });
 
-                    // Guardar refTime y el estado de éxito en res.locals
+                    // Guardar refTime, proofSize, tip y el estado de éxito en res.locals
                     res.locals.refTime = refTime || 'N/A'; // Si no se encuentra, asignar 'N/A'
+                    res.locals.proofSize = proofSize || 'N/A'; // Si no se encuentra, asignar 'N/A'
+                    res.locals.tip = tip.toString(); // Guardar el valor del tip
                     res.locals.transactionSuccess = true; // Transacción exitosa
                     res.locals.transactionCount = transactionCount; // Guardamos el contador de la transacción
 
                     resolve({
                         blockHash: result.status.asFinalized.toString(),
-                        gasUsed: refTime ? refTime.toHuman() : 'No se encontró el consumo de gas'
+                        gasUsed: refTime ? refTime.toHuman() : 'No se encontró el consumo de gas',
+                        proofSizeUsed: proofSize ? proofSize.toHuman() : 'No se encontró el consumo de proofSize',
+                        tip: tip.toString() // Retorna el valor del tip
                     });
                 } else if (result.isError) {
                     console.error('Error en la transacción:', result);
@@ -471,6 +517,8 @@ async function executeContractAndGetGas(contract, signer, res, ...params) {
                     // Guardar el estado de fallo en res.locals
                     res.locals.transactionSuccess = false; // Transacción fallida
                     res.locals.refTime = 0; // Gas 0 cuando falla la transacción
+                    res.locals.proofSize = 0; // proofSize 0 cuando falla la transacción
+                    res.locals.tip = '0'; // Tip 0 cuando falla la transacción
 
                     reject(new Error('Error en la transacción.'));
                 }
@@ -481,11 +529,16 @@ async function executeContractAndGetGas(contract, signer, res, ...params) {
         console.error(`Error al ejecutar la transacción: ${error.message}`);
         res.locals.transactionSuccess = false; // Transacción fallida
         res.locals.refTime = 0; // Gas 0 cuando falla la transacción
+        res.locals.proofSize = 0; // proofSize 0 cuando falla la transacción
+        res.locals.tip = '0'; // Tip 0 cuando falla la transacción
         throw error;
     }
 }
 
 
+
+
+// Ruta POST para crear un usuario usando la función addUser con gas dinámico
 app.post('/create_user_with_dynamic_gas', async (req, res) => {
     const { name, lastname, dni, email, role } = req.body;
 
@@ -505,18 +558,22 @@ app.post('/create_user_with_dynamic_gas', async (req, res) => {
         // Transferir fondos a la nueva cuenta y esperar hasta que la transacción sea finalizada
         await transferFunds(alice, newAccount.address, 1000000000000);
 
-        // Ejecutar la transacción del contrato (addUser) y recuperar el gas consumido
-        const result = await executeContractAndGetGas(contract, alice, res, newAccount.address, userInfo, role);
+        // Definir un límite de gas alto para la transacción (ajusta según tu necesidad)
+        const gasLimit = api.registry.createType('WeightV2', {
+            refTime: api.registry.createType('Compact<u64>', 20000000000), // Ajusta este valor según lo necesario
+            proofSize: api.registry.createType('Compact<u64>', 10000000)
+        });
+
+        // Ejecutar la transacción del contrato (addUser) y guardar el gas consumido y tip
+        await addUser(alice, newAccount, userInfo, role, gasLimit, res);
 
         // Responder con éxito
         res.status(200).json({
             message: 'Usuario creado con éxito',
-            blockHash: result.blockHash,
-            gasUsed: result.gasUsed,
-            cpuUsageStart: res.locals.cpuUsageStart,
-            cpuUsageEnd: res.locals.cpuUsageEnd,
-            ramUsageStart: res.locals.ramUsageStart,
-            ramUsageEnd: res.locals.ramUsageEnd
+            blockHash: res.locals.blockHash,
+            gasUsed: res.locals.refTime,
+            proofSize: res.locals.proofSize,
+            tip: res.locals.tip
         });
 
     } catch (error) {
@@ -524,6 +581,7 @@ app.post('/create_user_with_dynamic_gas', async (req, res) => {
         res.status(500).json({ error: `Error al crear el usuario: ${error.message}` });
     }
 });
+
 
 
 
