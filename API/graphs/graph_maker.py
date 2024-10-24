@@ -40,10 +40,16 @@ def parse_data(data):
         entry['cpuUsageEnd'] = float(entry['cpuUsageEnd'].replace('%', ''))
         entry['ramUsageStart'] = float(entry['ramUsageStart'].replace('%', ''))
         entry['ramUsageEnd'] = float(entry['ramUsageEnd'].replace('%', ''))
+        
+        # Calcular la diferencia de CPU y RAM entre inicio y fin
+        entry['cpuUsageDiff'] = entry['cpuUsageEnd'] - entry['cpuUsageStart']
+        entry['ramUsageDiff'] = entry['ramUsageEnd'] - entry['ramUsageStart']
+        
         entry['transactionCost'] = calculate_transaction_cost(entry)
         entry['latency'] = entry['duration']
         entry['timestamp'] = datetime.fromisoformat(entry['time'].replace('Z', '+00:00'))
     return data
+
 
 def plot_metric_vs_time(data, metric, title):
     plt.figure(figsize=(10, 6))
@@ -112,19 +118,19 @@ def main():
     data = read_data()
     data = parse_data(data)
     
-    # Gráficos de CPU, RAM, Latencia vs Tiempo
-    plot_metric_vs_time(data, 'cpuUsageStart', 'CPU Usage vs Time')
-    plot_metric_vs_time(data, 'ramUsageStart', 'RAM Usage vs Time')
+    # Gráficos de diferencias de CPU, RAM, Latencia vs Tiempo
+    plot_metric_vs_time(data, 'cpuUsageDiff', 'CPU Usage Difference vs Time')
+    plot_metric_vs_time(data, 'ramUsageDiff', 'RAM Usage Difference vs Time')
     plot_metric_vs_time(data, 'latency', 'Latency vs Time')
     
     # Gráfico de Costo Transaccional vs Longitud de Parámetros
     plot_transaction_cost_vs_length(data)
     
     # Velocidad de Transacción
-    transaction_speed = calculate_transaction_speed(data, interval='60S')
+    transaction_speed = calculate_transaction_speed(data, interval='60s')
     
     # Tabla de estadísticas (Media, Moda, Mediana)
-    metrics = ['cpuUsageStart', 'ramUsageStart', 'transactionCost', 'latency']
+    metrics = ['cpuUsageDiff', 'ramUsageDiff', 'transactionCost', 'latency']
     stats_table = generate_statistics_table(data, metrics)
     
     print("Estadísticas:")
