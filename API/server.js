@@ -7,6 +7,10 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 require('dotenv').config();
+const { logRequestToTxt, logRequestToJson } = require('./logging_middleware');
+
+const { getTip } = require('./tip_manager');
+
 const app = express();
 const port = 3000;
 
@@ -20,7 +24,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Contract Dirección y ABI
-const CONTRACT_ADDRESS = '5GkydDDn1dSXqkTzLZxi89bbyFv3vYTwWxabc6e7QPBjmsAi';
+const CONTRACT_ADDRESS = '5DYT7X58LFq24ttfNZbcgX4vwP8DGjP6Zy6RKQaXMchkMh9z';
 const CONTRACT_ABI_PATH = path.resolve(__dirname, '../target/ink/smart_contract/smart_contract.json');
 
 // Performance monitoring configuration
@@ -31,111 +35,9 @@ let fileExists = fs.existsSync(logFileJsonPath);
 const total_request = process.env.TOTAL_REQUESTS || "100";
 const test_type = process.env.TEST_TYPE || 'sequential';
 
-// Utility function to get current CPU and RAM usage
-function getSystemUsage() {
-    const cpuUsage = os.loadavg()[0]; // 1 minute load average
-    const totalMem = os.totalmem();
-    const freeMem = os.freemem();
-    const usedMem = totalMem - freeMem;
-    const memUsage = (usedMem / totalMem) * 100;
-  
-    return { cpuUsage, memUsage };
-}
-
-// Middleware para medir la duración de la solicitud y registrar logs en formato txt
-app.use((req, res, next) => {
-    const startTime = Date.now(); // Tiempo de inicio de la transacción
-    const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage(); // Obtener el uso de CPU y RAM al inicio
-
-    res.on('finish', () => {
-        const duration = Date.now() - startTime; // Calcular la duración de la transacción
-        const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage(); // Obtener el uso de CPU y RAM al finalizar
-
-        // Registrar el log, ya sea que la transacción haya sido exitosa o no
-        const logEntry = `
-        Time: ${new Date().toISOString()}
-        Request Number: ${res.locals.transactionCount}
-        Route: ${req.method} ${req.originalUrl}
-        Method: ${req.method}
-        RefTime (Gas Computacional): ${res.locals.refTime || 'N/A'}
-        Duration: ${duration} ms
-        CPU Usage (start): ${startCpu.toFixed(2)}%, CPU Usage (end): ${endCpu.toFixed(2)}%
-        RAM Usage (start): ${startMem.toFixed(2)}%, RAM Usage (end): ${endMem.toFixed(2)}%
-        Transaction Success: ${res.locals.transactionSuccess ? 'Yes' : 'No'}
-        Test Type: ${test_type}
-        ---
-        `;
-
-        // Escribimos el log al archivo de texto
-        fs.appendFile(LOG_FILE_PATH, logEntry, (err) => {
-            if (err) throw new Error(`Error al escribir en el log: ${err.message}`);
-        });
-    });
-
-    next();
-});
-
-// Middleware para medir la duración de la solicitud y registrar logs en formato JSON
-app.use((req, res, next) => {
-    const startTime = Date.now(); // Tiempo de inicio de la transacción
-    const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage(); // Obtener el uso de CPU y RAM al inicio
-
-    res.on('finish', () => {
-        const duration = Date.now() - startTime; // Calcular la duración de la transacción
-        const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage(); // Obtener el uso de CPU y RAM al finalizar
-
-        // Registrar el log, ya sea que la transacción haya sido exitosa o no
-        const logEntry = {
-            time: new Date().toISOString(),
-            requestNumber: res.locals.transactionCount,
-            route: `${req.method} ${req.originalUrl}`,
-            method: req.method,
-            refTime: res.locals.refTime || 'N/A', // Añadir `refTime` incluso si la transacción falla
-            duration: `${duration} ms`,
-            cpuUsageStart: `${startCpu.toFixed(2)}%`,
-            cpuUsageEnd: `${endCpu.toFixed(2)}%`,
-            ramUsageStart: `${startMem.toFixed(2)}%`,
-            ramUsageEnd: `${endMem.toFixed(2)}%`,
-            transactionSuccess: res.locals.transactionSuccess ? 'Yes' : 'No', // Registrar si la transacción fue exitosa o no
-            testType: test_type // Añadir el tipo de prueba
-        };
-
-        const logEntryString = JSON.stringify(logEntry);
-
-        if (!fileExists) {
-            try {
-                const initialContent = `[${logEntryString}]`;
-                fs.writeFileSync(logFileJsonPath, initialContent); // Crear el archivo
-                fileExists = true;
-            } catch (err) {
-                console.error(`Error al crear el archivo de log JSON: ${err.message}`);
-            }
-        } else {
-            try {
-                fs.readFile(logFileJsonPath, 'utf8', (err, data) => {
-                    if (err) return console.error(`Error al leer el archivo de log JSON: ${err.message}`);
-
-                    let newData = data.trim();
-
-                    if (newData.length === 0 || newData === '[]') {
-                        newData = `[${logEntryString}]`;
-                    } else {
-                        newData = newData.slice(0, -1);
-                        newData += `,${logEntryString}]`;
-                    }
-
-                    fs.writeFile(logFileJsonPath, newData, (err) => {
-                        if (err) return console.error(`Error al escribir en el archivo de log JSON: ${err.message}`);
-                    });
-                });
-            } catch (err) {
-                console.error(`Error al actualizar el archivo de log JSON: ${err.message}`);
-            }
-        }
-    });
-
-    next();
-});
+// Middlewares para registrar logs en formato txt y json
+app.use(logRequestToTxt);
+app.use(logRequestToJson);
 
 
 let api;
@@ -547,7 +449,7 @@ async function executeContractAndGetGas(contract, signer, res, ...params) {
         return new Promise((resolve, reject) => {
             tx.signAndSend(signer, (result) => {
                 if (result.status.isFinalized) {
-                    console.log('Transacción finalizada en bloque:', result.status.asFinalized);
+                    //console.log('Transacción finalizada en bloque:', result.status.asFinalized);
 
                     // Iterar sobre los eventos para encontrar el peso (gas) consumido
                     result.events.forEach(({ event: { data, method, section } }) => {
