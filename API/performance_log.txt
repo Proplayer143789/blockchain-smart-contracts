@@ -203,3 +203,41 @@
         Test Type: sequential
         ---
         
+        Time: 2024-10-24T00:53:19.568Z
+        Request Number: 1
+        Route: POST /create_user_with_dynamic_gas
+        Method: POST
+        RefTime (Gas Computacional): 3244394527
+        Duration: 4392 ms
+        CPU Usage (start): 1.41%, CPU Usage (end): 1.46%
+        RAM Usage (start): 33.86%, RAM Usage (end): 33.97%
+        Transaction Success: Yes
+        Test Type: sequential
+        ---
+        
+        Time: 2024-10-24T01:24:47.641Z
+        Request Number: 1
+        Route: POST /create_user_with_dynamic_gas
+        Method: POST
+        RefTime (Gas Computacional): 3244394527
+        Duration: 3329 ms
+        CPU Usage (start): 0.20%, CPU Usage (end): 0.20%
+        RAM Usage (start): 33.67%, RAM Usage (end): 33.64%
+        Transaction Success: Yes
+        Parameters Length: 94
+        Test Type: sequential
+        ---
+        
+        Time: 2024-10-24T01:25:50.096Z
+        Request Number: 1
+        Route: POST /create_user_with_dynamic_gas
+        Method: POST
+        RefTime (Gas Computacional): 3244394527
+        Duration: 2711 ms
+        CPU Usage (start): 0.23%, CPU Usage (end): 0.21%
+        RAM Usage (start): 33.90%, RAM Usage (end): 33.99%
+        Transaction Success: Yes
+        Parameters Length: 94
+        Test Type: sequential
+        ---
+        

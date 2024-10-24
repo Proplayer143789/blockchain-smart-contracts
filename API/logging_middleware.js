@@ -22,10 +22,33 @@ function getSystemUsage() {
     return { cpuUsage, memUsage };
 }
 
+// Función para calcular la longitud total de los parámetros
+function getParamsLength(req) {
+    let length = 0;
+
+    // Longitud de parámetros del cuerpo (body)
+    if (req.body && typeof req.body === 'object') {
+        length += JSON.stringify(req.body).length;
+    }
+
+    /*// Longitud de parámetros de la URL
+    if (req.params && typeof req.params === 'object') {
+        length += JSON.stringify(req.params).length;
+    }
+
+    // Longitud de parámetros de consulta (query)
+    if (req.query && typeof req.query === 'object') {
+        length += JSON.stringify(req.query).length;
+    }*/
+
+    return length;
+}
+
 // Middleware para medir la duración de la solicitud y registrar logs en formato txt
 function logRequestToTxt(req, res, next) {
     const startTime = Date.now();
     const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage();
+    const paramsLength = getParamsLength(req);
 
     res.on('finish', () => {
         const duration = Date.now() - startTime;
@@ -41,6 +64,7 @@ function logRequestToTxt(req, res, next) {
         CPU Usage (start): ${startCpu.toFixed(2)}%, CPU Usage (end): ${endCpu.toFixed(2)}%
         RAM Usage (start): ${startMem.toFixed(2)}%, RAM Usage (end): ${endMem.toFixed(2)}%
         Transaction Success: ${res.locals.transactionSuccess ? 'Yes' : 'No'}
+        Parameters Length: ${paramsLength}
         Test Type: ${test_type}
         ---
         `;
@@ -58,6 +82,7 @@ function logRequestToTxt(req, res, next) {
 function logRequestToJson(req, res, next) {
     const startTime = Date.now();
     const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage();
+    const paramsLength = getParamsLength(req);
 
     res.on('finish', () => {
         const duration = Date.now() - startTime;
@@ -75,6 +100,7 @@ function logRequestToJson(req, res, next) {
             ramUsageStart: `${startMem.toFixed(2)}%`,
             ramUsageEnd: `${endMem.toFixed(2)}%`,
             transactionSuccess: res.locals.transactionSuccess ? 'Yes' : 'No',
+            parametersLength: paramsLength,
             testType: test_type
         };
 

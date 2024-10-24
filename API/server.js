@@ -114,15 +114,7 @@ function updateTransactionCount() {
 let pendingTransactions = parseInt(total_request); 
 let tip = pendingTransactions; // Variable global para el tip, que comienza en el total de transacciones
 
-// Función para manejar el tip: disminuye con cada transacción
-function decrementTip() {
-    if (tip > 0) {
-        tip -= 1;
-    }
-
-    console.log(`Tip set to: ${tip}`);
-}
-
+// Función para crear una nueva cuenta
 function createNewAccount(customText = null) {
     const keyring = new Keyring({ type: 'sr25519' });
     const mnemonic = customText || mnemonicGenerate();
@@ -138,7 +130,7 @@ function createNewAccount(customText = null) {
 
 // Función para transferir fondos con tip incluido usando transferKeepAlive
 async function transferFunds(sender, recipient, amount) {
-    decrementTip(); // Disminuye el tip antes de la transacción
+    const tip = getTip(); // Obtener el tip usando la función getTip
     const transfer = api.tx.balances.transferKeepAlive(recipient, amount);
 
     return new Promise((resolve, reject) => {
@@ -163,7 +155,7 @@ async function transferFunds(sender, recipient, amount) {
 
 // Modificar la función addUser para incluir el tip en la transacción
 async function addUser(alice, newAccount, userInfo, role, gasLimit) {
-    decrementTip(); // Disminuye el tip antes de la transacción
+    const tip = getTip(); // Obtener el tip usando la función getTip
     const addUserTx = contract.tx.addUser({ value: 0, gasLimit }, newAccount.address, userInfo, role);
     return new Promise((resolve, reject) => {
         addUserTx.signAndSend(alice, { tip }, ({ events = [], status }) => {
@@ -193,7 +185,7 @@ async function addUser(alice, newAccount, userInfo, role, gasLimit) {
 
 // Modificar la función assignRole para incluir el tip en la transacción
 async function assignRole(alice, newAccount, role, userInfo, gasLimit) {
-    decrementTip(); // Disminuye el tip antes de la transacción
+    const tip = getTip(); // Obtener el tip usando la función getTip
     const assignRoleTx = contract.tx.assignRole({ value: 0, gasLimit }, newAccount.address, role, userInfo);
     return new Promise((resolve, reject) => {
         assignRoleTx.signAndSend(alice, { tip }, (result) => {
