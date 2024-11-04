@@ -39,6 +39,7 @@ const test_type = process.env.TEST_TYPE || 'sequential';
 app.use(logRequestToTxt);
 app.use(logRequestToJson);
 
+const ACCOUNT_IDS_FILE = path.join(__dirname, 'account_ids.txt');
 
 let api;
 let contract;
@@ -568,6 +569,9 @@ app.post('/create_user_with_dynamic_gas', async (req, res) => {
 
         // Ejecutar la transacción del contrato (addUser) y guardar el gas consumido y tip
         await addUser(alice, newAccount, userInfo, role, gasLimit, res);
+
+        // Guardar el Account ID en 'account_ids.txt'
+        fs.appendFileSync(ACCOUNT_IDS_FILE, `${newAccount.address}\n`, 'utf8');
 
         // Responder con éxito
         res.status(200).json({
