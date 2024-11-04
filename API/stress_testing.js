@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require('uuid');  // Para generar identificadores únicos
 const faker = require('faker'); // Para generar datos ficticios
 const readline = require('readline'); // Para elegir los métodos desde la consola
 const fs = require('fs');
+const path = require('path');
 
 // Cargar variables del archivo .env
 const HOST = process.env.HOST === '0.0.0.0' ? 'localhost' : process.env.HOST; // Si es 0.0.0.0, usar localhost para las solicitudes
@@ -11,9 +12,13 @@ const PORT = process.env.PORT || 3000; // El puerto en el que corre el servidor
 const TOTAL_REQUESTS = process.env.TOTAL_REQUESTS || 50; // Cantidad de solicitudes totales
 const SIMULTANEOUS_REQUESTS = 10; // Cantidad de solicitudes simultáneas por lote
 const MODE = process.env.TEST_TYPE || 'concurrent'; // Puede ser 'sequential', 'concurrent', o 'batch'
+const BATCH_WAIT_TIME = process.env.BATCH_WAIT_TIME || 6; // Tiempo de espera entre lotes
 
 // URL completa de tu API (basada en HOST y PORT)
 const FULL_URL = `http://${HOST}:${PORT}`;  // Construir correctamente el URL
+
+// Definir la ruta del archivo donde se almacenan los AccountIds
+const ACCOUNT_IDS_FILE = path.join(__dirname, 'account_ids.txt');
 
 // Función para generar datos aleatorios
 function generateTestData() {
@@ -46,8 +51,53 @@ async function getRole(publicAddress) {
     }
 }
 
+// Función para obtener la lista de AccountIds desde el archivo txt
+function getUserAccountsFromFile() {
+    try {
+        const data = fs.readFileSync(ACCOUNT_IDS_FILE, 'utf8');
+        const accounts = data.split('\n').filter(line => line.trim() !== '');
+        return accounts;
+    } catch (error) {
+        console.error(`Error al leer el archivo de AccountIds: ${error.message}`);
+        return [];
+    }
+}
+
+// Actualizar la función para obtener roles de múltiples usuarios
+async function runGetRoleTest() {
+    console.log('Obteniendo lista de usuarios desde el archivo...');
+    const accounts = getUserAccountsFromFile();
+    if (accounts.length === 0) {
+        console.log('No se encontraron usuarios para probar.');
+        return;
+    }
+
+    console.log(`Ejecutando prueba de get_role con ${accounts.length} usuarios...`);
+
+    // Llamadas individuales al endpoint /role/:publicAddress
+    for (const accountId of accounts) {
+        try {
+            const role = await getRole(accountId);
+            console.log(`Rol obtenido para ${accountId}:`, role);
+        } catch (error) {
+            console.error(`Error al obtener el rol para ${accountId}: ${error.message}`);
+        }
+    }
+}
+
 // Prueba secuencial (las solicitudes se realizan una por una)
 async function runSequentialTest(endpoint) {
+    console.log(`Running sequential test with ${TOTAL_REQUESTS} requests...`);
+    for (let i = 0; i < TOTAL_REQUESTS; i++) {
+        const data = generateTestData();
+        console.log(`Executing request ${i + 1}:`, data);
+
+        if (endpoint === 'create_user_with_dynamic_gas') {
+            await createUserWithDynamicGas(data);
+        } else if (endpoint === 'get_role') {
+            await getRole(data.dni);
+        }
+    }
     console.log(`Running sequential test with ${TOTAL_REQUESTS} requests...`);
     for (let i = 0; i < TOTAL_REQUESTS; i++) {
         const data = generateTestData();
@@ -91,7 +141,12 @@ async function runBatchTest(batchSize, endpoint) {
                 batchPromises.push(getRole(data.dni));
             }
         }
+        
         await Promise.all(batchPromises);
+
+        // Esperar BATCH_WAIT_TIME segundos antes del siguiente lote
+        console.log(`Waiting for ${BATCH_WAIT_TIME} seconds before next batch...`);
+        await new Promise(resolve => setTimeout(resolve, BATCH_WAIT_TIME * 1000));
     }
     console.log('Batch test completed');
 }
@@ -133,7 +188,9 @@ Selecciona la opción: `, (answer) => {
 
     if (endpoint === 'ALL') {
         await runSequentialTest('create_user_with_dynamic_gas');
-        await runConcurrentTest('get_role');
+        await runGetRoleTest(); // Ejecutar la prueba de get_role
+    } else if (endpoint === 'get_role') {
+        await runGetRoleTest();
     } else {
         switch (MODE) {
             case 'sequential':
@@ -150,3 +207,4 @@ Selecciona la opción: `, (answer) => {
         }
     }
 })();
+
