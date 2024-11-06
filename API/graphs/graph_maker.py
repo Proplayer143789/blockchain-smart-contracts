@@ -67,55 +67,93 @@ def calculate_transaction_cost(entry):
 def parse_data(data):
     parsed_data = []
     for entry in data:
-        if entry.get('transactionSuccess') == 'Yes' and 'duration' in entry:
-            entry['duration'] = float(entry['duration'].replace(' ms', ''))
-            entry['cpuUsageStart'] = float(entry['cpuUsageStart'].replace('%', ''))
-            entry['cpuUsageEnd'] = float(entry['cpuUsageEnd'].replace('%', ''))
-            entry['ramUsageStart'] = float(entry['ramUsageStart'].replace('%', ''))
-            entry['ramUsageEnd'] = float(entry['ramUsageEnd'].replace('%', ''))
-            
-            # Calcular la diferencia de CPU y RAM entre inicio y fin
-            entry['cpuUsageDiff'] = entry['cpuUsageEnd'] - entry['cpuUsageStart']
-            entry['ramUsageDiff'] = entry['ramUsageEnd'] - entry['ramUsageStart']
-            
-            entry['transactionCost'] = calculate_transaction_cost(entry)
-            entry['latency'] = entry['duration']
-            entry['timestamp'] = datetime.fromisoformat(entry['time'].replace('Z', '+00:00'))
-            entry['groupID'] = entry.get('GroupID', 'N/A')  # Capturar el groupID del log
-            entry['totalTransactions'] = int(entry.get('totalTransactions', 0)) if entry.get('totalTransactions') != 'N/A' else 0
-            parsed_data.append(entry)
-        else:
-            print(f"Entrada omitida: {entry}")
+        try:
+            if entry.get('transactionSuccess') == 'Yes':
+                # Convertir valores numéricos de manera segura
+                duration = float(entry.get('duration', '0').replace(' ms', ''))
+                cpu_start = float(entry.get('cpuUsageStart', '0').replace('%', ''))
+                cpu_end = float(entry.get('cpuUsageEnd', '0').replace('%', ''))
+                ram_start = float(entry.get('ramUsageStart', '0').replace('%', ''))
+                ram_end = float(entry.get('ramUsageEnd', '0').replace('%', ''))
+                
+                parsed_entry = {
+                    'duration': duration,
+                    'cpuUsageStart': cpu_start,
+                    'cpuUsageEnd': cpu_end,
+                    'ramUsageStart': ram_start,
+                    'ramUsageEnd': ram_end,
+                    'cpuUsageDiff': cpu_end - cpu_start,
+                    'ramUsageDiff': ram_end - ram_start,
+                    'transactionCost': calculate_transaction_cost(entry),
+                    'latency': duration,
+                    'timestamp': datetime.fromisoformat(entry['time'].replace('Z', '+00:00')),
+                    'groupID': entry.get('GroupID', 'N/A'),
+                    'totalTransactions': int(entry.get('totalTransactions', 0)) if entry.get('totalTransactions', 'N/A') != 'N/A' else 0,
+                    'testType': entry.get('testType', 'Unknown'),
+                    'parametersLength': int(entry.get('parametersLength', 0)) if entry.get('parametersLength', 'N/A') != 'N/A' else 0,
+                    'method': entry.get('method', 'Unknown')
+                }
+                parsed_data.append(parsed_entry)
+            else:
+                print(f"Entrada omitida (transactionSuccess != Yes): {entry}")
+        except Exception as e:
+            print(f"Error procesando entrada: {entry}")
+            print(f"Error: {str(e)}")
     return parsed_data
 
-
 def plot_metric_vs_time(data, metric, title):
-    plt.figure(figsize=(10, 6))
-    for test_type in sorted(set(entry['testType'] for entry in data)):
-        # Filtrar los datos por testType
-        test_type_data = [entry for entry in data if entry['testType'] == test_type]
-        for total_tx in sorted(set(entry['totalTransactions'] for entry in test_type_data)):
-            # Filtrar los datos por totalTransactions
-            subset = [entry for entry in test_type_data if entry['totalTransactions'] == total_tx]
-            for group in sorted(set(entry['groupID'] for entry in subset if entry['groupID'] != 'N/A')):
-                group_data = [entry for entry in subset if entry['groupID'] == group]
-                # Ordenar los datos por timestamp
-                group_data.sort(key=lambda x: x['timestamp'])
-                start_time = group_data[0]['timestamp']
-                end_time = group_data[-1]['timestamp']
-                total_duration = (end_time - start_time).total_seconds() / 60  # Duración total en minutos
-                # Calcular tiempos relativos en minutos
-                times = [(entry['timestamp'] - start_time).total_seconds() / 60 for entry in group_data]
-                metrics = [entry[metric] for entry in group_data]
-                label = f'{test_type} - Group {group[:8]} (Duración: {total_duration:.2f}h)'
-                plt.plot(times, metrics, label=label)
-    plt.xlabel('Tiempo (minutos)')
+    if not data:
+        print(f"No hay datos para graficar {metric}")
+        return
+        
+    plt.figure(figsize=(12, 8))
+    
+    # Verificar que el metric existe en los datos
+    if not any(metric in entry for entry in data):
+        print(f"La métrica {metric} no existe en los datos")
+        return
+        
+    # Agrupar por tipo de prueba y número total de transacciones
+    test_groups = {}
+    for entry in data:
+        key = (entry['testType'], entry['totalTransactions'])
+        if key not in test_groups:
+            test_groups[key] = {}
+        group_id = entry['groupID']
+        if group_id not in test_groups[key]:
+            test_groups[key][group_id] = []
+        test_groups[key][group_id].append(entry)
+
+    # Plotear cada grupo
+    for (test_type, total_tx), groups in test_groups.items():
+        for group_id, entries in groups.items():
+            if entries:
+                # Ordenar por timestamp
+                entries.sort(key=lambda x: x['timestamp'])
+                start_time = entries[0]['timestamp']
+                times = [(entry['timestamp'] - start_time).total_seconds() / 60 for entry in entries]
+                metrics = [float(entry[metric]) for entry in entries if entry[metric] is not None]
+                
+                if times and metrics and len(times) == len(metrics):
+                    label = f'{test_type} - {total_tx} tx - Group {group_id[:8]}'
+                    plt.plot(times, metrics, label=label, marker='o', markersize=2)
+                else:
+                    print(f"Datos incompletos para {test_type} - Group {group_id}")
+
+    plt.xlabel('Tiempo Relativo (minutos)')
     plt.ylabel(metric)
     plt.title(title)
-    plt.legend()
-    plt.savefig(f'{metric}_vs_time.png')
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.tight_layout()
+    plt.grid(True)
+    
+    try:
+        plt.savefig(f'{metric}_vs_time.png', bbox_inches='tight')
+        print(f"Gráfica guardada: {metric}_vs_time.png")
+    except Exception as e:
+        print(f"Error guardando la gráfica {metric}: {str(e)}")
+    
     plt.close()
-
 
 def plot_transaction_cost_vs_length(data):
     plt.figure(figsize=(10, 6))
