@@ -13,10 +13,10 @@ let decrementalTip = totalTransactions;
 
 /**
  * Función para generar un tip aleatorio entre un rango específico
- * @returns {number} El valor del tip aleatorio entre 1 y el total de transacciones * 100
+ * @returns {number} El valor del tip aleatorio entre 1 y el total de transacciones 
  */
 function generateRandomTip() {
-    return Math.floor(Math.random() * totalTransactions * 100 ) + 1;
+    return Math.floor(Math.random() * totalTransactions ) + 1;
 }
 
 /**

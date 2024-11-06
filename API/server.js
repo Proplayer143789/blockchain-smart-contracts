@@ -24,7 +24,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Contract Dirección y ABI
-const CONTRACT_ADDRESS = '5DUJDX5k7ZYgcShPEuJpiT9Zme3UV3QJKqKPMYH4oBWEUAvN';
+const CONTRACT_ADDRESS = '5HqhFvrpCMS3sZFbqRpaXra24LhPjwizhGMNBYJFnjh16CC5';
 const CONTRACT_ABI_PATH = path.resolve(__dirname, '../target/ink/smart_contract/smart_contract.json');
 
 // Performance monitoring configuration

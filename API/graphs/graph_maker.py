@@ -31,7 +31,7 @@ def read_data():
     return data
 
 def calculate_transaction_cost(entry):
-    return float(entry.get('refTime', 0)) + float(entry.get('proofSize', 0)) + float(entry.get('tip', 0))
+    return float(entry.get('refTime', 0)) + float(entry.get('proofSize', 0))
 
 def parse_data(data):
     for entry in data:
@@ -67,13 +67,14 @@ def plot_metric_vs_time(data, metric, title):
 
 def plot_transaction_cost_vs_length(data):
     plt.figure(figsize=(10, 6))
-    lengths = [entry['parametersLength'] for entry in data]
-    costs = [entry['transactionCost'] for entry in data]
-    plt.plot(lengths, costs, 'o-')
-    plt.xlabel('Parameters Length')
-    plt.ylabel('Transaction Cost')
-    plt.title('Transaction Cost vs Parameters Length')
-    #plt.show()
+    df = pd.DataFrame(data)
+    df['parametersLength'] = pd.to_numeric(df['parametersLength'])
+    df['transactionCost'] = pd.to_numeric(df['transactionCost'])
+    df.boxplot(column='transactionCost', by='parametersLength')
+    plt.xlabel('Longitud de Parámetros')
+    plt.ylabel('Costo de Transacción')
+    plt.title('Costo de Transacción vs Longitud de Parámetros')
+    plt.suptitle('')
     plt.savefig('transaction_cost_vs_length.png')
 
 def calculate_statistics(data, metric):
