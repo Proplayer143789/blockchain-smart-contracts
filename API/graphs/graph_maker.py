@@ -23,32 +23,66 @@ def read_data():
             lines = file.read().strip().split('---')
             data = []
             for line in lines:
-                entry = {}
-                for part in line.split('\n'):
-                    key, value = part.strip().split(':', 1)
-                    entry[key.strip()] = value.strip()
+                entry_raw = {}
+                # Dividir el contenido por líneas y luego por ', ' para capturar todas las parejas clave-valor
+                parts = line.strip().split('\n')
+                for part in parts:
+                    part = part.strip()
+                    # Dividir por ', ' en caso de que haya múltiples parejas clave-valor en una línea
+                    sub_parts = part.split(', ')
+                    for sub_part in sub_parts:
+                        if ':' in sub_part:
+                            key, value = sub_part.split(':', 1)
+                            entry_raw[key.strip()] = value.strip()
+                # Mapeo de claves originales a estandarizadas
+                entry = {
+                    'time': entry_raw.get('Time'),
+                    'requestNumber': entry_raw.get('Request Number'),
+                    'route': entry_raw.get('Route'),
+                    'method': entry_raw.get('Method'),
+                    'refTime': entry_raw.get('RefTime (Gas Computacional)'),
+                    'proofSize': entry_raw.get('ProofSize'),
+                    'tip': entry_raw.get('Tip'),
+                    'duration': entry_raw.get('Duration'),
+                    'cpuUsageStart': entry_raw.get('CPU Usage (start)'),
+                    'cpuUsageEnd': entry_raw.get('CPU Usage (end)'),
+                    'ramUsageStart': entry_raw.get('RAM Usage (start)'),
+                    'ramUsageEnd': entry_raw.get('RAM Usage (end)'),
+                    'transactionSuccess': entry_raw.get('Transaction Success'),
+                    'parametersLength': entry_raw.get('Parameters Length'),
+                    'testType': entry_raw.get('Test Type'),
+                }
                 data.append(entry)
     return data
 
 def calculate_transaction_cost(entry):
-    return float(entry.get('refTime', 0)) + float(entry.get('proofSize', 0))
+    refTime = entry.get('refTime', '0')
+    proofSize = entry.get('proofSize', '0')
+    refTime = float(refTime) if refTime != 'N/A' else 0.0
+    proofSize = float(proofSize) if proofSize != 'N/A' else 0.0
+    return refTime + proofSize
 
 def parse_data(data):
+    parsed_data = []
     for entry in data:
-        entry['duration'] = float(entry['duration'].replace(' ms', ''))
-        entry['cpuUsageStart'] = float(entry['cpuUsageStart'].replace('%', ''))
-        entry['cpuUsageEnd'] = float(entry['cpuUsageEnd'].replace('%', ''))
-        entry['ramUsageStart'] = float(entry['ramUsageStart'].replace('%', ''))
-        entry['ramUsageEnd'] = float(entry['ramUsageEnd'].replace('%', ''))
-        
-        # Calcular la diferencia de CPU y RAM entre inicio y fin
-        entry['cpuUsageDiff'] = entry['cpuUsageEnd'] - entry['cpuUsageStart']
-        entry['ramUsageDiff'] = entry['ramUsageEnd'] - entry['ramUsageStart']
-        
-        entry['transactionCost'] = calculate_transaction_cost(entry)
-        entry['latency'] = entry['duration']
-        entry['timestamp'] = datetime.fromisoformat(entry['time'].replace('Z', '+00:00'))
-    return data
+        if entry.get('transactionSuccess') == 'Yes' and 'duration' in entry:
+            entry['duration'] = float(entry['duration'].replace(' ms', ''))
+            entry['cpuUsageStart'] = float(entry['cpuUsageStart'].replace('%', ''))
+            entry['cpuUsageEnd'] = float(entry['cpuUsageEnd'].replace('%', ''))
+            entry['ramUsageStart'] = float(entry['ramUsageStart'].replace('%', ''))
+            entry['ramUsageEnd'] = float(entry['ramUsageEnd'].replace('%', ''))
+            
+            # Calcular la diferencia de CPU y RAM entre inicio y fin
+            entry['cpuUsageDiff'] = entry['cpuUsageEnd'] - entry['cpuUsageStart']
+            entry['ramUsageDiff'] = entry['ramUsageEnd'] - entry['ramUsageStart']
+            
+            entry['transactionCost'] = calculate_transaction_cost(entry)
+            entry['latency'] = entry['duration']
+            entry['timestamp'] = datetime.fromisoformat(entry['time'].replace('Z', '+00:00'))
+            parsed_data.append(entry)
+        else:
+            print(f"Entrada omitida: {entry}")
+    return parsed_data
 
 
 def plot_metric_vs_time(data, metric, title):
