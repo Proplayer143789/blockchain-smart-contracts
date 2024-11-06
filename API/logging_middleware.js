@@ -43,10 +43,14 @@ function logRequestToTxt(req, res, next) {
     res.on('finish', () => {
         const duration = Date.now() - startTime;
         const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage();
+        const groupID = req.body.groupID || 'N/A'; // Obtener el groupID de la solicitud
+        const totalTransactions = req.body.totalTransactions || 'N/A'; // Obtener totalTransactions de la solicitud
 
         const logEntry = `
         Time: ${new Date().toISOString()}
         Request Number: ${res.locals.transactionCount}
+        GroupID: ${groupID}
+        Total Transactions: ${totalTransactions}
         Route: ${req.method} ${req.originalUrl}
         Method: ${req.method}
         RefTime (Gas Computacional): ${res.locals.refTime || 'N/A'}
@@ -79,10 +83,14 @@ function logRequestToJson(req, res, next) {
     res.on('finish', () => {
         const duration = Date.now() - startTime;
         const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage();
+        const groupID = req.body.groupID || 'N/A'; // Obtener el groupID de la solicitud
+        const totalTransactions = req.body.totalTransactions || 'N/A'; // Obtener totalTransactions de la solicitud
 
         const logEntry = {
             time: new Date().toISOString(),
             requestNumber: res.locals.transactionCount,
+            groupID: groupID,
+            totalTransactions: totalTransactions,
             route: `${req.method} ${req.originalUrl}`,
             method: req.method,
             refTime: res.locals.refTime || 'N/A',

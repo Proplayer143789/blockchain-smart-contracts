@@ -44,6 +44,7 @@ def read_data():
                     'proofSize': entry_raw.get('ProofSize'),
                     'tip': entry_raw.get('Tip'),
                     'duration': entry_raw.get('Duration'),
+                    'groupID': entry_raw.get('GroupID'),
                     'cpuUsageStart': entry_raw.get('CPU Usage (start)'),
                     'cpuUsageEnd': entry_raw.get('CPU Usage (end)'),
                     'ramUsageStart': entry_raw.get('RAM Usage (start)'),
@@ -51,6 +52,7 @@ def read_data():
                     'transactionSuccess': entry_raw.get('Transaction Success'),
                     'parametersLength': entry_raw.get('Parameters Length'),
                     'testType': entry_raw.get('Test Type'),
+                    'totalTransactions': entry_raw.get('Total Transactions'),
                 }
                 data.append(entry)
     return data
@@ -79,6 +81,8 @@ def parse_data(data):
             entry['transactionCost'] = calculate_transaction_cost(entry)
             entry['latency'] = entry['duration']
             entry['timestamp'] = datetime.fromisoformat(entry['time'].replace('Z', '+00:00'))
+            entry['groupID'] = entry.get('GroupID', 'N/A')  # Capturar el groupID del log
+            entry['totalTransactions'] = int(entry.get('totalTransactions', 0)) if entry.get('totalTransactions') != 'N/A' else 0
             parsed_data.append(entry)
         else:
             print(f"Entrada omitida: {entry}")
@@ -87,16 +91,30 @@ def parse_data(data):
 
 def plot_metric_vs_time(data, metric, title):
     plt.figure(figsize=(10, 6))
-    for test_type in set(entry['testType'] for entry in data):
-        times = [entry['timestamp'] for entry in data if entry['testType'] == test_type]
-        metrics = [entry[metric] for entry in data if entry['testType'] == test_type]
-        plt.plot(times, metrics, label=f'Test Type: {test_type}')
-    plt.xlabel('Time')
+    for test_type in sorted(set(entry['testType'] for entry in data)):
+        # Filtrar los datos por testType
+        test_type_data = [entry for entry in data if entry['testType'] == test_type]
+        for total_tx in sorted(set(entry['totalTransactions'] for entry in test_type_data)):
+            # Filtrar los datos por totalTransactions
+            subset = [entry for entry in test_type_data if entry['totalTransactions'] == total_tx]
+            for group in sorted(set(entry['groupID'] for entry in subset if entry['groupID'] != 'N/A')):
+                group_data = [entry for entry in subset if entry['groupID'] == group]
+                # Ordenar los datos por timestamp
+                group_data.sort(key=lambda x: x['timestamp'])
+                start_time = group_data[0]['timestamp']
+                end_time = group_data[-1]['timestamp']
+                total_duration = (end_time - start_time).total_seconds() / 60  # Duración total en minutos
+                # Calcular tiempos relativos en minutos
+                times = [(entry['timestamp'] - start_time).total_seconds() / 60 for entry in group_data]
+                metrics = [entry[metric] for entry in group_data]
+                label = f'{test_type} - Group {group[:8]} (Duración: {total_duration:.2f}h)'
+                plt.plot(times, metrics, label=label)
+    plt.xlabel('Tiempo (minutos)')
     plt.ylabel(metric)
     plt.title(title)
     plt.legend()
-    #plt.show()
     plt.savefig(f'{metric}_vs_time.png')
+    plt.close()
 
 
 def plot_transaction_cost_vs_length(data):
@@ -153,10 +171,10 @@ def main():
     data = read_data()
     data = parse_data(data)
     
-    # Gráficos de diferencias de CPU, RAM, Latencia vs Tiempo
-    plot_metric_vs_time(data, 'cpuUsageDiff', 'CPU Usage Difference vs Time')
-    plot_metric_vs_time(data, 'ramUsageDiff', 'RAM Usage Difference vs Time')
-    plot_metric_vs_time(data, 'latency', 'Latency vs Time')
+    # Gráficos actualizados
+    plot_metric_vs_time(data, 'cpuUsageDiff', 'Diferencia de Uso de CPU vs Tiempo')
+    plot_metric_vs_time(data, 'ramUsageDiff', 'Diferencia de Uso de RAM vs Tiempo')
+    plot_metric_vs_time(data, 'latency', 'Latencia vs Tiempo')
     
     # Gráfico de Costo Transaccional vs Longitud de Parámetros
     plot_transaction_cost_vs_length(data)

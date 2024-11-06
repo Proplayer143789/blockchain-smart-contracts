@@ -87,20 +87,15 @@ async function runGetRoleTest() {
 
 // Prueba secuencial (las solicitudes se realizan una por una)
 async function runSequentialTest(endpoint) {
+    // Generar un groupID único para esta sesión de pruebas
+    const groupID = uuidv4();
+    const totalTransactions = parseInt(TOTAL_REQUESTS); // Obtener el total de transacciones
     console.log(`Running sequential test with ${TOTAL_REQUESTS} requests...`);
-    for (let i = 0; i < TOTAL_REQUESTS; i++) {
+    for (let i = 0; i < totalTransactions; i++) {
         const data = generateTestData();
-        console.log(`Executing request ${i + 1}:`, data);
-
-        if (endpoint === 'create_user_with_dynamic_gas') {
-            await createUserWithDynamicGas(data);
-        } else if (endpoint === 'get_role') {
-            await getRole(data.dni);
-        }
-    }
-    console.log(`Running sequential test with ${TOTAL_REQUESTS} requests...`);
-    for (let i = 0; i < TOTAL_REQUESTS; i++) {
-        const data = generateTestData();
+        // Añadir el groupID y totalTransactions a los datos enviados en la solicitud
+        data.groupID = groupID;
+        data.totalTransactions = totalTransactions;
         console.log(`Executing request ${i + 1}:`, data);
 
         if (endpoint === 'create_user_with_dynamic_gas') {
@@ -114,10 +109,15 @@ async function runSequentialTest(endpoint) {
 
 // Prueba concurrente (las solicitudes se ejecutan simultáneamente)
 async function runConcurrentTest(endpoint) {
+    const groupID = uuidv4();
+    const totalTransactions = parseInt(TOTAL_REQUESTS);
     console.log(`Running concurrent test with ${TOTAL_REQUESTS} requests...`);
     const promises = [];
-    for (let i = 0; i < TOTAL_REQUESTS; i++) {
+    for (let i = 0; i < totalTransactions; i++) {
         const data = generateTestData();
+        data.groupID = groupID;
+        data.totalTransactions = totalTransactions;
+
         if (endpoint === 'create_user_with_dynamic_gas') {
             promises.push(createUserWithDynamicGas(data));
         } else if (endpoint === 'get_role') {
@@ -130,18 +130,23 @@ async function runConcurrentTest(endpoint) {
 
 // Prueba por lotes (ejecuta solicitudes en grupos)
 async function runBatchTest(batchSize, endpoint) {
+    const groupID = uuidv4();
+    const totalTransactions = parseInt(TOTAL_REQUESTS);
     console.log(`Running batch test with ${TOTAL_REQUESTS} requests in batches of ${batchSize}...`);
-    for (let i = 0; i < TOTAL_REQUESTS; i += batchSize) {
+    for (let i = 0; i < totalTransactions; i += batchSize) {
         const batchPromises = [];
-        for (let j = 0; j < batchSize && i + j < TOTAL_REQUESTS; j++) {
+        for (let j = 0; j < batchSize && i + j < totalTransactions; j++) {
             const data = generateTestData();
+            data.groupID = groupID;
+            data.totalTransactions = totalTransactions;
+
             if (endpoint === 'create_user_with_dynamic_gas') {
                 batchPromises.push(createUserWithDynamicGas(data));
             } else if (endpoint === 'get_role') {
                 batchPromises.push(getRole(data.dni));
             }
         }
-        
+
         await Promise.all(batchPromises);
 
         // Esperar BATCH_WAIT_TIME segundos antes del siguiente lote
