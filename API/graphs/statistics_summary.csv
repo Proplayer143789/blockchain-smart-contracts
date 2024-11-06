@@ -1,2 +1,2 @@
 Method,Test Type,cpuUsageDiff_mean,cpuUsageDiff_median,cpuUsageDiff_mode,ramUsageDiff_mean,ramUsageDiff_median,ramUsageDiff_mode,transactionCost_mean,transactionCost_median,transactionCost_mode,latency_mean,latency_median,latency_mode
-POST,sequential,-0.0005,0.0,0.0,0.0013000000000000077,0.0,0.0,3279608053.15,3279767336.5,3280714607.0,2116.83,2118.5,2118.0
+POST,sequential,4.9999999999999975e-05,0.0,0.0,0.001700000000000017,0.0,0.0,3279553971.56,3279607609.5,3280714607.0,2118.77,2119.0,2119.0

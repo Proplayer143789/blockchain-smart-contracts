@@ -54,7 +54,9 @@ def read_data():
                     'testType': entry_raw.get('Test Type'),
                     'totalTransactions': entry_raw.get('Total Transactions'),
                 }
+                
                 data.append(entry)
+    print("Datos cargados exitosamente", data[1])
     return data
 
 def calculate_transaction_cost(entry):
@@ -66,9 +68,24 @@ def calculate_transaction_cost(entry):
 
 def parse_data(data):
     parsed_data = []
+    null_entries = 0
+    
     for entry in data:
+        # Ignorar entradas completamente nulas
+        if all(value is None for value in entry.values()):
+            null_entries += 1
+            continue
+            
         try:
+            # Solo procesar entradas con transactionSuccess válido
             if entry.get('transactionSuccess') == 'Yes':
+                # Validar que los campos requeridos existan y no sean None
+                required_fields = ['time', 'duration', 'cpuUsageStart', 'cpuUsageEnd', 
+                                 'ramUsageStart', 'ramUsageEnd', 'testType', 'method', 'groupID', 'requestNumber', 'totalTransactions']
+                if not all(entry.get(field) for field in required_fields):
+                    print(f"Entrada omitida por campos faltantes: {entry}")
+                    continue
+
                 # Convertir valores numéricos de manera segura
                 duration = float(entry.get('duration', '0').replace(' ms', ''))
                 cpu_start = float(entry.get('cpuUsageStart', '0').replace('%', ''))
@@ -88,6 +105,7 @@ def parse_data(data):
                     'latency': duration,
                     'timestamp': datetime.fromisoformat(entry['time'].replace('Z', '+00:00')),
                     'groupID': entry.get('GroupID', 'N/A'),
+                    'requestNumber': int(entry.get('Request Number', 0)) if entry.get('Request Number', 'N/A') != 'N/A' else 0,
                     'totalTransactions': int(entry.get('totalTransactions', 0)) if entry.get('totalTransactions', 'N/A') != 'N/A' else 0,
                     'testType': entry.get('testType', 'Unknown'),
                     'parametersLength': int(entry.get('parametersLength', 0)) if entry.get('parametersLength', 'N/A') != 'N/A' else 0,
@@ -98,7 +116,14 @@ def parse_data(data):
                 print(f"Entrada omitida (transactionSuccess != Yes): {entry}")
         except Exception as e:
             print(f"Error procesando entrada: {entry}")
-            print(f"Error: {str(e)}")
+            print(f"Error detallado: {str(e)}")
+            continue
+    
+    if null_entries > 0:
+        print(f"Se encontraron {null_entries} entradas nulas que fueron ignoradas")
+    if not parsed_data:
+        print("Advertencia: No se pudo procesar ningún dato válido")
+    print(f"Se procesaron {len(parsed_data)} entradas de datos", parsed_data[1])
     return parsed_data
 
 def plot_metric_vs_time(data, metric, title):
@@ -108,7 +133,6 @@ def plot_metric_vs_time(data, metric, title):
         
     plt.figure(figsize=(12, 8))
     
-    # Verificar que el metric existe en los datos
     if not any(metric in entry for entry in data):
         print(f"La métrica {metric} no existe en los datos")
         return
@@ -118,33 +142,63 @@ def plot_metric_vs_time(data, metric, title):
     for entry in data:
         key = (entry['testType'], entry['totalTransactions'])
         if key not in test_groups:
-            test_groups[key] = {}
-        group_id = entry['groupID']
-        if group_id not in test_groups[key]:
-            test_groups[key][group_id] = []
-        test_groups[key][group_id].append(entry)
+            test_groups[key] = []
+        test_groups[key].append(entry)
 
-    # Plotear cada grupo
-    for (test_type, total_tx), groups in test_groups.items():
-        for group_id, entries in groups.items():
-            if entries:
-                # Ordenar por timestamp
-                entries.sort(key=lambda x: x['timestamp'])
-                start_time = entries[0]['timestamp']
-                times = [(entry['timestamp'] - start_time).total_seconds() / 60 for entry in entries]
-                metrics = [float(entry[metric]) for entry in entries if entry[metric] is not None]
+    # Plotear cada tipo de test
+    for (test_type, total_tx), entries in test_groups.items():
+        # Organizar por grupos para calcular duraciones máximas
+        group_entries = {}
+        max_durations = []
+        
+        for entry in entries:
+            group_id = entry['groupID']
+            if group_id not in group_entries:
+                group_entries[group_id] = []
+            group_entries[group_id].append(entry)
+        
+        # Calcular duración máxima para cada grupo
+        for group_data in group_entries.values():
+            if group_data:
+                group_data.sort(key=lambda x: x['timestamp'])
+                start_time = group_data[0]['timestamp']
+                end_time = group_data[-1]['timestamp']
+                duration = (end_time - start_time).total_seconds() / 60  # en minutos
+                max_durations.append(duration)
+        
+        # Calcular duración promedio para este tipo de test
+        avg_duration = mean(max_durations) if max_durations else 1
+        print(f"Duración promedio para {test_type}: {avg_duration:.2f} minutos")
+        
+        # Recolectar todos los puntos normalizados
+        all_points = []
+        
+        # Procesar cada grupo y normalizar sus tiempos
+        for group_data in group_entries.values():
+            if group_data:
+                group_data.sort(key=lambda x: x['timestamp'])
+                start_time = group_data[0]['timestamp']
                 
-                if times and metrics and len(times) == len(metrics):
-                    label = f'{test_type} - {total_tx} tx - Group {group_id[:8]}'
-                    plt.plot(times, metrics, label=label, marker='o', markersize=2)
-                else:
-                    print(f"Datos incompletos para {test_type} - Group {group_id}")
+                for entry in group_data:
+                    relative_time = (entry['timestamp'] - start_time).total_seconds() / 60
+                    # Normalizar el tiempo usando la duración promedio
+                    normalized_time = (relative_time / avg_duration) * 100  # Convertir a porcentaje
+                    if entry[metric] is not None:
+                        all_points.append((normalized_time, float(entry[metric])))
+        
+        if all_points:
+            # Ordenar puntos por tiempo normalizado
+            all_points.sort(key=lambda x: x[0])
+            times, metrics = zip(*all_points)
+            
+            label = f'{test_type} - {total_tx} tx (Duración promedio: {avg_duration:.2f}min)'
+            plt.plot(times, metrics, label=label, marker='o', markersize=2)
+            print(f"Graficando {len(times)} puntos para {label}")
 
-    plt.xlabel('Tiempo Relativo (minutos)')
+    plt.xlabel('Porcentaje de Tiempo Transcurrido (%)')
     plt.ylabel(metric)
-    plt.title(title)
+    plt.title(title, fontsize=15)
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-    plt.tight_layout()
     plt.grid(True)
     
     try:
@@ -155,16 +209,98 @@ def plot_metric_vs_time(data, metric, title):
     
     plt.close()
 
+def plot_metric_vs_transaction(data, metric, title):
+    if not data:
+        print(f"No hay datos para graficar {metric}")
+        return
+        
+    plt.figure(figsize=(12, 8))
+    
+    # Validar que la métrica existe en los datos
+    if not any(metric in entry and entry[metric] is not None for entry in data):
+        print(f"No se encontraron valores válidos para la métrica {metric}")
+        return
+    
+    # Agrupar por tipo de prueba y número total de transacciones
+    test_groups = {}
+    print(f"Procesando {len(data)} entradas de datos")
+    print(f"Ejemplo de data 1: {data[0]}")
+    for entry in data:
+        key = (entry['testType'], entry['totalTransactions'])
+        if key not in test_groups:
+            test_groups[key] = []
+        test_groups[key].append(entry)
+    print(f"Grupos de prueba encontrados: {len(test_groups)}")
+    # Plotear cada tipo de test
+    for (test_type, total_tx), entries in test_groups.items():
+        # Organizar las entradas por número de solicitud
+        request_groups = {}
+        for entry in entries:
+            # Validar que tengamos los campos necesarios
+            if entry.get('requestNumber') is not None and entry.get('transactionSuccess') == 'Yes':
+                request_num = int(entry.get('requestNumber'))
+                if request_num not in request_groups:
+                    request_groups[request_num] = []
+                # Asegurar que el valor del metric existe y es válido
+                if entry.get(metric) is not None:
+                    try:
+                        request_groups[request_num].append(float(entry[metric]))
+                    except ValueError:
+                        print(f"Valor no válido para metric en transacción #{request_num}")
+                        continue
+        
+        # Calcular promedios por número de solicitud
+        transaction_numbers = sorted(request_groups.keys())
+        metric_values = []
+        print(f"Procesando {len(transaction_numbers)} transacciones para {test_type} - {total_tx} tx")
+        for num in transaction_numbers:
+            if request_groups[num]:  # VEerificar que hay valores para promediar
+                metric_values.append(mean(request_groups[num]))
+            else:
+                print(f"Advertencia: No hay valores válidos para la transacción #{num}")
+        print("Promedios calculados:", metric_values)
+        if transaction_numbers and metric_values:  # Verificar que hay datos para graficar
+            label = f'{test_type} - {total_tx} tx'
+            plt.plot(transaction_numbers, metric_values, label=label, marker='o', markersize=2)
+            print(f"Graficando {len(transaction_numbers)} puntos promediados para {label}")
+            
+            # Imprimir algunos detalles para verificación
+            for num in transaction_numbers:
+                values = request_groups[num]
+                if values:
+                    print(f"{test_type} - Transacción #{num}: {len(values)} valores, promedio: {mean(values):.2f}")
+        else:
+            print(f"No hay datos válidos para graficar {test_type} - {total_tx} tx")
+
+    plt.xlabel('Número de Transacción')
+    plt.ylabel(f'-{metric} (Promedio)')
+    plt.title(title, fontsize=15)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.grid(True)
+    
+    try:
+        plt.savefig(f'{metric}_vs_transaction_avg.png', bbox_inches='tight')
+        print(f"Gráfica guardada: {metric}_vs_transaction_avg.png")
+    except Exception as e:
+        print(f"Error guardando la gráfica {metric}: {str(e)}")
+    
+    plt.close()
+
+    # Agregar información sobre datos procesados
+    if not any(len(request_groups) > 0 for request_groups in test_groups.values()):
+        print(f"No se encontraron grupos de prueba válidos para {metric}")
+
 def plot_transaction_cost_vs_length(data):
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(20, 15))  # Aumentar el tamaño de la figura
     df = pd.DataFrame(data)
     df['parametersLength'] = pd.to_numeric(df['parametersLength'])
     df['transactionCost'] = pd.to_numeric(df['transactionCost'])
     df.boxplot(column='transactionCost', by='parametersLength')
     plt.xlabel('Longitud de Parámetros')
     plt.ylabel('Costo de Transacción')
-    plt.title('Costo de Transacción vs Longitud de Parámetros')
+    plt.title('Costo de Transacción vs Longitud de Parámetros', fontsize=15)
     plt.suptitle('')
+    plt.tight_layout()  # Ajustar automáticamente los márgenes
     plt.savefig('transaction_cost_vs_length.png')
 
 def calculate_statistics(data, metric):
@@ -207,22 +343,31 @@ def calculate_transaction_speed(data, interval='60S'):
 
 def main():
     data = read_data()
-    data = parse_data(data)
+    if not data:
+        print("No se pudieron cargar datos del archivo")
+        return
+        
+    parsed_data = parse_data(data)
+    if not parsed_data:
+        print("No hay datos válidos para procesar")
+        return
+    
+    print(f"Se procesaron exitosamente {len(parsed_data)} entradas de datos")
     
     # Gráficos actualizados
-    plot_metric_vs_time(data, 'cpuUsageDiff', 'Diferencia de Uso de CPU vs Tiempo')
-    plot_metric_vs_time(data, 'ramUsageDiff', 'Diferencia de Uso de RAM vs Tiempo')
-    plot_metric_vs_time(data, 'latency', 'Latencia vs Tiempo')
+    plot_metric_vs_transaction(parsed_data, 'cpuUsageDiff', 'Diferencia de Uso de CPU vs Número de Transacción')
+    plot_metric_vs_time(parsed_data, 'ramUsageDiff', 'Diferencia de Uso de RAM vs Tiempo')
+    plot_metric_vs_time(parsed_data, 'latency', 'Latencia vs Tiempo')
     
     # Gráfico de Costo Transaccional vs Longitud de Parámetros
-    plot_transaction_cost_vs_length(data)
+    plot_transaction_cost_vs_length(parsed_data)
     
     # Velocidad de Transacción
-    transaction_speed = calculate_transaction_speed(data, interval='60s')
+    transaction_speed = calculate_transaction_speed(parsed_data, interval='60s')
     
     # Tabla de estadísticas (Media, Moda, Mediana)
     metrics = ['cpuUsageDiff', 'ramUsageDiff', 'transactionCost', 'latency']
-    stats_table = generate_statistics_table(data, metrics)
+    stats_table = generate_statistics_table(parsed_data, metrics)
     
     print("Estadísticas:")
     print(stats_table)
