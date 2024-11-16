@@ -222,83 +222,34 @@ def plot_metric_vs_transaction(data, metric, title):
     if not data:
         print(f"No hay datos para graficar {metric}")
         return
-        
+
     plt.figure(figsize=(12, 8))
-    
-    # Validar que la métrica existe en los datos
-    if not any(metric in entry and entry[metric] is not None for entry in data):
+
+    # Filtrar datos válidos
+    valid_data = [entry for entry in data if entry.get(metric) is not None and entry.get('requestNumber') is not None]
+    if not valid_data:
         print(f"No se encontraron valores válidos para la métrica {metric}")
         return
-    
-    # Agrupar por tipo de prueba y número total de transacciones
-    test_groups = {}
-    print(f"Procesando {len(data)} entradas de datos")
-    print(f"Ejemplo de data 1: {data[0]}")
-    for entry in data:
-        key = (entry['testType'], entry['totalTransactions'])
-        if key not in test_groups:
-            test_groups[key] = []
-        test_groups[key].append(entry)
-    print(f"Grupos de prueba encontrados: {len(test_groups)}")
-    # Plotear cada tipo de test
-    for (test_type, total_tx), entries in test_groups.items():
-        print("Test type", test_type)
-        # Organizar las entradas por número de solicitud
-        request_groups = {}
-        for entry in entries:
-            # Validar que tengamos los campos necesarios
-            if entry.get('requestNumber') is not None and entry.get('transactionSuccess') == 'Yes':
-                request_num = int(entry.get('requestNumber'))
-                if request_num not in request_groups:
-                    request_groups[request_num] = []
-                # Asegurar que el valor del metric existe y es válido
-                if entry.get(metric) is not None:
-                    try:
-                        request_groups[request_num].append(float(entry[metric]))
-                    except ValueError:
-                        print(f"Valor no válido para metric en transacción #{request_num}")
-                        continue
-        
-        # Calcular promedios por número de solicitud
-        transaction_numbers = sorted(request_groups.keys())
-        metric_values = []
-        print(f"Procesando {len(transaction_numbers)} transacciones para {test_type} - {total_tx} tx")
-        for num in transaction_numbers:
-            if request_groups[num]:  # VEerificar que hay valores para promediar
-                metric_values.append(mean(request_groups[num]))
-            else:
-                print(f"Advertencia: No hay valores válidos para la transacción #{num}")
-        print("Promedios calculados:", metric_values)
-        if transaction_numbers and metric_values:  # Verificar que hay datos para graficar
-            label = f'{test_type} - {total_tx} tx'
-            plt.plot(transaction_numbers, metric_values, label=label, marker='o', markersize=2)
-            print(f"Graficando {len(transaction_numbers)} puntos promediados para {label}")
-            
-            # Imprimir algunos detalles para verificación
-            for num in transaction_numbers:
-                values = request_groups[num]
-                if values:
-                    print(f"{test_type} - Transacción #{num}: {len(values)} valores, promedio: {mean(values):.2f}")
-        else:
-            print(f"No hay datos válidos para graficar {test_type} - {total_tx} tx")
 
+    # Ordenar los datos por número de transacción
+    valid_data.sort(key=lambda x: int(x['requestNumber']))
+    transaction_numbers = [int(entry['requestNumber']) for entry in valid_data]
+    metric_values = [float(entry[metric]) for entry in valid_data]
+
+    # Plotear los datos
+    plt.plot(transaction_numbers, metric_values, marker='o', markersize=3)
     plt.xlabel('Número de Transacción')
-    plt.ylabel(f'-{metric} (Promedio)')
-    plt.title(title, fontsize=15)
-    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.ylabel(metric)
+    plt.title(title)
     plt.grid(True)
-    
+
     try:
-        plt.savefig(f'{metric}_vs_transaction_avg.png', bbox_inches='tight')
-        print(f"Gráfica guardada: {metric}_vs_transaction_avg.png")
+        plt.savefig(f'{metric}_vs_transaction.png', bbox_inches='tight')
+        print(f"Gráfica guardada: {metric}_vs_transaction.png")
     except Exception as e:
         print(f"Error guardando la gráfica {metric}: {str(e)}")
-    
-    plt.close()
 
-    # Agregar información sobre datos procesados
-    if not any(len(request_groups) > 0 for request_groups in test_groups.values()):
-        print(f"No se encontraron grupos de prueba válidos para {metric}")
+    plt.close()
 
 def plot_transaction_cost_vs_length(data):
     plt.figure(figsize=(20, 15))  # Aumentar el tamaño de la figura
