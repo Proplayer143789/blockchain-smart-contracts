@@ -9,8 +9,10 @@
         ProofSize: 53012
         Tip: 56
         Duration: 2138 ms
-        CPU Usage (start): 0.11%, CPU Usage (end): 0.11%
-        RAM Usage (start): 13.19%, RAM Usage (end): 13.20%
+        CPU Usage (start): 0.11%
+        CPU Usage (end): 0.11%
+        RAM Usage (start): 13.19%
+        RAM Usage (end): 13.20%
         Transaction Success: Yes
         Parameters Length: 170
         Test Type: sequential
@@ -26,8 +28,10 @@
         ProofSize: 53012
         Tip: 51
         Duration: 2090 ms
-        CPU Usage (start): 0.11%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.20%, RAM Usage (end): 13.20%
+        CPU Usage (start): 0.11%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.20%
+        RAM Usage (end): 13.20%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -43,8 +47,10 @@
         ProofSize: 53012
         Tip: 48
         Duration: 2124 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.20%, RAM Usage (end): 13.18%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.20%
+        RAM Usage (end): 13.18%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -60,8 +66,10 @@
         ProofSize: 53012
         Tip: 2
         Duration: 2117 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.18%, RAM Usage (end): 13.05%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.18%
+        RAM Usage (end): 13.05%
         Transaction Success: Yes
         Parameters Length: 164
         Test Type: sequential
@@ -77,8 +85,10 @@
         ProofSize: 53012
         Tip: 10
         Duration: 2117 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.05%, RAM Usage (end): 13.06%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.05%
+        RAM Usage (end): 13.06%
         Transaction Success: Yes
         Parameters Length: 169
         Test Type: sequential
@@ -94,8 +104,10 @@
         ProofSize: 53012
         Tip: 29
         Duration: 2120 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.09%
-        RAM Usage (start): 13.06%, RAM Usage (end): 13.06%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.09%
+        RAM Usage (start): 13.06%
+        RAM Usage (end): 13.06%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -111,8 +123,10 @@
         ProofSize: 53012
         Tip: 69
         Duration: 2119 ms
-        CPU Usage (start): 0.09%, CPU Usage (end): 0.09%
-        RAM Usage (start): 13.06%, RAM Usage (end): 13.06%
+        CPU Usage (start): 0.09%
+        CPU Usage (end): 0.09%
+        RAM Usage (start): 13.06%
+        RAM Usage (end): 13.06%
         Transaction Success: Yes
         Parameters Length: 173
         Test Type: sequential
@@ -128,8 +142,10 @@
         ProofSize: 53012
         Tip: 41
         Duration: 2128 ms
-        CPU Usage (start): 0.09%, CPU Usage (end): 0.09%
-        RAM Usage (start): 13.06%, RAM Usage (end): 13.09%
+        CPU Usage (start): 0.09%
+        CPU Usage (end): 0.09%
+        RAM Usage (start): 13.06%
+        RAM Usage (end): 13.09%
         Transaction Success: Yes
         Parameters Length: 176
         Test Type: sequential
@@ -145,8 +161,10 @@
         ProofSize: 53012
         Tip: 31
         Duration: 2128 ms
-        CPU Usage (start): 0.09%, CPU Usage (end): 0.08%
-        RAM Usage (start): 13.09%, RAM Usage (end): 13.09%
+        CPU Usage (start): 0.09%
+        CPU Usage (end): 0.08%
+        RAM Usage (start): 13.09%
+        RAM Usage (end): 13.09%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -162,8 +180,10 @@
         ProofSize: 53012
         Tip: 47
         Duration: 2118 ms
-        CPU Usage (start): 0.08%, CPU Usage (end): 0.08%
-        RAM Usage (start): 13.09%, RAM Usage (end): 13.12%
+        CPU Usage (start): 0.08%
+        CPU Usage (end): 0.08%
+        RAM Usage (start): 13.09%
+        RAM Usage (end): 13.12%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -179,8 +199,10 @@
         ProofSize: 53012
         Tip: 27
         Duration: 2128 ms
-        CPU Usage (start): 0.08%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.12%, RAM Usage (end): 13.13%
+        CPU Usage (start): 0.08%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.12%
+        RAM Usage (end): 13.13%
         Transaction Success: Yes
         Parameters Length: 164
         Test Type: sequential
@@ -196,8 +218,10 @@
         ProofSize: 53012
         Tip: 62
         Duration: 2111 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.13%, RAM Usage (end): 13.13%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.13%
+        RAM Usage (end): 13.13%
         Transaction Success: Yes
         Parameters Length: 160
         Test Type: sequential
@@ -213,8 +237,10 @@
         ProofSize: 53012
         Tip: 72
         Duration: 2118 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.13%, RAM Usage (end): 13.14%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.13%
+        RAM Usage (end): 13.14%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -230,8 +256,10 @@
         ProofSize: 53012
         Tip: 79
         Duration: 2128 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.15%
-        RAM Usage (start): 13.14%, RAM Usage (end): 13.14%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.15%
+        RAM Usage (start): 13.14%
+        RAM Usage (end): 13.14%
         Transaction Success: Yes
         Parameters Length: 165
         Test Type: sequential
@@ -247,8 +275,10 @@
         ProofSize: 53012
         Tip: 42
         Duration: 2129 ms
-        CPU Usage (start): 0.15%, CPU Usage (end): 0.15%
-        RAM Usage (start): 13.14%, RAM Usage (end): 13.14%
+        CPU Usage (start): 0.15%
+        CPU Usage (end): 0.15%
+        RAM Usage (start): 13.14%
+        RAM Usage (end): 13.14%
         Transaction Success: Yes
         Parameters Length: 176
         Test Type: sequential
@@ -264,8 +294,10 @@
         ProofSize: 53012
         Tip: 58
         Duration: 2121 ms
-        CPU Usage (start): 0.15%, CPU Usage (end): 0.14%
-        RAM Usage (start): 13.14%, RAM Usage (end): 13.14%
+        CPU Usage (start): 0.15%
+        CPU Usage (end): 0.14%
+        RAM Usage (start): 13.14%
+        RAM Usage (end): 13.14%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -281,8 +313,10 @@
         ProofSize: 53012
         Tip: 9
         Duration: 2096 ms
-        CPU Usage (start): 0.14%, CPU Usage (end): 0.14%
-        RAM Usage (start): 13.14%, RAM Usage (end): 13.15%
+        CPU Usage (start): 0.14%
+        CPU Usage (end): 0.14%
+        RAM Usage (start): 13.14%
+        RAM Usage (end): 13.15%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -298,8 +332,10 @@
         ProofSize: 53012
         Tip: 93
         Duration: 2118 ms
-        CPU Usage (start): 0.14%, CPU Usage (end): 0.12%
-        RAM Usage (start): 13.15%, RAM Usage (end): 13.15%
+        CPU Usage (start): 0.14%
+        CPU Usage (end): 0.12%
+        RAM Usage (start): 13.15%
+        RAM Usage (end): 13.15%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -315,8 +351,10 @@
         ProofSize: 53012
         Tip: 7
         Duration: 2107 ms
-        CPU Usage (start): 0.12%, CPU Usage (end): 0.12%
-        RAM Usage (start): 13.15%, RAM Usage (end): 13.18%
+        CPU Usage (start): 0.12%
+        CPU Usage (end): 0.12%
+        RAM Usage (start): 13.15%
+        RAM Usage (end): 13.18%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -332,8 +370,10 @@
         ProofSize: 53012
         Tip: 88
         Duration: 2124 ms
-        CPU Usage (start): 0.12%, CPU Usage (end): 0.12%
-        RAM Usage (start): 13.18%, RAM Usage (end): 13.21%
+        CPU Usage (start): 0.12%
+        CPU Usage (end): 0.12%
+        RAM Usage (start): 13.18%
+        RAM Usage (end): 13.21%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -349,8 +389,10 @@
         ProofSize: 53012
         Tip: 5
         Duration: 2113 ms
-        CPU Usage (start): 0.12%, CPU Usage (end): 0.11%
-        RAM Usage (start): 13.21%, RAM Usage (end): 13.20%
+        CPU Usage (start): 0.12%
+        CPU Usage (end): 0.11%
+        RAM Usage (start): 13.21%
+        RAM Usage (end): 13.20%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -366,8 +408,10 @@
         ProofSize: 53012
         Tip: 100
         Duration: 2111 ms
-        CPU Usage (start): 0.11%, CPU Usage (end): 0.11%
-        RAM Usage (start): 13.20%, RAM Usage (end): 13.20%
+        CPU Usage (start): 0.11%
+        CPU Usage (end): 0.11%
+        RAM Usage (start): 13.20%
+        RAM Usage (end): 13.20%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -383,8 +427,10 @@
         ProofSize: 53012
         Tip: 96
         Duration: 2130 ms
-        CPU Usage (start): 0.11%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.20%, RAM Usage (end): 13.22%
+        CPU Usage (start): 0.11%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.20%
+        RAM Usage (end): 13.22%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -400,8 +446,10 @@
         ProofSize: 53012
         Tip: 11
         Duration: 2117 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.22%, RAM Usage (end): 13.22%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.22%
+        RAM Usage (end): 13.22%
         Transaction Success: Yes
         Parameters Length: 169
         Test Type: sequential
@@ -417,8 +465,10 @@
         ProofSize: 53012
         Tip: 92
         Duration: 2119 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.22%, RAM Usage (end): 13.23%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.22%
+        RAM Usage (end): 13.23%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -434,8 +484,10 @@
         ProofSize: 53012
         Tip: 86
         Duration: 2126 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.23%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.23%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -451,8 +503,10 @@
         ProofSize: 53012
         Tip: 72
         Duration: 2119 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 173
         Test Type: sequential
@@ -468,8 +522,10 @@
         ProofSize: 53012
         Tip: 80
         Duration: 2120 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.09%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.09%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 173
         Test Type: sequential
@@ -485,8 +541,10 @@
         ProofSize: 53012
         Tip: 9
         Duration: 2080 ms
-        CPU Usage (start): 0.09%, CPU Usage (end): 0.09%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.09%
+        CPU Usage (end): 0.09%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 161
         Test Type: sequential
@@ -502,8 +560,10 @@
         ProofSize: 53012
         Tip: 30
         Duration: 2109 ms
-        CPU Usage (start): 0.09%, CPU Usage (end): 0.16%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.26%
+        CPU Usage (start): 0.09%
+        CPU Usage (end): 0.16%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.26%
         Transaction Success: Yes
         Parameters Length: 169
         Test Type: sequential
@@ -519,8 +579,10 @@
         ProofSize: 53012
         Tip: 74
         Duration: 2117 ms
-        CPU Usage (start): 0.16%, CPU Usage (end): 0.16%
-        RAM Usage (start): 13.26%, RAM Usage (end): 13.26%
+        CPU Usage (start): 0.16%
+        CPU Usage (end): 0.16%
+        RAM Usage (start): 13.26%
+        RAM Usage (end): 13.26%
         Transaction Success: Yes
         Parameters Length: 165
         Test Type: sequential
@@ -536,8 +598,10 @@
         ProofSize: 53012
         Tip: 13
         Duration: 2122 ms
-        CPU Usage (start): 0.16%, CPU Usage (end): 0.15%
-        RAM Usage (start): 13.26%, RAM Usage (end): 13.26%
+        CPU Usage (start): 0.16%
+        CPU Usage (end): 0.15%
+        RAM Usage (start): 13.26%
+        RAM Usage (end): 13.26%
         Transaction Success: Yes
         Parameters Length: 165
         Test Type: sequential
@@ -553,8 +617,10 @@
         ProofSize: 53012
         Tip: 91
         Duration: 2119 ms
-        CPU Usage (start): 0.15%, CPU Usage (end): 0.15%
-        RAM Usage (start): 13.26%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.15%
+        CPU Usage (end): 0.15%
+        RAM Usage (start): 13.26%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 173
         Test Type: sequential
@@ -570,8 +636,10 @@
         ProofSize: 53012
         Tip: 49
         Duration: 2119 ms
-        CPU Usage (start): 0.15%, CPU Usage (end): 0.15%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.15%
+        CPU Usage (end): 0.15%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -587,8 +655,10 @@
         ProofSize: 53012
         Tip: 28
         Duration: 2079 ms
-        CPU Usage (start): 0.15%, CPU Usage (end): 0.14%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.23%
+        CPU Usage (start): 0.15%
+        CPU Usage (end): 0.14%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.23%
         Transaction Success: Yes
         Parameters Length: 170
         Test Type: sequential
@@ -604,8 +674,10 @@
         ProofSize: 53012
         Tip: 55
         Duration: 2117 ms
-        CPU Usage (start): 0.14%, CPU Usage (end): 0.14%
-        RAM Usage (start): 13.23%, RAM Usage (end): 13.23%
+        CPU Usage (start): 0.14%
+        CPU Usage (end): 0.14%
+        RAM Usage (start): 13.23%
+        RAM Usage (end): 13.23%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -621,8 +693,10 @@
         ProofSize: 53012
         Tip: 10
         Duration: 2126 ms
-        CPU Usage (start): 0.14%, CPU Usage (end): 0.12%
-        RAM Usage (start): 13.23%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.14%
+        CPU Usage (end): 0.12%
+        RAM Usage (start): 13.23%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -638,8 +712,10 @@
         ProofSize: 53012
         Tip: 98
         Duration: 2120 ms
-        CPU Usage (start): 0.12%, CPU Usage (end): 0.12%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.12%
+        CPU Usage (end): 0.12%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 177
         Test Type: sequential
@@ -655,8 +731,10 @@
         ProofSize: 53012
         Tip: 13
         Duration: 2110 ms
-        CPU Usage (start): 0.12%, CPU Usage (end): 0.12%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.12%
+        CPU Usage (end): 0.12%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -672,8 +750,10 @@
         ProofSize: 53012
         Tip: 62
         Duration: 2117 ms
-        CPU Usage (start): 0.12%, CPU Usage (end): 0.35%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.12%
+        CPU Usage (end): 0.35%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -689,8 +769,10 @@
         ProofSize: 53012
         Tip: 76
         Duration: 2109 ms
-        CPU Usage (start): 0.35%, CPU Usage (end): 0.35%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.35%
+        CPU Usage (end): 0.35%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 169
         Test Type: sequential
@@ -706,8 +788,10 @@
         ProofSize: 53012
         Tip: 90
         Duration: 2130 ms
-        CPU Usage (start): 0.35%, CPU Usage (end): 0.33%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.35%
+        CPU Usage (end): 0.33%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -723,8 +807,10 @@
         ProofSize: 53012
         Tip: 37
         Duration: 2118 ms
-        CPU Usage (start): 0.33%, CPU Usage (end): 0.33%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.26%
+        CPU Usage (start): 0.33%
+        CPU Usage (end): 0.33%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.26%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -740,8 +826,10 @@
         ProofSize: 53012
         Tip: 40
         Duration: 2119 ms
-        CPU Usage (start): 0.33%, CPU Usage (end): 0.30%
-        RAM Usage (start): 13.26%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.33%
+        CPU Usage (end): 0.30%
+        RAM Usage (start): 13.26%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 169
         Test Type: sequential
@@ -757,8 +845,10 @@
         ProofSize: 53012
         Tip: 51
         Duration: 2118 ms
-        CPU Usage (start): 0.30%, CPU Usage (end): 0.30%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.26%
+        CPU Usage (start): 0.30%
+        CPU Usage (end): 0.30%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.26%
         Transaction Success: Yes
         Parameters Length: 176
         Test Type: sequential
@@ -774,8 +864,10 @@
         ProofSize: 53012
         Tip: 70
         Duration: 2083 ms
-        CPU Usage (start): 0.30%, CPU Usage (end): 0.30%
-        RAM Usage (start): 13.26%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.30%
+        CPU Usage (end): 0.30%
+        RAM Usage (start): 13.26%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -791,8 +883,10 @@
         ProofSize: 53012
         Tip: 60
         Duration: 2114 ms
-        CPU Usage (start): 0.30%, CPU Usage (end): 0.28%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.30%
+        CPU Usage (end): 0.28%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 167
         Test Type: sequential
@@ -808,8 +902,10 @@
         ProofSize: 53012
         Tip: 85
         Duration: 2028 ms
-        CPU Usage (start): 0.28%, CPU Usage (end): 0.28%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.28%
+        CPU Usage (end): 0.28%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 179
         Test Type: sequential
@@ -825,8 +921,10 @@
         ProofSize: 53012
         Tip: 32
         Duration: 2109 ms
-        CPU Usage (start): 0.28%, CPU Usage (end): 0.33%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.28%
+        CPU Usage (end): 0.33%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 176
         Test Type: sequential
@@ -842,8 +940,10 @@
         ProofSize: 53012
         Tip: 55
         Duration: 2109 ms
-        CPU Usage (start): 0.33%, CPU Usage (end): 0.33%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.23%
+        CPU Usage (start): 0.33%
+        CPU Usage (end): 0.33%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.23%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -859,8 +959,10 @@
         ProofSize: 53012
         Tip: 48
         Duration: 2118 ms
-        CPU Usage (start): 0.33%, CPU Usage (end): 0.31%
-        RAM Usage (start): 13.23%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.33%
+        CPU Usage (end): 0.31%
+        RAM Usage (start): 13.23%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -876,8 +978,10 @@
         ProofSize: 53012
         Tip: 20
         Duration: 2118 ms
-        CPU Usage (start): 0.31%, CPU Usage (end): 0.31%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.31%
+        CPU Usage (end): 0.31%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 165
         Test Type: sequential
@@ -893,8 +997,10 @@
         ProofSize: 53012
         Tip: 7
         Duration: 2109 ms
-        CPU Usage (start): 0.31%, CPU Usage (end): 0.31%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.31%
+        CPU Usage (end): 0.31%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -910,8 +1016,10 @@
         ProofSize: 53012
         Tip: 26
         Duration: 2109 ms
-        CPU Usage (start): 0.31%, CPU Usage (end): 0.28%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.31%
+        CPU Usage (end): 0.28%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 165
         Test Type: sequential
@@ -927,8 +1035,10 @@
         ProofSize: 53012
         Tip: 52
         Duration: 2120 ms
-        CPU Usage (start): 0.28%, CPU Usage (end): 0.28%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.28%
+        CPU Usage (end): 0.28%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -944,8 +1054,10 @@
         ProofSize: 53012
         Tip: 36
         Duration: 2127 ms
-        CPU Usage (start): 0.28%, CPU Usage (end): 0.26%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.23%
+        CPU Usage (start): 0.28%
+        CPU Usage (end): 0.26%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.23%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -961,8 +1073,10 @@
         ProofSize: 53012
         Tip: 71
         Duration: 2108 ms
-        CPU Usage (start): 0.26%, CPU Usage (end): 0.26%
-        RAM Usage (start): 13.23%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.26%
+        CPU Usage (end): 0.26%
+        RAM Usage (start): 13.23%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 170
         Test Type: sequential
@@ -978,8 +1092,10 @@
         ProofSize: 53012
         Tip: 85
         Duration: 2120 ms
-        CPU Usage (start): 0.26%, CPU Usage (end): 0.26%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.26%
+        CPU Usage (end): 0.26%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -995,8 +1111,10 @@
         ProofSize: 53012
         Tip: 56
         Duration: 2120 ms
-        CPU Usage (start): 0.26%, CPU Usage (end): 0.24%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.26%
+        CPU Usage (end): 0.24%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 173
         Test Type: sequential
@@ -1012,8 +1130,10 @@
         ProofSize: 53012
         Tip: 73
         Duration: 2114 ms
-        CPU Usage (start): 0.24%, CPU Usage (end): 0.24%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.24%
+        CPU Usage (end): 0.24%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -1029,8 +1149,10 @@
         ProofSize: 53012
         Tip: 61
         Duration: 2118 ms
-        CPU Usage (start): 0.24%, CPU Usage (end): 0.22%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.24%
+        CPU Usage (end): 0.22%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -1046,8 +1168,10 @@
         ProofSize: 53012
         Tip: 41
         Duration: 2109 ms
-        CPU Usage (start): 0.22%, CPU Usage (end): 0.22%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.22%
+        CPU Usage (end): 0.22%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -1063,8 +1187,10 @@
         ProofSize: 53012
         Tip: 77
         Duration: 2130 ms
-        CPU Usage (start): 0.22%, CPU Usage (end): 0.20%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.26%
+        CPU Usage (start): 0.22%
+        CPU Usage (end): 0.20%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.26%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -1080,8 +1206,10 @@
         ProofSize: 53012
         Tip: 69
         Duration: 2117 ms
-        CPU Usage (start): 0.20%, CPU Usage (end): 0.20%
-        RAM Usage (start): 13.26%, RAM Usage (end): 13.26%
+        CPU Usage (start): 0.20%
+        CPU Usage (end): 0.20%
+        RAM Usage (start): 13.26%
+        RAM Usage (end): 13.26%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -1097,8 +1225,10 @@
         ProofSize: 53012
         Tip: 87
         Duration: 2119 ms
-        CPU Usage (start): 0.20%, CPU Usage (end): 0.20%
-        RAM Usage (start): 13.26%, RAM Usage (end): 13.14%
+        CPU Usage (start): 0.20%
+        CPU Usage (end): 0.20%
+        RAM Usage (start): 13.26%
+        RAM Usage (end): 13.14%
         Transaction Success: Yes
         Parameters Length: 167
         Test Type: sequential
@@ -1114,8 +1244,10 @@
         ProofSize: 53012
         Tip: 53
         Duration: 2119 ms
-        CPU Usage (start): 0.20%, CPU Usage (end): 0.18%
-        RAM Usage (start): 13.14%, RAM Usage (end): 13.14%
+        CPU Usage (start): 0.20%
+        CPU Usage (end): 0.18%
+        RAM Usage (start): 13.14%
+        RAM Usage (end): 13.14%
         Transaction Success: Yes
         Parameters Length: 164
         Test Type: sequential
@@ -1131,8 +1263,10 @@
         ProofSize: 53012
         Tip: 46
         Duration: 2128 ms
-        CPU Usage (start): 0.18%, CPU Usage (end): 0.18%
-        RAM Usage (start): 13.14%, RAM Usage (end): 13.16%
+        CPU Usage (start): 0.18%
+        CPU Usage (end): 0.18%
+        RAM Usage (start): 13.14%
+        RAM Usage (end): 13.16%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -1148,8 +1282,10 @@
         ProofSize: 53012
         Tip: 15
         Duration: 2112 ms
-        CPU Usage (start): 0.18%, CPU Usage (end): 0.17%
-        RAM Usage (start): 13.16%, RAM Usage (end): 13.16%
+        CPU Usage (start): 0.18%
+        CPU Usage (end): 0.17%
+        RAM Usage (start): 13.16%
+        RAM Usage (end): 13.16%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -1165,8 +1301,10 @@
         ProofSize: 53012
         Tip: 24
         Duration: 2116 ms
-        CPU Usage (start): 0.17%, CPU Usage (end): 0.17%
-        RAM Usage (start): 13.16%, RAM Usage (end): 13.16%
+        CPU Usage (start): 0.17%
+        CPU Usage (end): 0.17%
+        RAM Usage (start): 13.16%
+        RAM Usage (end): 13.16%
         Transaction Success: Yes
         Parameters Length: 169
         Test Type: sequential
@@ -1182,8 +1320,10 @@
         ProofSize: 53012
         Tip: 44
         Duration: 2108 ms
-        CPU Usage (start): 0.17%, CPU Usage (end): 0.16%
-        RAM Usage (start): 13.16%, RAM Usage (end): 13.17%
+        CPU Usage (start): 0.17%
+        CPU Usage (end): 0.16%
+        RAM Usage (start): 13.16%
+        RAM Usage (end): 13.17%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -1199,8 +1339,10 @@
         ProofSize: 53012
         Tip: 62
         Duration: 2118 ms
-        CPU Usage (start): 0.16%, CPU Usage (end): 0.16%
-        RAM Usage (start): 13.17%, RAM Usage (end): 13.18%
+        CPU Usage (start): 0.16%
+        CPU Usage (end): 0.16%
+        RAM Usage (start): 13.17%
+        RAM Usage (end): 13.18%
         Transaction Success: Yes
         Parameters Length: 176
         Test Type: sequential
@@ -1216,8 +1358,10 @@
         ProofSize: 53012
         Tip: 45
         Duration: 2130 ms
-        CPU Usage (start): 0.16%, CPU Usage (end): 0.16%
-        RAM Usage (start): 13.18%, RAM Usage (end): 13.19%
+        CPU Usage (start): 0.16%
+        CPU Usage (end): 0.16%
+        RAM Usage (start): 13.18%
+        RAM Usage (end): 13.19%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -1233,8 +1377,10 @@
         ProofSize: 53012
         Tip: 54
         Duration: 2118 ms
-        CPU Usage (start): 0.16%, CPU Usage (end): 0.14%
-        RAM Usage (start): 13.19%, RAM Usage (end): 13.21%
+        CPU Usage (start): 0.16%
+        CPU Usage (end): 0.14%
+        RAM Usage (start): 13.19%
+        RAM Usage (end): 13.21%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -1250,8 +1396,10 @@
         ProofSize: 53012
         Tip: 38
         Duration: 2119 ms
-        CPU Usage (start): 0.14%, CPU Usage (end): 0.14%
-        RAM Usage (start): 13.21%, RAM Usage (end): 13.21%
+        CPU Usage (start): 0.14%
+        CPU Usage (end): 0.14%
+        RAM Usage (start): 13.21%
+        RAM Usage (end): 13.21%
         Transaction Success: Yes
         Parameters Length: 167
         Test Type: sequential
@@ -1267,8 +1415,10 @@
         ProofSize: 53012
         Tip: 74
         Duration: 2118 ms
-        CPU Usage (start): 0.14%, CPU Usage (end): 0.13%
-        RAM Usage (start): 13.21%, RAM Usage (end): 13.21%
+        CPU Usage (start): 0.14%
+        CPU Usage (end): 0.13%
+        RAM Usage (start): 13.21%
+        RAM Usage (end): 13.21%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -1284,8 +1434,10 @@
         ProofSize: 53012
         Tip: 32
         Duration: 2119 ms
-        CPU Usage (start): 0.13%, CPU Usage (end): 0.13%
-        RAM Usage (start): 13.21%, RAM Usage (end): 13.22%
+        CPU Usage (start): 0.13%
+        CPU Usage (end): 0.13%
+        RAM Usage (start): 13.21%
+        RAM Usage (end): 13.22%
         Transaction Success: Yes
         Parameters Length: 170
         Test Type: sequential
@@ -1301,8 +1453,10 @@
         ProofSize: 53012
         Tip: 51
         Duration: 2118 ms
-        CPU Usage (start): 0.13%, CPU Usage (end): 0.12%
-        RAM Usage (start): 13.22%, RAM Usage (end): 13.22%
+        CPU Usage (start): 0.13%
+        CPU Usage (end): 0.12%
+        RAM Usage (start): 13.22%
+        RAM Usage (end): 13.22%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -1318,8 +1472,10 @@
         ProofSize: 53012
         Tip: 65
         Duration: 2116 ms
-        CPU Usage (start): 0.12%, CPU Usage (end): 0.12%
-        RAM Usage (start): 13.22%, RAM Usage (end): 13.24%
+        CPU Usage (start): 0.12%
+        CPU Usage (end): 0.12%
+        RAM Usage (start): 13.22%
+        RAM Usage (end): 13.24%
         Transaction Success: Yes
         Parameters Length: 162
         Test Type: sequential
@@ -1335,8 +1491,10 @@
         ProofSize: 53012
         Tip: 11
         Duration: 2121 ms
-        CPU Usage (start): 0.12%, CPU Usage (end): 0.12%
-        RAM Usage (start): 13.24%, RAM Usage (end): 13.25%
+        CPU Usage (start): 0.12%
+        CPU Usage (end): 0.12%
+        RAM Usage (start): 13.24%
+        RAM Usage (end): 13.25%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -1352,8 +1510,10 @@
         ProofSize: 53012
         Tip: 93
         Duration: 2118 ms
-        CPU Usage (start): 0.12%, CPU Usage (end): 0.11%
-        RAM Usage (start): 13.25%, RAM Usage (end): 13.26%
+        CPU Usage (start): 0.12%
+        CPU Usage (end): 0.11%
+        RAM Usage (start): 13.25%
+        RAM Usage (end): 13.26%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -1369,8 +1529,10 @@
         ProofSize: 53012
         Tip: 43
         Duration: 2119 ms
-        CPU Usage (start): 0.11%, CPU Usage (end): 0.11%
-        RAM Usage (start): 13.26%, RAM Usage (end): 13.27%
+        CPU Usage (start): 0.11%
+        CPU Usage (end): 0.11%
+        RAM Usage (start): 13.26%
+        RAM Usage (end): 13.27%
         Transaction Success: Yes
         Parameters Length: 173
         Test Type: sequential
@@ -1386,8 +1548,10 @@
         ProofSize: 53012
         Tip: 97
         Duration: 2109 ms
-        CPU Usage (start): 0.11%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.27%, RAM Usage (end): 13.27%
+        CPU Usage (start): 0.11%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.27%
+        RAM Usage (end): 13.27%
         Transaction Success: Yes
         Parameters Length: 178
         Test Type: sequential
@@ -1403,8 +1567,10 @@
         ProofSize: 53012
         Tip: 47
         Duration: 2122 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.27%, RAM Usage (end): 13.31%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.27%
+        RAM Usage (end): 13.31%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -1420,8 +1586,10 @@
         ProofSize: 53012
         Tip: 23
         Duration: 2127 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.31%, RAM Usage (end): 13.30%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.31%
+        RAM Usage (end): 13.30%
         Transaction Success: Yes
         Parameters Length: 170
         Test Type: sequential
@@ -1437,8 +1605,10 @@
         ProofSize: 53012
         Tip: 2
         Duration: 2118 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.09%
-        RAM Usage (start): 13.30%, RAM Usage (end): 13.31%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.09%
+        RAM Usage (start): 13.30%
+        RAM Usage (end): 13.31%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -1454,8 +1624,10 @@
         ProofSize: 53012
         Tip: 98
         Duration: 2140 ms
-        CPU Usage (start): 0.09%, CPU Usage (end): 0.09%
-        RAM Usage (start): 13.31%, RAM Usage (end): 13.31%
+        CPU Usage (start): 0.09%
+        CPU Usage (end): 0.09%
+        RAM Usage (start): 13.31%
+        RAM Usage (end): 13.31%
         Transaction Success: Yes
         Parameters Length: 170
         Test Type: sequential
@@ -1471,8 +1643,10 @@
         ProofSize: 53012
         Tip: 68
         Duration: 2128 ms
-        CPU Usage (start): 0.09%, CPU Usage (end): 0.09%
-        RAM Usage (start): 13.31%, RAM Usage (end): 13.32%
+        CPU Usage (start): 0.09%
+        CPU Usage (end): 0.09%
+        RAM Usage (start): 13.31%
+        RAM Usage (end): 13.32%
         Transaction Success: Yes
         Parameters Length: 177
         Test Type: sequential
@@ -1488,8 +1662,10 @@
         ProofSize: 53012
         Tip: 78
         Duration: 2117 ms
-        CPU Usage (start): 0.09%, CPU Usage (end): 0.09%
-        RAM Usage (start): 13.32%, RAM Usage (end): 13.32%
+        CPU Usage (start): 0.09%
+        CPU Usage (end): 0.09%
+        RAM Usage (start): 13.32%
+        RAM Usage (end): 13.32%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -1505,8 +1681,10 @@
         ProofSize: 53012
         Tip: 91
         Duration: 2121 ms
-        CPU Usage (start): 0.09%, CPU Usage (end): 0.08%
-        RAM Usage (start): 13.32%, RAM Usage (end): 13.32%
+        CPU Usage (start): 0.09%
+        CPU Usage (end): 0.08%
+        RAM Usage (start): 13.32%
+        RAM Usage (end): 13.32%
         Transaction Success: Yes
         Parameters Length: 170
         Test Type: sequential
@@ -1522,8 +1700,10 @@
         ProofSize: 53012
         Tip: 10
         Duration: 2126 ms
-        CPU Usage (start): 0.08%, CPU Usage (end): 0.08%
-        RAM Usage (start): 13.32%, RAM Usage (end): 13.31%
+        CPU Usage (start): 0.08%
+        CPU Usage (end): 0.08%
+        RAM Usage (start): 13.32%
+        RAM Usage (end): 13.31%
         Transaction Success: Yes
         Parameters Length: 169
         Test Type: sequential
@@ -1539,8 +1719,10 @@
         ProofSize: 53012
         Tip: 22
         Duration: 2131 ms
-        CPU Usage (start): 0.08%, CPU Usage (end): 0.08%
-        RAM Usage (start): 13.31%, RAM Usage (end): 13.31%
+        CPU Usage (start): 0.08%
+        CPU Usage (end): 0.08%
+        RAM Usage (start): 13.31%
+        RAM Usage (end): 13.31%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -1556,8 +1738,10 @@
         ProofSize: 53012
         Tip: 13
         Duration: 2118 ms
-        CPU Usage (start): 0.08%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.31%, RAM Usage (end): 13.31%
+        CPU Usage (start): 0.08%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.31%
+        RAM Usage (end): 13.31%
         Transaction Success: Yes
         Parameters Length: 161
         Test Type: sequential
@@ -1573,8 +1757,10 @@
         ProofSize: 53012
         Tip: 82
         Duration: 2119 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.31%, RAM Usage (end): 13.31%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.31%
+        RAM Usage (end): 13.31%
         Transaction Success: Yes
         Parameters Length: 164
         Test Type: sequential
@@ -1590,8 +1776,10 @@
         ProofSize: 53012
         Tip: 30
         Duration: 2121 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.31%, RAM Usage (end): 13.30%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.31%
+        RAM Usage (end): 13.30%
         Transaction Success: Yes
         Parameters Length: 167
         Test Type: sequential
@@ -1607,8 +1795,10 @@
         ProofSize: 53012
         Tip: 71
         Duration: 2116 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.30%, RAM Usage (end): 13.31%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.30%
+        RAM Usage (end): 13.31%
         Transaction Success: Yes
         Parameters Length: 167
         Test Type: sequential
@@ -1624,8 +1814,10 @@
         ProofSize: 53012
         Tip: 68
         Duration: 2120 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.06%
-        RAM Usage (start): 13.31%, RAM Usage (end): 13.31%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.06%
+        RAM Usage (start): 13.31%
+        RAM Usage (end): 13.31%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -1641,8 +1833,10 @@
         ProofSize: 53012
         Tip: 20
         Duration: 2119 ms
-        CPU Usage (start): 0.06%, CPU Usage (end): 0.06%
-        RAM Usage (start): 13.31%, RAM Usage (end): 13.31%
+        CPU Usage (start): 0.06%
+        CPU Usage (end): 0.06%
+        RAM Usage (start): 13.31%
+        RAM Usage (end): 13.31%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -1658,8 +1852,10 @@
         ProofSize: 53012
         Tip: 24
         Duration: 2126 ms
-        CPU Usage (start): 0.06%, CPU Usage (end): 0.06%
-        RAM Usage (start): 13.31%, RAM Usage (end): 13.30%
+        CPU Usage (start): 0.06%
+        CPU Usage (end): 0.06%
+        RAM Usage (start): 13.31%
+        RAM Usage (end): 13.30%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -1675,8 +1871,10 @@
         ProofSize: 53012
         Tip: 52
         Duration: 2121 ms
-        CPU Usage (start): 0.06%, CPU Usage (end): 0.06%
-        RAM Usage (start): 13.30%, RAM Usage (end): 13.30%
+        CPU Usage (start): 0.06%
+        CPU Usage (end): 0.06%
+        RAM Usage (start): 13.30%
+        RAM Usage (end): 13.30%
         Transaction Success: Yes
         Parameters Length: 165
         Test Type: sequential
@@ -1692,8 +1890,10 @@
         ProofSize: 53012
         Tip: 45
         Duration: 2125 ms
-        CPU Usage (start): 0.06%, CPU Usage (end): 0.06%
-        RAM Usage (start): 13.30%, RAM Usage (end): 13.32%
+        CPU Usage (start): 0.06%
+        CPU Usage (end): 0.06%
+        RAM Usage (start): 13.30%
+        RAM Usage (end): 13.32%
         Transaction Success: Yes
         Parameters Length: 163
         Test Type: sequential
@@ -1709,8 +1909,10 @@
         ProofSize: 53012
         Tip: 15
         Duration: 2125 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.45%, RAM Usage (end): 13.46%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.45%
+        RAM Usage (end): 13.46%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -1726,8 +1928,10 @@
         ProofSize: 53012
         Tip: 19
         Duration: 2079 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.45%, RAM Usage (end): 13.46%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.45%
+        RAM Usage (end): 13.46%
         Transaction Success: Yes
         Parameters Length: 170
         Test Type: sequential
@@ -1743,8 +1947,10 @@
         ProofSize: 53012
         Tip: 32
         Duration: 2120 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.46%, RAM Usage (end): 13.45%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.46%
+        RAM Usage (end): 13.45%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -1760,8 +1966,10 @@
         ProofSize: 53012
         Tip: 40
         Duration: 2124 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.45%, RAM Usage (end): 13.43%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.45%
+        RAM Usage (end): 13.43%
         Transaction Success: Yes
         Parameters Length: 173
         Test Type: sequential
@@ -1777,8 +1985,10 @@
         ProofSize: 53012
         Tip: 37
         Duration: 2112 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.43%, RAM Usage (end): 13.43%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.43%
+        RAM Usage (end): 13.43%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -1794,8 +2004,10 @@
         ProofSize: 53012
         Tip: 43
         Duration: 2141 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.43%, RAM Usage (end): 13.44%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.43%
+        RAM Usage (end): 13.44%
         Transaction Success: Yes
         Parameters Length: 163
         Test Type: sequential
@@ -1811,8 +2023,10 @@
         ProofSize: 53012
         Tip: 56
         Duration: 2116 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.44%, RAM Usage (end): 13.43%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.44%
+        RAM Usage (end): 13.43%
         Transaction Success: Yes
         Parameters Length: 170
         Test Type: sequential
@@ -1828,8 +2042,10 @@
         ProofSize: 53012
         Tip: 29
         Duration: 2127 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.43%, RAM Usage (end): 13.44%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.43%
+        RAM Usage (end): 13.44%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -1845,8 +2061,10 @@
         ProofSize: 53012
         Tip: 95
         Duration: 2126 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.44%, RAM Usage (end): 13.45%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.44%
+        RAM Usage (end): 13.45%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -1862,8 +2080,10 @@
         ProofSize: 53012
         Tip: 20
         Duration: 2112 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.45%, RAM Usage (end): 13.33%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.45%
+        RAM Usage (end): 13.33%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -1879,8 +2099,10 @@
         ProofSize: 53012
         Tip: 27
         Duration: 2128 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.33%, RAM Usage (end): 13.35%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.33%
+        RAM Usage (end): 13.35%
         Transaction Success: Yes
         Parameters Length: 167
         Test Type: sequential
@@ -1896,8 +2118,10 @@
         ProofSize: 53012
         Tip: 52
         Duration: 2115 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.35%, RAM Usage (end): 13.35%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.35%
+        RAM Usage (end): 13.35%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -1913,8 +2137,10 @@
         ProofSize: 53012
         Tip: 76
         Duration: 2131 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.35%, RAM Usage (end): 13.36%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.35%
+        RAM Usage (end): 13.36%
         Transaction Success: Yes
         Parameters Length: 167
         Test Type: sequential
@@ -1930,8 +2156,10 @@
         ProofSize: 53012
         Tip: 66
         Duration: 2117 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.36%, RAM Usage (end): 13.38%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.36%
+        RAM Usage (end): 13.38%
         Transaction Success: Yes
         Parameters Length: 169
         Test Type: sequential
@@ -1947,8 +2175,10 @@
         ProofSize: 53012
         Tip: 74
         Duration: 2119 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.38%, RAM Usage (end): 13.39%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.38%
+        RAM Usage (end): 13.39%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -1964,8 +2194,10 @@
         ProofSize: 53012
         Tip: 61
         Duration: 2070 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.39%, RAM Usage (end): 13.40%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.39%
+        RAM Usage (end): 13.40%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -1981,8 +2213,10 @@
         ProofSize: 53012
         Tip: 61
         Duration: 2130 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.40%, RAM Usage (end): 13.41%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.40%
+        RAM Usage (end): 13.41%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -1998,8 +2232,10 @@
         ProofSize: 53012
         Tip: 31
         Duration: 2128 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.41%, RAM Usage (end): 13.42%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.41%
+        RAM Usage (end): 13.42%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -2015,8 +2251,10 @@
         ProofSize: 53012
         Tip: 91
         Duration: 2127 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.42%, RAM Usage (end): 13.42%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.42%
+        RAM Usage (end): 13.42%
         Transaction Success: Yes
         Parameters Length: 165
         Test Type: sequential
@@ -2032,8 +2270,10 @@
         ProofSize: 53012
         Tip: 10
         Duration: 2120 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.42%, RAM Usage (end): 13.41%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.42%
+        RAM Usage (end): 13.41%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -2049,8 +2289,10 @@
         ProofSize: 53012
         Tip: 63
         Duration: 2127 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.41%, RAM Usage (end): 13.42%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.41%
+        RAM Usage (end): 13.42%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -2066,8 +2308,10 @@
         ProofSize: 53012
         Tip: 68
         Duration: 2129 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.42%, RAM Usage (end): 13.43%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.42%
+        RAM Usage (end): 13.43%
         Transaction Success: Yes
         Parameters Length: 167
         Test Type: sequential
@@ -2083,8 +2327,10 @@
         ProofSize: 53012
         Tip: 31
         Duration: 2119 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.43%, RAM Usage (end): 13.43%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.43%
+        RAM Usage (end): 13.43%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -2100,8 +2346,10 @@
         ProofSize: 53012
         Tip: 81
         Duration: 2128 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.43%, RAM Usage (end): 13.44%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.43%
+        RAM Usage (end): 13.44%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -2117,8 +2365,10 @@
         ProofSize: 53012
         Tip: 63
         Duration: 2110 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.44%, RAM Usage (end): 13.44%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.44%
+        RAM Usage (end): 13.44%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -2134,8 +2384,10 @@
         ProofSize: 53012
         Tip: 37
         Duration: 2114 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.44%, RAM Usage (end): 13.47%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.44%
+        RAM Usage (end): 13.47%
         Transaction Success: Yes
         Parameters Length: 164
         Test Type: sequential
@@ -2151,8 +2403,10 @@
         ProofSize: 53012
         Tip: 5
         Duration: 2135 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.47%, RAM Usage (end): 13.47%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.47%
+        RAM Usage (end): 13.47%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -2168,8 +2422,10 @@
         ProofSize: 53012
         Tip: 53
         Duration: 2121 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.47%, RAM Usage (end): 13.47%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.47%
+        RAM Usage (end): 13.47%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -2185,8 +2441,10 @@
         ProofSize: 53012
         Tip: 53
         Duration: 2126 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.47%, RAM Usage (end): 13.48%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.47%
+        RAM Usage (end): 13.48%
         Transaction Success: Yes
         Parameters Length: 176
         Test Type: sequential
@@ -2202,8 +2460,10 @@
         ProofSize: 53012
         Tip: 40
         Duration: 2119 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.48%, RAM Usage (end): 13.48%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.48%
+        RAM Usage (end): 13.48%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -2219,8 +2479,10 @@
         ProofSize: 53012
         Tip: 47
         Duration: 2127 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.48%, RAM Usage (end): 13.49%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.48%
+        RAM Usage (end): 13.49%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -2236,8 +2498,10 @@
         ProofSize: 53012
         Tip: 74
         Duration: 2111 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.00%
-        RAM Usage (start): 13.49%, RAM Usage (end): 13.49%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.00%
+        RAM Usage (start): 13.49%
+        RAM Usage (end): 13.49%
         Transaction Success: Yes
         Parameters Length: 173
         Test Type: sequential
@@ -2253,8 +2517,10 @@
         ProofSize: 53012
         Tip: 96
         Duration: 2118 ms
-        CPU Usage (start): 0.00%, CPU Usage (end): 0.08%
-        RAM Usage (start): 13.49%, RAM Usage (end): 13.51%
+        CPU Usage (start): 0.00%
+        CPU Usage (end): 0.08%
+        RAM Usage (start): 13.49%
+        RAM Usage (end): 13.51%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -2270,8 +2536,10 @@
         ProofSize: 53012
         Tip: 73
         Duration: 2121 ms
-        CPU Usage (start): 0.08%, CPU Usage (end): 0.08%
-        RAM Usage (start): 13.51%, RAM Usage (end): 13.53%
+        CPU Usage (start): 0.08%
+        CPU Usage (end): 0.08%
+        RAM Usage (start): 13.51%
+        RAM Usage (end): 13.53%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -2287,8 +2555,10 @@
         ProofSize: 53012
         Tip: 77
         Duration: 2113 ms
-        CPU Usage (start): 0.08%, CPU Usage (end): 0.08%
-        RAM Usage (start): 13.53%, RAM Usage (end): 13.53%
+        CPU Usage (start): 0.08%
+        CPU Usage (end): 0.08%
+        RAM Usage (start): 13.53%
+        RAM Usage (end): 13.53%
         Transaction Success: Yes
         Parameters Length: 165
         Test Type: sequential
@@ -2304,8 +2574,10 @@
         ProofSize: 53012
         Tip: 73
         Duration: 2119 ms
-        CPU Usage (start): 0.08%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.53%, RAM Usage (end): 13.52%
+        CPU Usage (start): 0.08%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.53%
+        RAM Usage (end): 13.52%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -2321,8 +2593,10 @@
         ProofSize: 53012
         Tip: 64
         Duration: 2120 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.52%, RAM Usage (end): 13.53%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.52%
+        RAM Usage (end): 13.53%
         Transaction Success: Yes
         Parameters Length: 164
         Test Type: sequential
@@ -2338,8 +2612,10 @@
         ProofSize: 53012
         Tip: 60
         Duration: 2128 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.53%, RAM Usage (end): 13.53%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.53%
+        RAM Usage (end): 13.53%
         Transaction Success: Yes
         Parameters Length: 173
         Test Type: sequential
@@ -2355,8 +2631,10 @@
         ProofSize: 53012
         Tip: 49
         Duration: 2120 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.53%, RAM Usage (end): 13.52%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.53%
+        RAM Usage (end): 13.52%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -2372,8 +2650,10 @@
         ProofSize: 53012
         Tip: 25
         Duration: 2126 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.52%, RAM Usage (end): 13.54%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.52%
+        RAM Usage (end): 13.54%
         Transaction Success: Yes
         Parameters Length: 169
         Test Type: sequential
@@ -2389,8 +2669,10 @@
         ProofSize: 53012
         Tip: 35
         Duration: 2120 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.06%
-        RAM Usage (start): 13.54%, RAM Usage (end): 13.53%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.06%
+        RAM Usage (start): 13.54%
+        RAM Usage (end): 13.53%
         Transaction Success: Yes
         Parameters Length: 177
         Test Type: sequential
@@ -2406,8 +2688,10 @@
         ProofSize: 53012
         Tip: 62
         Duration: 2119 ms
-        CPU Usage (start): 0.06%, CPU Usage (end): 0.06%
-        RAM Usage (start): 13.53%, RAM Usage (end): 13.53%
+        CPU Usage (start): 0.06%
+        CPU Usage (end): 0.06%
+        RAM Usage (start): 13.53%
+        RAM Usage (end): 13.53%
         Transaction Success: Yes
         Parameters Length: 164
         Test Type: sequential
@@ -2423,8 +2707,10 @@
         ProofSize: 53012
         Tip: 68
         Duration: 2121 ms
-        CPU Usage (start): 0.06%, CPU Usage (end): 0.06%
-        RAM Usage (start): 13.53%, RAM Usage (end): 13.53%
+        CPU Usage (start): 0.06%
+        CPU Usage (end): 0.06%
+        RAM Usage (start): 13.53%
+        RAM Usage (end): 13.53%
         Transaction Success: Yes
         Parameters Length: 170
         Test Type: sequential
@@ -2440,8 +2726,10 @@
         ProofSize: 53012
         Tip: 33
         Duration: 2127 ms
-        CPU Usage (start): 0.06%, CPU Usage (end): 0.06%
-        RAM Usage (start): 13.53%, RAM Usage (end): 13.53%
+        CPU Usage (start): 0.06%
+        CPU Usage (end): 0.06%
+        RAM Usage (start): 13.53%
+        RAM Usage (end): 13.53%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -2457,8 +2745,10 @@
         ProofSize: 53012
         Tip: 50
         Duration: 2128 ms
-        CPU Usage (start): 0.06%, CPU Usage (end): 0.05%
-        RAM Usage (start): 13.53%, RAM Usage (end): 13.53%
+        CPU Usage (start): 0.06%
+        CPU Usage (end): 0.05%
+        RAM Usage (start): 13.53%
+        RAM Usage (end): 13.53%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -2474,8 +2764,10 @@
         ProofSize: 53012
         Tip: 73
         Duration: 2119 ms
-        CPU Usage (start): 0.05%, CPU Usage (end): 0.05%
-        RAM Usage (start): 13.53%, RAM Usage (end): 13.54%
+        CPU Usage (start): 0.05%
+        CPU Usage (end): 0.05%
+        RAM Usage (start): 13.53%
+        RAM Usage (end): 13.54%
         Transaction Success: Yes
         Parameters Length: 178
         Test Type: sequential
@@ -2491,8 +2783,10 @@
         ProofSize: 53012
         Tip: 73
         Duration: 2118 ms
-        CPU Usage (start): 0.05%, CPU Usage (end): 0.05%
-        RAM Usage (start): 13.54%, RAM Usage (end): 13.54%
+        CPU Usage (start): 0.05%
+        CPU Usage (end): 0.05%
+        RAM Usage (start): 13.54%
+        RAM Usage (end): 13.54%
         Transaction Success: Yes
         Parameters Length: 173
         Test Type: sequential
@@ -2508,8 +2802,10 @@
         ProofSize: 53012
         Tip: 99
         Duration: 2120 ms
-        CPU Usage (start): 0.05%, CPU Usage (end): 0.13%
-        RAM Usage (start): 13.54%, RAM Usage (end): 13.55%
+        CPU Usage (start): 0.05%
+        CPU Usage (end): 0.13%
+        RAM Usage (start): 13.54%
+        RAM Usage (end): 13.55%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -2525,8 +2821,10 @@
         ProofSize: 53012
         Tip: 13
         Duration: 2116 ms
-        CPU Usage (start): 0.13%, CPU Usage (end): 0.13%
-        RAM Usage (start): 13.55%, RAM Usage (end): 13.43%
+        CPU Usage (start): 0.13%
+        CPU Usage (end): 0.13%
+        RAM Usage (start): 13.55%
+        RAM Usage (end): 13.43%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -2542,8 +2840,10 @@
         ProofSize: 53012
         Tip: 9
         Duration: 2121 ms
-        CPU Usage (start): 0.13%, CPU Usage (end): 0.12%
-        RAM Usage (start): 13.43%, RAM Usage (end): 13.43%
+        CPU Usage (start): 0.13%
+        CPU Usage (end): 0.12%
+        RAM Usage (start): 13.43%
+        RAM Usage (end): 13.43%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -2559,8 +2859,10 @@
         ProofSize: 53012
         Tip: 59
         Duration: 2119 ms
-        CPU Usage (start): 0.12%, CPU Usage (end): 0.12%
-        RAM Usage (start): 13.43%, RAM Usage (end): 13.44%
+        CPU Usage (start): 0.12%
+        CPU Usage (end): 0.12%
+        RAM Usage (start): 13.43%
+        RAM Usage (end): 13.44%
         Transaction Success: Yes
         Parameters Length: 176
         Test Type: sequential
@@ -2576,8 +2878,10 @@
         ProofSize: 53012
         Tip: 27
         Duration: 2120 ms
-        CPU Usage (start): 0.12%, CPU Usage (end): 0.11%
-        RAM Usage (start): 13.44%, RAM Usage (end): 13.44%
+        CPU Usage (start): 0.12%
+        CPU Usage (end): 0.11%
+        RAM Usage (start): 13.44%
+        RAM Usage (end): 13.44%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -2593,8 +2897,10 @@
         ProofSize: 53012
         Tip: 76
         Duration: 2124 ms
-        CPU Usage (start): 0.11%, CPU Usage (end): 0.11%
-        RAM Usage (start): 13.44%, RAM Usage (end): 13.46%
+        CPU Usage (start): 0.11%
+        CPU Usage (end): 0.11%
+        RAM Usage (start): 13.44%
+        RAM Usage (end): 13.46%
         Transaction Success: Yes
         Parameters Length: 163
         Test Type: sequential
@@ -2610,8 +2916,10 @@
         ProofSize: 53012
         Tip: 92
         Duration: 2112 ms
-        CPU Usage (start): 0.11%, CPU Usage (end): 0.11%
-        RAM Usage (start): 13.46%, RAM Usage (end): 13.46%
+        CPU Usage (start): 0.11%
+        CPU Usage (end): 0.11%
+        RAM Usage (start): 13.46%
+        RAM Usage (end): 13.46%
         Transaction Success: Yes
         Parameters Length: 173
         Test Type: sequential
@@ -2627,8 +2935,10 @@
         ProofSize: 53012
         Tip: 13
         Duration: 2116 ms
-        CPU Usage (start): 0.11%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.46%, RAM Usage (end): 13.48%
+        CPU Usage (start): 0.11%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.46%
+        RAM Usage (end): 13.48%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -2644,8 +2954,10 @@
         ProofSize: 53012
         Tip: 57
         Duration: 2122 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.48%, RAM Usage (end): 13.50%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.48%
+        RAM Usage (end): 13.50%
         Transaction Success: Yes
         Parameters Length: 160
         Test Type: sequential
@@ -2661,8 +2973,10 @@
         ProofSize: 53012
         Tip: 24
         Duration: 2118 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.17%
-        RAM Usage (start): 13.50%, RAM Usage (end): 13.52%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.17%
+        RAM Usage (start): 13.50%
+        RAM Usage (end): 13.52%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -2678,8 +2992,10 @@
         ProofSize: 53012
         Tip: 2
         Duration: 2119 ms
-        CPU Usage (start): 0.17%, CPU Usage (end): 0.17%
-        RAM Usage (start): 13.52%, RAM Usage (end): 13.52%
+        CPU Usage (start): 0.17%
+        CPU Usage (end): 0.17%
+        RAM Usage (start): 13.52%
+        RAM Usage (end): 13.52%
         Transaction Success: Yes
         Parameters Length: 162
         Test Type: sequential
@@ -2695,8 +3011,10 @@
         ProofSize: 53012
         Tip: 17
         Duration: 2117 ms
-        CPU Usage (start): 0.17%, CPU Usage (end): 0.16%
-        RAM Usage (start): 13.52%, RAM Usage (end): 13.53%
+        CPU Usage (start): 0.17%
+        CPU Usage (end): 0.16%
+        RAM Usage (start): 13.52%
+        RAM Usage (end): 13.53%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -2712,8 +3030,10 @@
         ProofSize: 53012
         Tip: 70
         Duration: 2119 ms
-        CPU Usage (start): 0.16%, CPU Usage (end): 0.16%
-        RAM Usage (start): 13.53%, RAM Usage (end): 13.52%
+        CPU Usage (start): 0.16%
+        CPU Usage (end): 0.16%
+        RAM Usage (start): 13.53%
+        RAM Usage (end): 13.52%
         Transaction Success: Yes
         Parameters Length: 161
         Test Type: sequential
@@ -2729,8 +3049,10 @@
         ProofSize: 53012
         Tip: 68
         Duration: 2120 ms
-        CPU Usage (start): 0.16%, CPU Usage (end): 0.16%
-        RAM Usage (start): 13.52%, RAM Usage (end): 13.53%
+        CPU Usage (start): 0.16%
+        CPU Usage (end): 0.16%
+        RAM Usage (start): 13.52%
+        RAM Usage (end): 13.53%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -2746,8 +3068,10 @@
         ProofSize: 53012
         Tip: 50
         Duration: 2139 ms
-        CPU Usage (start): 0.16%, CPU Usage (end): 0.14%
-        RAM Usage (start): 13.53%, RAM Usage (end): 13.54%
+        CPU Usage (start): 0.16%
+        CPU Usage (end): 0.14%
+        RAM Usage (start): 13.53%
+        RAM Usage (end): 13.54%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -2763,8 +3087,10 @@
         ProofSize: 53012
         Tip: 26
         Duration: 2116 ms
-        CPU Usage (start): 0.14%, CPU Usage (end): 0.14%
-        RAM Usage (start): 13.54%, RAM Usage (end): 13.55%
+        CPU Usage (start): 0.14%
+        CPU Usage (end): 0.14%
+        RAM Usage (start): 13.54%
+        RAM Usage (end): 13.55%
         Transaction Success: Yes
         Parameters Length: 164
         Test Type: sequential
@@ -2780,8 +3106,10 @@
         ProofSize: 53012
         Tip: 41
         Duration: 2119 ms
-        CPU Usage (start): 0.14%, CPU Usage (end): 0.13%
-        RAM Usage (start): 13.55%, RAM Usage (end): 13.56%
+        CPU Usage (start): 0.14%
+        CPU Usage (end): 0.13%
+        RAM Usage (start): 13.55%
+        RAM Usage (end): 13.56%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -2797,8 +3125,10 @@
         ProofSize: 53012
         Tip: 80
         Duration: 2130 ms
-        CPU Usage (start): 0.13%, CPU Usage (end): 0.13%
-        RAM Usage (start): 13.56%, RAM Usage (end): 13.58%
+        CPU Usage (start): 0.13%
+        CPU Usage (end): 0.13%
+        RAM Usage (start): 13.56%
+        RAM Usage (end): 13.58%
         Transaction Success: Yes
         Parameters Length: 163
         Test Type: sequential
@@ -2814,8 +3144,10 @@
         ProofSize: 53012
         Tip: 94
         Duration: 2135 ms
-        CPU Usage (start): 0.13%, CPU Usage (end): 0.20%
-        RAM Usage (start): 13.58%, RAM Usage (end): 13.63%
+        CPU Usage (start): 0.13%
+        CPU Usage (end): 0.20%
+        RAM Usage (start): 13.58%
+        RAM Usage (end): 13.63%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -2831,8 +3163,10 @@
         ProofSize: 53012
         Tip: 83
         Duration: 2125 ms
-        CPU Usage (start): 0.20%, CPU Usage (end): 0.20%
-        RAM Usage (start): 13.63%, RAM Usage (end): 13.63%
+        CPU Usage (start): 0.20%
+        CPU Usage (end): 0.20%
+        RAM Usage (start): 13.63%
+        RAM Usage (end): 13.63%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -2848,8 +3182,10 @@
         ProofSize: 53012
         Tip: 49
         Duration: 2124 ms
-        CPU Usage (start): 0.20%, CPU Usage (end): 0.20%
-        RAM Usage (start): 13.63%, RAM Usage (end): 13.65%
+        CPU Usage (start): 0.20%
+        CPU Usage (end): 0.20%
+        RAM Usage (start): 13.63%
+        RAM Usage (end): 13.65%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -2865,8 +3201,10 @@
         ProofSize: 53012
         Tip: 79
         Duration: 2122 ms
-        CPU Usage (start): 0.20%, CPU Usage (end): 0.19%
-        RAM Usage (start): 13.65%, RAM Usage (end): 13.66%
+        CPU Usage (start): 0.20%
+        CPU Usage (end): 0.19%
+        RAM Usage (start): 13.65%
+        RAM Usage (end): 13.66%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -2882,8 +3220,10 @@
         ProofSize: 53012
         Tip: 32
         Duration: 2127 ms
-        CPU Usage (start): 0.19%, CPU Usage (end): 0.19%
-        RAM Usage (start): 13.66%, RAM Usage (end): 13.67%
+        CPU Usage (start): 0.19%
+        CPU Usage (end): 0.19%
+        RAM Usage (start): 13.66%
+        RAM Usage (end): 13.67%
         Transaction Success: Yes
         Parameters Length: 173
         Test Type: sequential
@@ -2899,8 +3239,10 @@
         ProofSize: 53012
         Tip: 32
         Duration: 2122 ms
-        CPU Usage (start): 0.19%, CPU Usage (end): 0.17%
-        RAM Usage (start): 13.67%, RAM Usage (end): 13.67%
+        CPU Usage (start): 0.19%
+        CPU Usage (end): 0.17%
+        RAM Usage (start): 13.67%
+        RAM Usage (end): 13.67%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -2916,8 +3258,10 @@
         ProofSize: 53012
         Tip: 49
         Duration: 2095 ms
-        CPU Usage (start): 0.17%, CPU Usage (end): 0.17%
-        RAM Usage (start): 13.67%, RAM Usage (end): 13.67%
+        CPU Usage (start): 0.17%
+        CPU Usage (end): 0.17%
+        RAM Usage (start): 13.67%
+        RAM Usage (end): 13.67%
         Transaction Success: Yes
         Parameters Length: 165
         Test Type: sequential
@@ -2933,8 +3277,10 @@
         ProofSize: 53012
         Tip: 76
         Duration: 2118 ms
-        CPU Usage (start): 0.17%, CPU Usage (end): 0.17%
-        RAM Usage (start): 13.67%, RAM Usage (end): 13.68%
+        CPU Usage (start): 0.17%
+        CPU Usage (end): 0.17%
+        RAM Usage (start): 13.67%
+        RAM Usage (end): 13.68%
         Transaction Success: Yes
         Parameters Length: 162
         Test Type: sequential
@@ -2950,8 +3296,10 @@
         ProofSize: 53012
         Tip: 68
         Duration: 2121 ms
-        CPU Usage (start): 0.17%, CPU Usage (end): 0.16%
-        RAM Usage (start): 13.68%, RAM Usage (end): 13.68%
+        CPU Usage (start): 0.17%
+        CPU Usage (end): 0.16%
+        RAM Usage (start): 13.68%
+        RAM Usage (end): 13.68%
         Transaction Success: Yes
         Parameters Length: 169
         Test Type: sequential
@@ -2967,8 +3315,10 @@
         ProofSize: 53012
         Tip: 60
         Duration: 2126 ms
-        CPU Usage (start): 0.16%, CPU Usage (end): 0.16%
-        RAM Usage (start): 13.68%, RAM Usage (end): 13.67%
+        CPU Usage (start): 0.16%
+        CPU Usage (end): 0.16%
+        RAM Usage (start): 13.68%
+        RAM Usage (end): 13.67%
         Transaction Success: Yes
         Parameters Length: 165
         Test Type: sequential
@@ -2984,8 +3334,10 @@
         ProofSize: 53012
         Tip: 27
         Duration: 2121 ms
-        CPU Usage (start): 0.16%, CPU Usage (end): 0.14%
-        RAM Usage (start): 13.67%, RAM Usage (end): 13.67%
+        CPU Usage (start): 0.16%
+        CPU Usage (end): 0.14%
+        RAM Usage (start): 13.67%
+        RAM Usage (end): 13.67%
         Transaction Success: Yes
         Parameters Length: 167
         Test Type: sequential
@@ -3001,8 +3353,10 @@
         ProofSize: 53012
         Tip: 13
         Duration: 2131 ms
-        CPU Usage (start): 0.14%, CPU Usage (end): 0.14%
-        RAM Usage (start): 13.67%, RAM Usage (end): 13.68%
+        CPU Usage (start): 0.14%
+        CPU Usage (end): 0.14%
+        RAM Usage (start): 13.67%
+        RAM Usage (end): 13.68%
         Transaction Success: Yes
         Parameters Length: 164
         Test Type: sequential
@@ -3018,8 +3372,10 @@
         ProofSize: 53012
         Tip: 36
         Duration: 2124 ms
-        CPU Usage (start): 0.14%, CPU Usage (end): 0.13%
-        RAM Usage (start): 13.68%, RAM Usage (end): 13.68%
+        CPU Usage (start): 0.14%
+        CPU Usage (end): 0.13%
+        RAM Usage (start): 13.68%
+        RAM Usage (end): 13.68%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -3035,8 +3391,10 @@
         ProofSize: 53012
         Tip: 91
         Duration: 2130 ms
-        CPU Usage (start): 0.13%, CPU Usage (end): 0.13%
-        RAM Usage (start): 13.68%, RAM Usage (end): 13.68%
+        CPU Usage (start): 0.13%
+        CPU Usage (end): 0.13%
+        RAM Usage (start): 13.68%
+        RAM Usage (end): 13.68%
         Transaction Success: Yes
         Parameters Length: 162
         Test Type: sequential
@@ -3052,8 +3410,10 @@
         ProofSize: 53012
         Tip: 21
         Duration: 2120 ms
-        CPU Usage (start): 0.13%, CPU Usage (end): 0.13%
-        RAM Usage (start): 13.68%, RAM Usage (end): 13.69%
+        CPU Usage (start): 0.13%
+        CPU Usage (end): 0.13%
+        RAM Usage (start): 13.68%
+        RAM Usage (end): 13.69%
         Transaction Success: Yes
         Parameters Length: 176
         Test Type: sequential
@@ -3069,8 +3429,10 @@
         ProofSize: 53012
         Tip: 17
         Duration: 2117 ms
-        CPU Usage (start): 0.13%, CPU Usage (end): 0.12%
-        RAM Usage (start): 13.69%, RAM Usage (end): 13.70%
+        CPU Usage (start): 0.13%
+        CPU Usage (end): 0.12%
+        RAM Usage (start): 13.69%
+        RAM Usage (end): 13.70%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -3086,8 +3448,10 @@
         ProofSize: 53012
         Tip: 3
         Duration: 2119 ms
-        CPU Usage (start): 0.12%, CPU Usage (end): 0.12%
-        RAM Usage (start): 13.70%, RAM Usage (end): 13.71%
+        CPU Usage (start): 0.12%
+        CPU Usage (end): 0.12%
+        RAM Usage (start): 13.70%
+        RAM Usage (end): 13.71%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -3103,8 +3467,10 @@
         ProofSize: 53012
         Tip: 68
         Duration: 2121 ms
-        CPU Usage (start): 0.12%, CPU Usage (end): 0.11%
-        RAM Usage (start): 13.71%, RAM Usage (end): 13.71%
+        CPU Usage (start): 0.12%
+        CPU Usage (end): 0.11%
+        RAM Usage (start): 13.71%
+        RAM Usage (end): 13.71%
         Transaction Success: Yes
         Parameters Length: 179
         Test Type: sequential
@@ -3120,8 +3486,10 @@
         ProofSize: 53012
         Tip: 70
         Duration: 2118 ms
-        CPU Usage (start): 0.11%, CPU Usage (end): 0.11%
-        RAM Usage (start): 13.71%, RAM Usage (end): 13.71%
+        CPU Usage (start): 0.11%
+        CPU Usage (end): 0.11%
+        RAM Usage (start): 13.71%
+        RAM Usage (end): 13.71%
         Transaction Success: Yes
         Parameters Length: 169
         Test Type: sequential
@@ -3137,8 +3505,10 @@
         ProofSize: 53012
         Tip: 80
         Duration: 2130 ms
-        CPU Usage (start): 0.11%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.71%, RAM Usage (end): 13.71%
+        CPU Usage (start): 0.11%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.71%
+        RAM Usage (end): 13.71%
         Transaction Success: Yes
         Parameters Length: 170
         Test Type: sequential
@@ -3154,8 +3524,10 @@
         ProofSize: 53012
         Tip: 71
         Duration: 2127 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.71%, RAM Usage (end): 13.72%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.71%
+        RAM Usage (end): 13.72%
         Transaction Success: Yes
         Parameters Length: 170
         Test Type: sequential
@@ -3171,8 +3543,10 @@
         ProofSize: 53012
         Tip: 49
         Duration: 2119 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.10%
-        RAM Usage (start): 13.72%, RAM Usage (end): 13.69%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.10%
+        RAM Usage (start): 13.72%
+        RAM Usage (end): 13.69%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -3188,8 +3562,10 @@
         ProofSize: 53012
         Tip: 49
         Duration: 2119 ms
-        CPU Usage (start): 0.10%, CPU Usage (end): 0.09%
-        RAM Usage (start): 13.69%, RAM Usage (end): 13.69%
+        CPU Usage (start): 0.10%
+        CPU Usage (end): 0.09%
+        RAM Usage (start): 13.69%
+        RAM Usage (end): 13.69%
         Transaction Success: Yes
         Parameters Length: 168
         Test Type: sequential
@@ -3205,8 +3581,10 @@
         ProofSize: 53012
         Tip: 58
         Duration: 2118 ms
-        CPU Usage (start): 0.09%, CPU Usage (end): 0.09%
-        RAM Usage (start): 13.69%, RAM Usage (end): 13.59%
+        CPU Usage (start): 0.09%
+        CPU Usage (end): 0.09%
+        RAM Usage (start): 13.69%
+        RAM Usage (end): 13.59%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -3222,8 +3600,10 @@
         ProofSize: 53012
         Tip: 5
         Duration: 2118 ms
-        CPU Usage (start): 0.09%, CPU Usage (end): 0.09%
-        RAM Usage (start): 13.59%, RAM Usage (end): 13.59%
+        CPU Usage (start): 0.09%
+        CPU Usage (end): 0.09%
+        RAM Usage (start): 13.59%
+        RAM Usage (end): 13.59%
         Transaction Success: Yes
         Parameters Length: 173
         Test Type: sequential
@@ -3239,8 +3619,10 @@
         ProofSize: 53012
         Tip: 49
         Duration: 2129 ms
-        CPU Usage (start): 0.09%, CPU Usage (end): 0.09%
-        RAM Usage (start): 13.59%, RAM Usage (end): 13.60%
+        CPU Usage (start): 0.09%
+        CPU Usage (end): 0.09%
+        RAM Usage (start): 13.59%
+        RAM Usage (end): 13.60%
         Transaction Success: Yes
         Parameters Length: 167
         Test Type: sequential
@@ -3256,8 +3638,10 @@
         ProofSize: 53012
         Tip: 74
         Duration: 2119 ms
-        CPU Usage (start): 0.09%, CPU Usage (end): 0.08%
-        RAM Usage (start): 13.60%, RAM Usage (end): 13.60%
+        CPU Usage (start): 0.09%
+        CPU Usage (end): 0.08%
+        RAM Usage (start): 13.60%
+        RAM Usage (end): 13.60%
         Transaction Success: Yes
         Parameters Length: 172
         Test Type: sequential
@@ -3273,8 +3657,10 @@
         ProofSize: 53012
         Tip: 6
         Duration: 2129 ms
-        CPU Usage (start): 0.08%, CPU Usage (end): 0.08%
-        RAM Usage (start): 13.60%, RAM Usage (end): 13.61%
+        CPU Usage (start): 0.08%
+        CPU Usage (end): 0.08%
+        RAM Usage (start): 13.60%
+        RAM Usage (end): 13.61%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -3290,8 +3676,10 @@
         ProofSize: 53012
         Tip: 72
         Duration: 2117 ms
-        CPU Usage (start): 0.08%, CPU Usage (end): 0.08%
-        RAM Usage (start): 13.61%, RAM Usage (end): 13.61%
+        CPU Usage (start): 0.08%
+        CPU Usage (end): 0.08%
+        RAM Usage (start): 13.61%
+        RAM Usage (end): 13.61%
         Transaction Success: Yes
         Parameters Length: 174
         Test Type: sequential
@@ -3307,8 +3695,10 @@
         ProofSize: 53012
         Tip: 5
         Duration: 2111 ms
-        CPU Usage (start): 0.08%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.61%, RAM Usage (end): 13.62%
+        CPU Usage (start): 0.08%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.61%
+        RAM Usage (end): 13.62%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -3324,8 +3714,10 @@
         ProofSize: 53012
         Tip: 79
         Duration: 2118 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.62%, RAM Usage (end): 13.62%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.62%
+        RAM Usage (end): 13.62%
         Transaction Success: Yes
         Parameters Length: 166
         Test Type: sequential
@@ -3341,8 +3733,10 @@
         ProofSize: 53012
         Tip: 25
         Duration: 2131 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.62%, RAM Usage (end): 13.63%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.62%
+        RAM Usage (end): 13.63%
         Transaction Success: Yes
         Parameters Length: 175
         Test Type: sequential
@@ -3358,8 +3752,10 @@
         ProofSize: 53012
         Tip: 35
         Duration: 2116 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.63%, RAM Usage (end): 13.64%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.63%
+        RAM Usage (end): 13.64%
         Transaction Success: Yes
         Parameters Length: 164
         Test Type: sequential
@@ -3375,8 +3771,10 @@
         ProofSize: 53012
         Tip: 33
         Duration: 2119 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.07%
-        RAM Usage (start): 13.64%, RAM Usage (end): 13.64%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.07%
+        RAM Usage (start): 13.64%
+        RAM Usage (end): 13.64%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential
@@ -3392,8 +3790,10 @@
         ProofSize: 53012
         Tip: 97
         Duration: 2118 ms
-        CPU Usage (start): 0.07%, CPU Usage (end): 0.06%
-        RAM Usage (start): 13.64%, RAM Usage (end): 13.65%
+        CPU Usage (start): 0.07%
+        CPU Usage (end): 0.06%
+        RAM Usage (start): 13.64%
+        RAM Usage (end): 13.65%
         Transaction Success: Yes
         Parameters Length: 171
         Test Type: sequential

@@ -57,8 +57,10 @@ function logRequestToTxt(req, res, next) {
         ProofSize: ${res.locals.proofSize || 'N/A'}
         Tip: ${res.locals.tip || 'N/A'}
         Duration: ${duration} ms
-        CPU Usage (start): ${startCpu.toFixed(2)}%, CPU Usage (end): ${endCpu.toFixed(2)}%
-        RAM Usage (start): ${startMem.toFixed(2)}%, RAM Usage (end): ${endMem.toFixed(2)}%
+        CPU Usage (start): ${startCpu.toFixed(2)}%
+        CPU Usage (end): ${endCpu.toFixed(2)}%
+        RAM Usage (start): ${startMem.toFixed(2)}%
+        RAM Usage (end): ${endMem.toFixed(2)}%
         Transaction Success: ${res.locals.transactionSuccess ? 'Yes' : 'No'}
         Parameters Length: ${paramsLength}
         Test Type: ${test_type}

@@ -20,20 +20,21 @@ def read_data():
             data = json.load(file)
     else:
         with open('../performance_log.txt', 'r') as file:
-            lines = file.read().strip().split('---')
+            content = file.read().strip()
+            entries = content.split('---')
             data = []
-            for line in lines:
+            for entry_text in entries:
                 entry_raw = {}
-                # Dividir el contenido por líneas y luego por ', ' para capturar todas las parejas clave-valor
-                parts = line.strip().split('\n')
-                for part in parts:
-                    part = part.strip()
-                    # Dividir por ', ' en caso de que haya múltiples parejas clave-valor en una línea
-                    sub_parts = part.split(', ')
-                    for sub_part in sub_parts:
-                        if ':' in sub_part:
-                            key, value = sub_part.split(':', 1)
-                            entry_raw[key.strip()] = value.strip()
+                lines = entry_text.strip().split('\n')
+                for line in lines:
+                    line = line.strip()
+                    if line:
+                        # Manejar líneas con formato 'Clave: Valor'
+                        if ':' in line:
+                            key, value = line.split(':', 1)
+                            key = key.strip()
+                            value = value.strip()
+                            entry_raw[key] = value
                 # Mapeo de claves originales a estandarizadas
                 entry = {
                     'time': entry_raw.get('Time'),
@@ -54,10 +55,13 @@ def read_data():
                     'testType': entry_raw.get('Test Type'),
                     'totalTransactions': entry_raw.get('Total Transactions'),
                 }
-                
-                data.append(entry)
-    print("Datos cargados exitosamente", data[1])
-    return data
+                if any(entry.values()):
+                    data.append(entry)
+        print("Datos cargados exitosamente")
+        return data
+
+
+
 
 def calculate_transaction_cost(entry):
     refTime = entry.get('refTime', '0')
@@ -69,21 +73,23 @@ def calculate_transaction_cost(entry):
 def parse_data(data):
     parsed_data = []
     null_entries = 0
-    
+
     for entry in data:
         # Ignorar entradas completamente nulas
         if all(value is None for value in entry.values()):
             null_entries += 1
             continue
-            
+
         try:
             # Solo procesar entradas con transactionSuccess válido
             if entry.get('transactionSuccess') == 'Yes':
                 # Validar que los campos requeridos existan y no sean None
-                required_fields = ['time', 'duration', 'cpuUsageStart', 'cpuUsageEnd', 
-                                 'ramUsageStart', 'ramUsageEnd', 'testType', 'method', 'groupID', 'requestNumber', 'totalTransactions']
-                if not all(entry.get(field) for field in required_fields):
-                    print(f"Entrada omitida por campos faltantes: {entry}")
+                required_fields = ['time', 'duration', 'cpuUsageStart', 'cpuUsageEnd',
+                                   'ramUsageStart', 'ramUsageEnd', 'testType', 'method',
+                                   'groupID', 'requestNumber', 'totalTransactions']
+                missing_fields = [field for field in required_fields if not entry.get(field)]
+                if missing_fields:
+                    print(f"Entrada omitida por campos faltantes {missing_fields}: {entry}")
                     continue
 
                 # Convertir valores numéricos de manera segura
@@ -104,8 +110,8 @@ def parse_data(data):
                     'transactionCost': calculate_transaction_cost(entry),
                     'latency': duration,
                     'timestamp': datetime.fromisoformat(entry['time'].replace('Z', '+00:00')),
-                    'groupID': entry.get('GroupID', 'N/A'),
-                    'requestNumber': int(entry.get('Request Number', 0)) if entry.get('Request Number', 'N/A') != 'N/A' else 0,
+                    'groupID': entry.get('groupID', 'N/A'),
+                    'requestNumber': int(entry.get('requestNumber', 0)) if entry.get('requestNumber', 'N/A') != 'N/A' else 0,
                     'totalTransactions': int(entry.get('totalTransactions', 0)) if entry.get('totalTransactions', 'N/A') != 'N/A' else 0,
                     'testType': entry.get('testType', 'Unknown'),
                     'parametersLength': int(entry.get('parametersLength', 0)) if entry.get('parametersLength', 'N/A') != 'N/A' else 0,
@@ -118,12 +124,15 @@ def parse_data(data):
             print(f"Error procesando entrada: {entry}")
             print(f"Error detallado: {str(e)}")
             continue
-    
+
     if null_entries > 0:
         print(f"Se encontraron {null_entries} entradas nulas que fueron ignoradas")
     if not parsed_data:
         print("Advertencia: No se pudo procesar ningún dato válido")
-    print(f"Se procesaron {len(parsed_data)} entradas de datos", parsed_data[1])
+    else:
+        print(f"Se procesaron {len(parsed_data)} entradas de datos")
+        print(f"Primera entrada procesada: {parsed_data[0]}")
+
     return parsed_data
 
 def plot_metric_vs_time(data, metric, title):
@@ -233,6 +242,7 @@ def plot_metric_vs_transaction(data, metric, title):
     print(f"Grupos de prueba encontrados: {len(test_groups)}")
     # Plotear cada tipo de test
     for (test_type, total_tx), entries in test_groups.items():
+        print("Test type", test_type)
         # Organizar las entradas por número de solicitud
         request_groups = {}
         for entry in entries:
