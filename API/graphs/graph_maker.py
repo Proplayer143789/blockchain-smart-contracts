@@ -231,16 +231,24 @@ def plot_metric_vs_transaction(data, metric, title):
         print(f"No se encontraron valores válidos para la métrica {metric}")
         return
 
-    # Ordenar los datos por número de transacción
-    valid_data.sort(key=lambda x: int(x['requestNumber']))
-    transaction_numbers = [int(entry['requestNumber']) for entry in valid_data]
-    metric_values = [float(entry[metric]) for entry in valid_data]
+    # Agrupar datos por 'testType'
+    test_types = set(entry['testType'] for entry in valid_data)
+    for test_type in test_types:
+        # Filtrar datos para el tipo de prueba actual
+        type_data = [entry for entry in valid_data if entry['testType'] == test_type]
 
-    # Plotear los datos
-    plt.plot(transaction_numbers, metric_values, marker='o', markersize=3)
+        # Ordenar los datos por número de transacción
+        type_data.sort(key=lambda x: int(x['requestNumber']))
+        transaction_numbers = [int(entry['requestNumber']) for entry in type_data]
+        metric_values = [float(entry[metric]) for entry in type_data]
+
+        # Graficar los datos para este tipo de prueba
+        plt.plot(transaction_numbers, metric_values, label=test_type, marker='o', markersize=3)
+
     plt.xlabel('Número de Transacción')
     plt.ylabel(metric)
     plt.title(title)
+    plt.legend()
     plt.grid(True)
 
     try:
