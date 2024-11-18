@@ -24,7 +24,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Contract Dirección y ABI
-const CONTRACT_ADDRESS = '5HqhFvrpCMS3sZFbqRpaXra24LhPjwizhGMNBYJFnjh16CC5';
+const CONTRACT_ADDRESS = '5GzWrrTn2jhNG8TjiTa5QfABzvkohchEzjxvRjZqKNB71zxR';
 const CONTRACT_ABI_PATH = path.resolve(__dirname, '../target/ink/smart_contract/smart_contract.json');
 
 // Performance monitoring configuration
@@ -43,6 +43,7 @@ const ACCOUNT_IDS_FILE = path.join(__dirname, 'account_ids.txt');
 
 let api;
 let contract;
+let aliceNonce; // Variable global para el nonce de Alice
 
 async function init() {
     const wsProvider = new WsProvider('ws://localhost:9944');
@@ -57,6 +58,11 @@ async function init() {
     }
 
     contract = new ContractPromise(api, contractAbi, CONTRACT_ADDRESS);
+
+    // Obtener el nonce actual de Alice al inicializar
+    const keyring = new Keyring({ type: 'sr25519' });
+    const alice = keyring.addFromUri('//Alice');
+    aliceNonce = await api.rpc.system.accountNextIndex(alice.address);
 
     // Suscribirse a los eventos
     api.query.system.events((events) => {
@@ -91,6 +97,13 @@ async function init() {
             }
         });
     });
+}
+
+// Función para obtener y actualizar el nonce de manera atómica
+function getAndIncrementNonce() {
+    const currentNonce = aliceNonce;
+    aliceNonce = aliceNonce.addn(1); // Incrementar el nonce
+    return currentNonce;
 }
 
 let transactionCount = 0; // Contador global de transacciones
@@ -132,10 +145,11 @@ function createNewAccount(customText = null) {
 // Función para transferir fondos con tip incluido usando transferKeepAlive
 async function transferFunds(sender, recipient, amount) {
     const tip = getTip(); // Obtener el tip usando la función getTip
+    const nonce = getAndIncrementNonce(); // Obtener y actualizar el nonce
     const transfer = api.tx.balances.transferKeepAlive(recipient, amount);
 
     return new Promise((resolve, reject) => {
-        transfer.signAndSend(sender, { tip }, (result) => {
+        transfer.signAndSend(sender, { nonce, tip }, (result) => {
             if (result.status.isInBlock) {
                 console.log(`Transferencia incluida en el bloque: ${result.status.asInBlock}`);
             }
@@ -160,6 +174,7 @@ async function addUser(alice, newAccount, userInfo, role, gasLimit, res) {
     updateTransactionCount();
     const numberTransaction = transactionCount;
     const tip = getTip(); // Obtener el tip usando la función getTip
+    const nonce = getAndIncrementNonce(); // Obtener y actualizar el nonce
     const addUserTx = contract.tx.addUser({ value: 0, gasLimit }, newAccount.address, userInfo, role);
 
     // Inicializar variables para el gas
@@ -167,7 +182,7 @@ async function addUser(alice, newAccount, userInfo, role, gasLimit, res) {
     let proofSize = null;
 
     return new Promise((resolve, reject) => {
-        addUserTx.signAndSend(alice, { tip }, ({ events = [], status }) => {
+        addUserTx.signAndSend(alice, { nonce, tip }, ({ events = [], status }) => {
             if (status.isInBlock) {
                 console.log(`Transaction included at blockHash ${status.asInBlock}`);
 
@@ -456,33 +471,31 @@ app.get('/alice_account_id', async (req, res) => {
     res.status(200).send(`Alice's account: ${alice.address}`);
 });
 
-// Función para ejecutar el contrato y obtener el gas consumido después de la ejecución
+// Modificar la función executeContractAndGetGas para usar el nonce
 async function executeContractAndGetGas(contract, signer, res, ...params) {
     try {
         updateTransactionCount(); // Actualizar el contador de transacciones
         const tip = getTip();
+        const nonce = getAndIncrementNonce(); // Obtener y actualizar el nonce
         // Definir un límite de gas alto para asegurar la ejecución (sin estimación previa)
         const gasLimit = api.registry.createType('WeightV2', {
-            refTime: api.registry.createType('Compact<u64>', 20000000000), // Ajusta este valor según lo necesario
+            refTime: api.registry.createType('Compact<u64>', 20000000000), // Ajusta este valor según sea necesario
             proofSize: api.registry.createType('Compact<u64>', 10000000)
         });
 
-        // Definir el valor del tip (puedes ajustar según tus necesidades)
-        //const tip = api.registry.createType('Compact<Balance>', 1000000000); // Asume un valor fijo de 1 unidad (ajústalo según el token)
-
-        // Inicializamos refTime y proofSize fuera del contexto de los eventos
+        // Inicializar refTime y proofSize fuera del contexto de los eventos
         let refTime = null;
         let proofSize = null;
 
-        // Llamada directa al método addUser del contrato
+        // Llamada al método del contrato
         const tx = contract.tx.addUser(
-            { value: 0, gasLimit, tip }, // Incluye el tip junto con el límite de gas
-            ...params // Los parámetros del método
+            { value: 0, gasLimit }, // Opciones de la transacción
+            ...params // Parámetros del método
         );
 
         // Enviar la transacción y esperar a la finalización
         return new Promise((resolve, reject) => {
-            tx.signAndSend(signer, (result) => {
+            tx.signAndSend(signer, { nonce, tip }, (result) => { // Incluir nonce y tip
                 if (result.status.isFinalized) {
                     //console.log('Transacción finalizada en bloque:', result.status.asFinalized);
 
@@ -538,9 +551,6 @@ async function executeContractAndGetGas(contract, signer, res, ...params) {
     }
 }
 
-
-
-
 // Ruta POST para crear un usuario usando la función addUser con gas dinámico
 app.post('/create_user_with_dynamic_gas', async (req, res) => {
     const { name, lastname, dni, email, role } = req.body;
@@ -587,11 +597,6 @@ app.post('/create_user_with_dynamic_gas', async (req, res) => {
         res.status(500).json({ error: `Error al crear el usuario: ${error.message}` });
     }
 });
-
-
-
-
-
 
 // Iniciar el servidor
 init().then(() => {
