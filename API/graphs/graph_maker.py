@@ -68,6 +68,8 @@ def calculate_transaction_cost(entry):
     proofSize = entry.get('proofSize', '0')
     refTime = float(refTime) if refTime != 'N/A' else 0.0
     proofSize = float(proofSize) if proofSize != 'N/A' else 0.0
+    if entry.get('method') == 'GET':
+        return 0.0
     return refTime + proofSize
 
 def parse_data(data):
@@ -81,8 +83,8 @@ def parse_data(data):
             continue
 
         try:
-            # Solo procesar entradas con transactionSuccess válido
-            if entry.get('transactionSuccess') == 'Yes':
+            # Procesar entradas con 'transactionSuccess' == 'Yes' o método 'GET'
+            if entry.get('transactionSuccess') == 'Yes' or entry.get('method') == 'GET':
                 # Validar que los campos requeridos existan y no sean None
                 required_fields = ['time', 'duration', 'cpuUsageStart', 'cpuUsageEnd',
                                    'ramUsageStart', 'ramUsageEnd', 'testType', 'method',
@@ -119,7 +121,7 @@ def parse_data(data):
                 }
                 parsed_data.append(parsed_entry)
             else:
-                print(f"Entrada omitida (transactionSuccess != Yes): {entry}")
+                print(f"Entrada omitida (transactionSuccess != Yes y método no es GET): {entry}")
         except Exception as e:
             print(f"Error procesando entrada: {entry}")
             print(f"Error detallado: {str(e)}")

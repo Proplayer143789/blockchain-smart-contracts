@@ -598,6 +598,34 @@ app.post('/create_user_with_dynamic_gas', async (req, res) => {
     }
 });
 
+// Endpoint para verificar si un permiso existe entre dos usuarios
+app.get('/has_permission/:granter/:grantee', async (req, res) => {
+    const { granter, grantee } = req.params;
+
+    try {
+        const granterAccountId = api.createType('AccountId', granter);
+        const granteeAccountId = api.createType('AccountId', grantee);
+
+        const gasLimit = api.registry.createType('WeightV2', {
+            refTime: api.registry.createType('Compact<u64>', 10000000000),
+            proofSize: api.registry.createType('Compact<u64>', 10000000)
+        });
+
+        const { output } = await contract.query.hasPermission(granterAccountId, { value: 0, gasLimit }, granterAccountId, granteeAccountId);
+
+        if (output) {
+            const hasPermission = output.toHuman();
+            res.status(200).json({ hasPermission });
+        } else {
+            res.status(404).send('No se pudo obtener el permiso');
+        }
+
+    } catch (error) {
+        console.error('Error al consultar el permiso:', error);
+        res.status(500).send(`Error al consultar el permiso: ${error.message}`);
+    }
+});
+
 // Iniciar el servidor
 init().then(() => {
     const host = process.env.HOST || '0.0.0.0';

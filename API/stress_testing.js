@@ -51,6 +51,16 @@ async function getRole(publicAddress) {
     }
 }
 
+// Función para hacer una solicitud GET a /has_permission/:granter/:grantee
+async function hasPermission(granter, grantee) {
+    try {
+        const response = await axios.get(`${FULL_URL}/has_permission/${granter}/${grantee}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error obteniendo permiso: ${error.message}`);
+    }
+}
+
 // Función para obtener la lista de AccountIds desde el archivo txt
 function getUserAccountsFromFile() {
     try {
@@ -83,6 +93,38 @@ async function runGetRoleTest() {
             console.error(`Error al obtener el rol para ${accountId}: ${error.message}`);
         }
     }
+}
+
+// Función para generar datos de prueba para hasPermission
+function generatePermissionTestData() {
+    // Obtener dos cuentas de AccountIds.txt
+    const accounts = getUserAccountsFromFile();
+    if (accounts.length < 2) {
+        console.log('No hay suficientes usuarios para probar permisos.');
+        return null;
+    }
+    const granter = accounts[Math.floor(Math.random() * accounts.length)];
+    let grantee = accounts[Math.floor(Math.random() * accounts.length)];
+
+    // Asegurarse de que granter y grantee no sean iguales
+    while (granter === grantee) {
+        grantee = accounts[Math.floor(Math.random() * accounts.length)];
+    }
+
+    return { granter, grantee };
+}
+
+// Función para ejecutar pruebas de hasPermission
+async function runHasPermissionTest() {
+    console.log('Ejecutando prueba de hasPermission...');
+    const totalTransactions = parseInt(TOTAL_REQUESTS);
+    for (let i = 0; i < totalTransactions; i++) {
+        const data = generatePermissionTestData();
+        if (!data) break;
+        console.log(`Solicitando permiso de ${data.granter} a ${data.grantee}`);
+        await hasPermission(data.granter, data.grantee);
+    }
+    console.log('Prueba de hasPermission completada');
 }
 
 // Prueba secuencial (las solicitudes se realizan una por una)
@@ -166,7 +208,8 @@ function promptUserForEndpoint() {
         rl.question(`Selecciona el endpoint para testear: 
 1) POST /create_user_with_dynamic_gas
 2) GET /role
-3) ALL
+3) GET /has_permission
+4) ALL
 Selecciona la opción: `, (answer) => {
             rl.close();
             switch (answer) {
@@ -177,6 +220,9 @@ Selecciona la opción: `, (answer) => {
                     resolve('get_role');
                     break;
                 case '3':
+                    resolve('has_permission');
+                    break;
+                case '4':
                     resolve('ALL');
                     break;
                 default:
@@ -194,8 +240,11 @@ Selecciona la opción: `, (answer) => {
     if (endpoint === 'ALL') {
         await runSequentialTest('create_user_with_dynamic_gas');
         await runGetRoleTest(); // Ejecutar la prueba de get_role
+        await runHasPermissionTest();
     } else if (endpoint === 'get_role') {
         await runGetRoleTest();
+    } else if (endpoint === 'has_permission') {
+        await runHasPermissionTest();
     } else {
         switch (MODE) {
             case 'sequential':
