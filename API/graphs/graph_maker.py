@@ -190,60 +190,19 @@ def plot_metric_vs_time(data, metric, title, route):
 
     # Plotear cada tipo de test
     for (test_type, total_tx), entries in test_groups.items():
-        # Organizar por grupos para calcular duraciones máximas
-        group_entries = {}
-        max_durations = []
-        
+        # Obtener los timestamps en segundos desde el inicio
+        all_times = []
+        all_metrics = []
         for entry in entries:
-            group_id = entry['groupID']
-            if group_id not in group_entries:
-                group_entries[group_id] = []
-            group_entries[group_id].append(entry)
+            time_seconds = (entry['timestamp'] - entries[0]['timestamp']).total_seconds()
+            all_times.append(time_seconds)
+            all_metrics.append(float(entry[metric]) if entry[metric] else 0.0)
         
-        # Calcular duración máxima para cada grupo
-        for group_data in group_entries.values():
-            if group_data:
-                group_data.sort(key=lambda x: x['timestamp'])
-                start_time = group_data[0]['timestamp']
-                end_time = group_data[-1]['timestamp']
-                duration = (end_time - start_time).total_seconds() / 60  # en minutos
-                max_durations.append(duration)
-        
-        # Calcular duración promedio para este tipo de test
-        avg_duration = mean(max_durations) if max_durations else 1
-        print(f"Duración promedio para {test_type}: {avg_duration:.2f} minutos")
-        
-        # Evitar división por cero
-        if avg_duration == 0:
-            print(f"Advertencia: Duración promedio es cero para {test_type}. Saltando este grupo.")
-            continue  # O establecer avg_duration = 1 para evitar división por cero
-        
-        # Recolectar todos los puntos normalizados
-        all_points = []
-        
-        # Procesar cada grupo y normalizar sus tiempos
-        for group_data in group_entries.values():
-            if group_data:
-                group_data.sort(key=lambda x: x['timestamp'])
-                start_time = group_data[0]['timestamp']
-                
-                for entry in group_data:
-                    relative_time = (entry['timestamp'] - start_time).total_seconds() / 60
-                    # Normalizar el tiempo usando la duración promedio
-                    normalized_time = (relative_time / avg_duration) * 100  # Convertir a porcentaje
-                    if entry[metric] is not None:
-                        all_points.append((normalized_time, float(entry[metric])))
-        
-        if all_points:
-            # Ordenar puntos por tiempo normalizado
-            all_points.sort(key=lambda x: x[0])
-            times, metrics = zip(*all_points)
-            
-            label = f'{test_type} - {total_tx} tx (Duración promedio: {avg_duration:.2f}min)'
-            plt.plot(times, metrics, label=label, marker='o', markersize=2)
-            print(f"Graficando {len(times)} puntos para {label}")
+        label = f'{test_type} - {total_tx} tx'
+        plt.plot(all_times, all_metrics, label=label, marker='o', markersize=2)
+        print(f"Graficando {len(all_times)} puntos para {label}")
 
-    plt.xlabel('Porcentaje de Tiempo Transcurrido (%)')
+    plt.xlabel('Tiempo (segundos)')  # Cambiado a 'Tiempo (segundos)'
     plt.ylabel(metric)
     plt.title(f"{title} - {route}")
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
@@ -263,66 +222,77 @@ def plot_metric_vs_transaction(data, metric, title, route):
     if not data:
         print(f"No hay datos para graficar {metric}")
         return
-
+        
     plt.figure(figsize=(12, 8))
-
-    # Filtrar datos válidos y asegurar que las solicitudes GET tienen costo 0
-    valid_data = []
-    for entry in data:
-        if isinstance(entry, dict):
-            if entry.get(metric) is not None and entry.get('requestNumber') is not None:
-                if entry['method'] == 'GET' and metric == 'transactionCost':
-                    entry[metric] = 0.0
-                valid_data.append(entry)
-        else:
-            print(f"Entrada inválida encontrada (no es un diccionario): {entry}")
-
-    if not valid_data:
-        print(f"No se encontraron valores válidos para la métrica {metric}")
+    
+    if not any(metric in entry for entry in data):
+        print(f"La métrica {metric} no existe en los datos")
         return
+        
+    # Agrupar por tipo de prueba y número total de transacciones
+    test_groups = {}
+    for entry in data:
+        key = (entry['testType'], entry['totalTransactions'])
+        if key not in test_groups:
+            test_groups[key] = []
+        test_groups[key].append(entry)
 
-    # Agrupar datos por 'testType'
-    test_types = set(entry['testType'] for entry in valid_data)
-    for test_type in test_types:
-        # Filtrar datos para el tipo de prueba actual
-        type_data = [entry for entry in valid_data if entry['testType'] == test_type]
+    # Plotear cada tipo de test
+    for (test_type, total_tx), entries in test_groups.items():
+        # Obtener los requestNumbers y las métricas correspondientes
+        request_numbers = [entry['requestNumber'] for entry in entries]
+        metric_values = [float(entry[metric]) if entry[metric] else 0.0 for entry in entries]
+        
+        label = f'{test_type} - {total_tx} tx'
+        plt.plot(request_numbers, metric_values, label=label, marker='o', markersize=2)
+        print(f"Graficando {len(request_numbers)} puntos para {label}")
 
-        # Ordenar los datos por número de transacción
-        type_data.sort(key=lambda x: int(x['requestNumber']))
-        transaction_numbers = [int(entry['requestNumber']) for entry in type_data]
-        metric_values = [float(entry[metric]) for entry in type_data]
-
-        # Graficar los datos para este tipo de prueba
-        plt.plot(transaction_numbers, metric_values, label=test_type, marker='o', markersize=3)
-
-    plt.xlabel('Número de Transacción')
+    plt.xlabel('Request Number')  # Cambiado a 'Request Number'
     plt.ylabel(metric)
     plt.title(f"{title} - {route}")
-    plt.legend()
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.grid(True)
-
+    
     # Sanitizar el nombre de la ruta para usarlo en el nombre del archivo
     sanitized_route = sanitize_filename(route)
     try:
-        plt.savefig(f'{metric}_vs_transaction_{sanitized_route}.png', bbox_inches='tight')
+        plt.savefig(f'{metric}_vs_transaction_{sanitized_route}.png', bbox_inches='tight')  # Cambiado el nombre del archivo
         print(f"Gráfica guardada: {metric}_vs_transaction_{sanitized_route}.png")
     except Exception as e:
         print(f"Error guardando la gráfica {metric}: {str(e)}")
-
+    
     plt.close()
 
 def plot_transaction_cost_vs_length(data):
-    plt.figure(figsize=(20, 15))  # Aumentar el tamaño de la figura
-    df = pd.DataFrame(data)
-    df['parametersLength'] = pd.to_numeric(df['parametersLength'])
-    df['transactionCost'] = pd.to_numeric(df['transactionCost'])
-    df.boxplot(column='transactionCost', by='parametersLength')
-    plt.xlabel('Longitud de Parámetros')
-    plt.ylabel('Costo de Transacción')
-    plt.title('Costo de Transacción vs Longitud de Parámetros', fontsize=15)
-    plt.suptitle('')
-    plt.tight_layout()  # Ajustar automáticamente los márgenes
-    plt.savefig('transaction_cost_vs_length.png')
+    # Remover la gráfica y generar una tabla con media, mediana y moda
+    costs = [entry['transactionCost'] for entry in data if entry['transactionCost'] is not None]
+    lengths = [entry['parametersLength'] for entry in data if entry['parametersLength'] is not None]
+    
+    if not costs or not lengths:
+        print("No hay datos suficientes para generar la tabla de costo de transacción por longitud.")
+        return
+    
+    # Calcular estadísticas
+    cost_mean = mean(costs)
+    cost_median = median(costs)
+    cost_mode = Counter(costs).most_common(1)[0][0]
+    
+    length_mean = mean(lengths)
+    length_median = median(lengths)
+    length_mode = Counter(lengths).most_common(1)[0][0]
+    
+    # Crear la tabla
+    table = {
+        'Métrica': ['Costo de Transacción', 'Longitud de Parámetros'],
+        'Media': [cost_mean, length_mean],
+        'Mediana': [cost_median, length_median],
+        'Moda': [cost_mode, length_mode]
+    }
+    
+    df_table = pd.DataFrame(table)
+    print("Tabla de Costo de Transacción por Longitud:")
+    print(df_table)
+    df_table.to_csv('transaction_cost_per_length_stats.csv', index=False)
 
 def calculate_statistics(data, metric):
     values = [entry[metric] for entry in data]
@@ -334,12 +304,20 @@ def calculate_statistics(data, metric):
 
 def generate_statistics_table(data, metrics):
     stats_table = []
-    for method in set(entry['method'] for entry in data):
-        for test_type in set(entry['testType'] for entry in data):
-            subset = [entry for entry in data if entry['method'] == method and entry['testType'] == test_type]
-            stats = {'Method': method, 'Test Type': test_type}
+    for route in set(entry['route'] for entry in data):
+        for test_type in set(entry['testType'] for entry in data if entry['route'] == route):
+            subset = [entry for entry in data if entry['route'] == route and entry['testType'] == test_type]
+            stats = {'Route': route, 'Test Type': test_type}
             for metric in metrics:
-                metric_stats = calculate_statistics(subset, metric)
+                metric_values = [entry[metric] for entry in subset if entry[metric] is not None]
+                if metric_values:
+                    metric_stats = {
+                        'mean': mean(metric_values),
+                        'median': median(metric_values),
+                        'mode': Counter(metric_values).most_common(1)[0][0]
+                    }
+                else:
+                    metric_stats = {'mean': 'N/A', 'median': 'N/A', 'mode': 'N/A'}
                 stats[f'{metric}_mean'] = metric_stats['mean']
                 stats[f'{metric}_median'] = metric_stats['median']
                 stats[f'{metric}_mode'] = metric_stats['mode']
@@ -382,16 +360,16 @@ def main():
     for route in routes:
         route_data = [entry for entry in parsed_data if entry['route'] == route]
         for metric in metrics:
-            plot_metric_vs_transaction(route_data, metric, f'{metric} vs Número de Transacción', route)  # Cambiado de "Ruta base:" a route_data
+            plot_metric_vs_transaction(route_data, metric, f'{metric} vs Número de Transacción', route)  
             plot_metric_vs_time(route_data, metric, f'{metric} vs Tiempo', route)
     
-    # Gráfico de Costo Transaccional vs Longitud de Parámetros
+    # Generar tabla de Costo Transaccional por Longitud de Parámetros
     plot_transaction_cost_vs_length(parsed_data)
     
     # Velocidad de Transacción
     transaction_speed = calculate_transaction_speed(parsed_data, interval='60s')
     
-    # Tabla de estadísticas (Media, Moda, Mediana)
+    # Tabla de estadísticas (Media, Moda, Mediana) basada en ruta
     metrics = ['cpuUsageDiff', 'ramUsageDiff', 'transactionCost', 'latency']
     stats_table = generate_statistics_table(parsed_data, metrics)
     
