@@ -50,13 +50,14 @@ function logRequestToTxt(req, res, next) {
         const requestNumber = res.locals.requestNumber || 'N/A';
         // Obtener 'testType' directamente de la solicitud
         const testType = req.body.testType || req.query.testType || 'N/A';
+        const route = `${req.method} ${req.originalUrl.split('?')[0]}`; // Asegurar que solo se registra la ruta base
 
         const logEntry = `
         Time: ${new Date().toISOString()}
         Request Number: ${requestNumber}
         GroupID: ${groupID}
         Total Transactions: ${totalTransactions}
-        Route: ${req.method} ${req.originalUrl}
+        Route: ${route}
         Method: ${req.method}
         RefTime (Gas Computacional): ${res.locals.refTime || 'N/A'}
         ProofSize: ${res.locals.proofSize || 'N/A'}
@@ -98,13 +99,14 @@ function logRequestToJson(req, res, next) {
         const requestNumber = res.locals.requestNumber || 'N/A';
         // Obtener 'testType' directamente de la solicitud
         const testType = req.body.testType || req.query.testType || 'N/A';
+        const route = `${req.method} ${req.originalUrl.split('?')[0]}`; // Asegurar que solo se registra la ruta base
 
         const logEntry = {
             time: new Date().toISOString(),
             requestNumber: requestNumber,
             groupID: groupID,
             totalTransactions: totalTransactions,
-            route: `${req.method} ${req.originalUrl}`,
+            route: route,
             method: req.method,
             refTime: res.locals.refTime || 'N/A',
             proofSize: res.locals.proofSize || 'N/A',

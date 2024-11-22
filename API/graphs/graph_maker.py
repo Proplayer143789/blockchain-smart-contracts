@@ -145,7 +145,7 @@ def parse_data(data):
                     'testType': test_type,  # Actualizado para usar test_type normalizado
                     'parametersLength': int(entry.get('parametersLength', 0)) if entry.get('parametersLength', 'N/A') != 'N/A' else 0,
                     'method': entry.get('method', 'Unknown'),
-                    'route': base_route  # Agregar este campo
+                    'route': base_route  # Asegurarse de que la ruta es limpia y consistente
                 }
                 parsed_data.append(parsed_entry)
             else:
@@ -180,6 +180,28 @@ def plot_metric_vs_time(data, metric, title, route):
         print(f"La métrica {metric} no existe en los datos")
         return
         
+    # Mapeo de métricas a etiquetas en español
+    metric_labels = {
+        'ramUsageDiff': 'Uso de RAM (%)',  # Añadido '%' al label de RAM
+        'cpuUsageDiff': 'Uso de CPU (%)',  # Ya existente
+        'transactionCost': 'Costo de Transacción',
+        'latency': 'Latencia'
+    }
+    
+    # Obtener la etiqueta correspondiente o usar el nombre original si no está mapeado
+    y_label = metric_labels.get(metric, metric)
+    
+    # Mapeo de métricas a títulos en español
+    title_labels = {
+        'ramUsageDiff': 'Uso de RAM vs Tiempo',
+        'cpuUsageDiff': 'Uso de CPU vs Tiempo',
+        'transactionCost': 'Costo de Transacción vs Tiempo',
+        'latency': 'Latencia vs Tiempo'
+    }
+
+    # Obtener el título en español correspondiente
+    title_label = title_labels.get(metric, title)
+    
     # Agrupar por tipo de prueba y número total de transacciones
     test_groups = {}
     for entry in data:
@@ -203,8 +225,12 @@ def plot_metric_vs_time(data, metric, title, route):
         print(f"Graficando {len(all_times)} puntos para {label}")
 
     plt.xlabel('Tiempo (segundos)')  # Cambiado a 'Tiempo (segundos)'
-    plt.ylabel(metric)
-    plt.title(f"{title} - {route}")
+    plt.ylabel(y_label)  # Usar la etiqueta en español correspondiente
+
+    #if metric == 'cpuUsageDiff' or metric == 'ramUsageDiff':  # Establecer el límite inferior del eje Y a 0% para CPU y RAM
+    #    plt.ylim(bottom=0)
+
+    plt.title(f"{title_label} - {route}")
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.grid(True)
     
@@ -229,27 +255,53 @@ def plot_metric_vs_transaction(data, metric, title, route):
         print(f"La métrica {metric} no existe en los datos")
         return
         
+    # Mapeo de métricas a etiquetas en español
+    metric_labels = {
+        'ramUsageDiff': 'Uso de RAM (%)',  # Añadido '%' al label de RAM
+        'cpuUsageDiff': 'Uso de CPU (%)',  # Ya existente
+        'transactionCost': 'Costo de Transacción',
+        'latency': 'Latencia'
+    }
+    
+    # Obtener la etiqueta correspondiente o usar el nombre original si no está mapeado
+    y_label = metric_labels.get(metric, metric)
+    
+    # Mapeo de métricas a títulos en español
+    title_labels = {
+        'ramUsageDiff': 'Uso de RAM vs Id de Transacción',
+        'cpuUsageDiff': 'Uso de CPU vs Id de Transacción',
+        'transactionCost': 'Costo de Transacción vs Id de Transacción',
+        'latency': 'Latencia vs Id de Transacción'
+    }
+
+    # Obtener el título en español correspondiente
+    title_label = title_labels.get(metric, title)
+    
     # Agrupar por tipo de prueba y número total de transacciones
     test_groups = {}
     for entry in data:
-        key = (entry['testType'], entry['totalTransactions'])
+        key = (entry['testType'], entry['totalTransactions'], entry['route'])  # Incluir ruta en la agrupación
         if key not in test_groups:
             test_groups[key] = []
         test_groups[key].append(entry)
 
     # Plotear cada tipo de test
-    for (test_type, total_tx), entries in test_groups.items():
+    for (test_type, total_tx, route), entries in test_groups.items():
         # Obtener los requestNumbers y las métricas correspondientes
         request_numbers = [entry['requestNumber'] for entry in entries]
         metric_values = [float(entry[metric]) if entry[metric] else 0.0 for entry in entries]
         
-        label = f'{test_type} - {total_tx} tx'
+        label = f'{test_type} - {total_tx} tx - {route}'
         plt.plot(request_numbers, metric_values, label=label, marker='o', markersize=2)
         print(f"Graficando {len(request_numbers)} puntos para {label}")
 
-    plt.xlabel('Request Number')  # Cambiado a 'Request Number'
-    plt.ylabel(metric)
-    plt.title(f"{title} - {route}")
+    plt.xlabel('Id de transacción')  # Cambiado a 'Id de transacción'
+    plt.ylabel(y_label)  # Usar la etiqueta en español correspondiente
+
+    #if metric == 'cpuUsageDiff' or metric == 'ramUsageDiff':  # Establecer el límite inferior del eje Y a 0% para CPU y RAM
+    #    plt.ylim(bottom=0)
+
+    plt.title(f"{title_label} - {route}")
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.grid(True)
     
@@ -264,12 +316,15 @@ def plot_metric_vs_transaction(data, metric, title, route):
     plt.close()
 
 def plot_transaction_cost_vs_length(data):
+    # Filtrar solo las solicitudes POST
+    post_data = [entry for entry in data if entry['method'].upper() == 'POST']
+    
     # Remover la gráfica y generar una tabla con media, mediana y moda
-    costs = [entry['transactionCost'] for entry in data if entry['transactionCost'] is not None]
-    lengths = [entry['parametersLength'] for entry in data if entry['parametersLength'] is not None]
+    costs = [entry['transactionCost'] for entry in post_data if entry['transactionCost'] is not None]
+    lengths = [entry['parametersLength'] for entry in post_data if entry['parametersLength'] is not None]
     
     if not costs or not lengths:
-        print("No hay datos suficientes para generar la tabla de costo de transacción por longitud.")
+        print("No hay datos suficientes para generar la tabla de costo de transacción por longitud para POST.")
         return
     
     # Calcular estadísticas
@@ -290,9 +345,9 @@ def plot_transaction_cost_vs_length(data):
     }
     
     df_table = pd.DataFrame(table)
-    print("Tabla de Costo de Transacción por Longitud:")
+    print("Tabla de Costo de Transacción por Longitud (Solo POST):")
     print(df_table)
-    df_table.to_csv('transaction_cost_per_length_stats.csv', index=False)
+    df_table.to_csv('transaction_cost_per_length_stats_post.csv', index=False)
 
 def calculate_statistics(data, metric):
     values = [entry[metric] for entry in data]

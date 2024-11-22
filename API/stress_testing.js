@@ -398,3 +398,43 @@ Selecciona la opción: `, (answer) => {
     }
 })();
 
+// Configurar los endpoints a probar
+const ENDPOINTS = [
+    { method: 'GET', url: '/get_role/' },
+    { method: 'GET', url: '/has_permission/' }
+];
+
+// Función para seleccionar un endpoint de forma aleatoria o equilibrada
+function chooseEndpoint() {
+    // Opcional: Implementar una distribución equitativa
+    const index = Math.floor(Math.random() * ENDPOINTS.length);
+    return ENDPOINTS[index];
+}
+
+// Función para realizar una solicitud
+async function sendRequest() {
+    const endpoint = chooseEndpoint();
+    const url = `http://${HOST}:${PORT}${endpoint.url}`;
+
+    try {
+        let response;
+        if (endpoint.method === 'GET') {
+            // Ejemplo de parámetros necesarios
+            const params = {
+                // Añadir parámetros según el endpoint
+            };
+            response = await axios.get(url, { params });
+        }
+        // Manejar otros métodos si es necesario
+
+        console.log(`Solicitud a ${endpoint.url} respondida con estado ${response.status}`);
+    } catch (error) {
+        console.error(`Error en solicitud a ${endpoint.url}: ${error.message}`);
+    }
+}
+
+// Iniciar las solicitudes
+for (let i = 0; i < TOTAL_REQUESTS; i++) {
+    sendRequest();
+}
+
