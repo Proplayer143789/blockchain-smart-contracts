@@ -9,7 +9,6 @@ require('dotenv').config();
 const LOG_FILE_PATH = path.join(__dirname, 'performance_log.txt');
 const logFileJsonPath = path.join(__dirname, 'performance_log.json');
 let fileExists = fs.existsSync(logFileJsonPath);
-const test_type = process.env.TEST_TYPE || 'sequential';
 
 // Función para obtener el uso de sistema actual (CPU y RAM)
 function getSystemUsage() {
@@ -49,6 +48,8 @@ function logRequestToTxt(req, res, next) {
         const groupID = req.body.groupID || req.query.groupID || 'N/A';
         const totalTransactions = req.body.totalTransactions || req.query.totalTransactions || 'N/A';
         const requestNumber = res.locals.requestNumber || 'N/A';
+        // Obtener 'testType' directamente de la solicitud
+        const testType = req.body.testType || req.query.testType || 'N/A';
 
         const logEntry = `
         Time: ${new Date().toISOString()}
@@ -67,7 +68,7 @@ function logRequestToTxt(req, res, next) {
         RAM Usage (end): ${endMem.toFixed(2)}%
         Transaction Success: ${res.locals.transactionSuccess ? 'Yes' : 'No'}
         Parameters Length: ${paramsLength}
-        Test Type: ${test_type}
+        Test Type: ${testType}
         ---
         `;
 
@@ -95,6 +96,8 @@ function logRequestToJson(req, res, next) {
         const groupID = req.body.groupID || req.query.groupID || 'N/A';
         const totalTransactions = req.body.totalTransactions || req.query.totalTransactions || 'N/A';
         const requestNumber = res.locals.requestNumber || 'N/A';
+        // Obtener 'testType' directamente de la solicitud
+        const testType = req.body.testType || req.query.testType || 'N/A';
 
         const logEntry = {
             time: new Date().toISOString(),
@@ -113,7 +116,7 @@ function logRequestToJson(req, res, next) {
             ramUsageEnd: `${endMem.toFixed(2)}%`,
             transactionSuccess: res.locals.transactionSuccess ? 'Yes' : 'No',
             parametersLength: paramsLength,
-            testType: test_type
+            testType: testType
         };
 
         const logEntryString = JSON.stringify(logEntry);

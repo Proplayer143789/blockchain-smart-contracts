@@ -24,7 +24,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Contract Dirección y ABI
-const CONTRACT_ADDRESS = '5F62w143MMW21i8tNiBtANgkyWAtZ5T11Vx5adutaoceUtKX';
+const CONTRACT_ADDRESS = '5FpR6ZCqMaTVgmNnm9usHyh1EpDxcHWs6CjDCZVdYFuWfeXb';
 const CONTRACT_ABI_PATH = path.resolve(__dirname, '../target/ink/smart_contract/smart_contract.json');
 
 // Performance monitoring configuration
@@ -434,11 +434,12 @@ app.post('/create_user_with_existing_address', async (req, res) => {
 // Endpoint para obtener el rol de un usuario
 app.get('/role/:publicAddress', async (req, res) => {
     const { publicAddress } = req.params;
-    const { requestNumber, groupID, totalTransactions } = req.query;
+    const { requestNumber, groupID, totalTransactions, testType } = req.query;
 
     res.locals.requestNumber = requestNumber || 'N/A';
     res.locals.groupID = groupID || 'N/A';
     res.locals.totalTransactions = totalTransactions || 'N/A';
+    res.locals.testType = testType || 'N/A'; // Asegurar que testType se almacene correctamente
 
     try {
         const keyring = new Keyring({ type: 'sr25519' });
@@ -570,7 +571,7 @@ async function executeContractAndGetGas(contract, signer, res, ...params) {
 
 // Ruta POST para crear un usuario usando la función addUser con gas dinámico
 app.post('/create_user_with_dynamic_gas', async (req, res) => {
-    const { name, lastname, dni, email, role } = req.body;
+    const { name, lastname, dni, email, role, groupID, totalTransactions, requestNumber, testType } = req.body;
 
     try {
         const keyring = new Keyring({ type: 'sr25519' });
@@ -595,7 +596,7 @@ app.post('/create_user_with_dynamic_gas', async (req, res) => {
         });
 
         // Ejecutar la transacción del contrato (addUser) y guardar el gas consumido y tip
-        await addUser(alice, newAccount, userInfo, role, gasLimit, res);
+        await addUser(alice, newAccount, userInfo, role, gasLimit, res, testType);
 
         // Guardar el Account ID en 'account_ids.txt'
         fs.appendFileSync(ACCOUNT_IDS_FILE, `${newAccount.address}\n`, 'utf8');
@@ -618,11 +619,12 @@ app.post('/create_user_with_dynamic_gas', async (req, res) => {
 // Endpoint para verificar si un permiso existe entre dos usuarios
 app.get('/has_permission/:granter/:grantee', async (req, res) => {
     const { granter, grantee } = req.params;
-    const { requestNumber, groupID, totalTransactions } = req.query;
+    const { requestNumber, groupID, totalTransactions, testType } = req.query;
 
     res.locals.requestNumber = requestNumber || 'N/A';
     res.locals.groupID = groupID || 'N/A';
     res.locals.totalTransactions = totalTransactions || 'N/A';
+    res.locals.testType = testType || 'N/A'; // Asegurar que testType se almacene correctamente
 
     try {
         const granterAccountId = api.createType('AccountId', granter);

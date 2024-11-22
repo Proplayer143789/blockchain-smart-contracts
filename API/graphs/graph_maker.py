@@ -60,9 +60,6 @@ def read_data():
         print("Datos cargados exitosamente")
         return data
 
-
-
-
 def calculate_transaction_cost(entry):
     if entry.get('method') == 'GET':
         return 0.0
@@ -124,6 +121,13 @@ def parse_data(data):
                 
                 base_route = get_base_route(route)
 
+                # Normalizar el campo testType
+                test_type = entry.get('testType', 'Unknown')
+                if isinstance(test_type, str):
+                    test_type = test_type.strip().lower()
+                else:
+                    test_type = str(test_type)
+
                 parsed_entry = {
                     'duration': duration,
                     'cpuUsageStart': cpu_start,
@@ -138,7 +142,7 @@ def parse_data(data):
                     'groupID': entry.get('groupID', 'N/A'),
                     'requestNumber': int(entry.get('requestNumber', 0)) if entry.get('requestNumber', 'N/A') != 'N/A' else 0,
                     'totalTransactions': int(entry.get('totalTransactions', 0)) if entry.get('totalTransactions', 'N/A') != 'N/A' else 0,
-                    'testType': entry.get('testType', 'Unknown'),
+                    'testType': test_type,  # Actualizado para usar test_type normalizado
                     'parametersLength': int(entry.get('parametersLength', 0)) if entry.get('parametersLength', 'N/A') != 'N/A' else 0,
                     'method': entry.get('method', 'Unknown'),
                     'route': base_route  # Agregar este campo
@@ -265,10 +269,13 @@ def plot_metric_vs_transaction(data, metric, title, route):
     # Filtrar datos válidos y asegurar que las solicitudes GET tienen costo 0
     valid_data = []
     for entry in data:
-        if entry.get(metric) is not None and entry.get('requestNumber') is not None:
-            if entry['method'] == 'GET' and metric == 'transactionCost':
-                entry[metric] = 0.0
-            valid_data.append(entry)
+        if isinstance(entry, dict):
+            if entry.get(metric) is not None and entry.get('requestNumber') is not None:
+                if entry['method'] == 'GET' and metric == 'transactionCost':
+                    entry[metric] = 0.0
+                valid_data.append(entry)
+        else:
+            print(f"Entrada inválida encontrada (no es un diccionario): {entry}")
 
     if not valid_data:
         print(f"No se encontraron valores válidos para la métrica {metric}")
@@ -375,7 +382,7 @@ def main():
     for route in routes:
         route_data = [entry for entry in parsed_data if entry['route'] == route]
         for metric in metrics:
-            plot_metric_vs_transaction("Ruta base:", metric, f'{metric} vs Número de Transacción', route)
+            plot_metric_vs_transaction(route_data, metric, f'{metric} vs Número de Transacción', route)  # Cambiado de "Ruta base:" a route_data
             plot_metric_vs_time(route_data, metric, f'{metric} vs Tiempo', route)
     
     # Gráfico de Costo Transaccional vs Longitud de Parámetros
@@ -388,6 +395,7 @@ def main():
     metrics = ['cpuUsageDiff', 'ramUsageDiff', 'transactionCost', 'latency']
     stats_table = generate_statistics_table(parsed_data, metrics)
     
+
     print("Estadisticas:")
     print(stats_table)
     stats_table.to_csv('statistics_summary.csv', index=False)
