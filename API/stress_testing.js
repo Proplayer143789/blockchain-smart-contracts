@@ -11,7 +11,7 @@ const HOST = process.env.HOST === '0.0.0.0' ? 'localhost' : process.env.HOST; //
 const PORT = process.env.PORT || 3000; // El puerto en el que corre el servidor
 const TOTAL_REQUESTS = process.env.TOTAL_REQUESTS || 50; // Cantidad de solicitudes totales
 const SIMULTANEOUS_REQUESTS = 10; // Cantidad de solicitudes simultáneas por lote
-const MODE = process.env.TEST_TYPE || 'concurrent'; // Puede ser 'sequential', 'concurrent', o 'batch'
+let MODE = process.env.TEST_TYPE || 'concurrent'; // Puede ser 'sequential', 'concurrent', o 'batch'
 const BATCH_WAIT_TIME = process.env.BATCH_WAIT_TIME || 6; // Tiempo de espera entre lotes
 
 // URL completa de tu API (basada en HOST y PORT)
@@ -140,14 +140,57 @@ async function runHasPermissionTest() {
     const groupID = uuidv4();
     let requestNumber = 0;
 
-    for (let i = 0; i < totalTransactions; i++) {
-        const data = generatePermissionTestData();
-        if (!data) return;
+    // Obtener los datos necesarios
+    const accounts = getUserAccountsFromFile();
+    if (accounts.length < 2) {
+        console.log('No hay suficientes usuarios para probar permisos.');
+        return;
+    }
 
-        console.log(`Solicitando permiso de ${data.granter} a ${data.grantee}`);
-        requestNumber++;
+    // Función para generar datos de prueba
+    function getTestData() {
+        const granter = accounts[Math.floor(Math.random() * accounts.length)];
+        let grantee = accounts[Math.floor(Math.random() * accounts.length)];
+        while (granter === grantee) {
+            grantee = accounts[Math.floor(Math.random() * accounts.length)];
+        }
+        return { granter, grantee };
+    }
 
-        await hasPermission(data.granter, data.grantee, groupID, requestNumber, totalTransactions);
+    if (MODE === 'sequential') {
+        // Modo secuencial
+        for (let i = 0; i < totalTransactions; i++) {
+            const data = generatePermissionTestData();
+            if (!data) return;
+            requestNumber++;
+            await hasPermission(data.granter, data.grantee, groupID, requestNumber, totalTransactions);
+        }
+    } else if (MODE === 'concurrent') {
+        // Modo concurrente
+        const promises = [];
+        for (let i = 0; i < totalTransactions; i++) {
+            const data = generatePermissionTestData();
+            if (!data) return;
+            requestNumber++;
+            promises.push(hasPermission(data.granter, data.grantee, groupID, requestNumber, totalTransactions));
+        }
+        await Promise.all(promises);
+    } else if (MODE === 'batch') {
+        // Modo por lotes
+        for (let i = 0; i < totalTransactions; i += SIMULTANEOUS_REQUESTS) {
+            const batchPromises = [];
+            for (let j = 0; j < SIMULTANEOUS_REQUESTS && i + j < totalTransactions; j++) {
+                const data = generatePermissionTestData();
+                if (!data) return;
+                requestNumber++;
+                batchPromises.push(hasPermission(data.granter, data.grantee, groupID, requestNumber, totalTransactions));
+            }
+            await Promise.all(batchPromises);
+            console.log(`Esperando ${BATCH_WAIT_TIME} segundos antes del siguiente lote...`);
+            await new Promise(resolve => setTimeout(resolve, BATCH_WAIT_TIME * 1000));
+        }
+    } else {
+        console.error('Modo de prueba no válido.');
     }
     console.log('Prueba de hasPermission completada');
 }
@@ -263,13 +306,36 @@ Selecciona la opción: `, (answer) => {
     const endpoint = await promptUserForEndpoint();
 
     if (endpoint === 'ALL') {
-        await runSequentialTest('create_user_with_dynamic_gas');
-        await runGetRoleTest(); // Ejecutar la prueba de get_role
-        await runHasPermissionTest();
+        const endpoints = ['create_user_with_dynamic_gas', 'get_role', 'has_permission'];
+        const testModes = ['sequential', 'concurrent', 'batch'];
+        
+        for (const mode of testModes) {
+            MODE = mode; // Establecer el modo de prueba actual
+            console.log(`\nEjecutando pruebas en modo: ${MODE.toUpperCase()}\n`);
+            for (const ep of endpoints) {
+                if (ep === 'get_role') {
+                    await runGetRoleTest(MODE);
+                } else if (ep === 'has_permission') {
+                    await runHasPermissionTest(MODE);
+                } else {
+                    switch (MODE) {
+                        case 'sequential':
+                            await runSequentialTest(ep);
+                            break;
+                        case 'concurrent':
+                            await runConcurrentTest(ep);
+                            break;
+                        case 'batch':
+                            await runBatchTest(SIMULTANEOUS_REQUESTS, ep);
+                            break;
+                    }
+                }
+            }
+        }
     } else if (endpoint === 'get_role') {
-        await runGetRoleTest();
+        await runGetRoleTest(MODE);
     } else if (endpoint === 'has_permission') {
-        await runHasPermissionTest();
+        await runHasPermissionTest(MODE);
     } else {
         switch (MODE) {
             case 'sequential':

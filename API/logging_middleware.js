@@ -39,6 +39,9 @@ function logRequestToTxt(req, res, next) {
     const startTime = Date.now();
     const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage();
     const paramsLength = getParamsLength(req);
+    
+    // Asignar requestNumber desde req.query o req.body
+    res.locals.requestNumber = req.query.requestNumber || req.body.requestNumber || 'N/A';
 
     res.on('finish', () => {
         const duration = Date.now() - startTime;
@@ -82,6 +85,9 @@ function logRequestToJson(req, res, next) {
     const startTime = Date.now();
     const { cpuUsage: startCpu, memUsage: startMem } = getSystemUsage();
     const paramsLength = getParamsLength(req);
+    
+    // Asignar requestNumber desde req.query o req.body
+    res.locals.requestNumber = req.query.requestNumber || req.body.requestNumber || 'N/A';
 
     res.on('finish', () => {
         const duration = Date.now() - startTime;

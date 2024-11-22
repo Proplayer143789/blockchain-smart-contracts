@@ -6,8 +6,8 @@ import pandas as pd
 from datetime import datetime
 from dotenv import load_dotenv
 from collections import Counter
-
-
+import re  # Importar el módulo re para expresiones regulares
+import time
 # Cargar las variables de entorno desde la carpeta previa
 load_dotenv(dotenv_path='../.env')
 
@@ -72,6 +72,24 @@ def calculate_transaction_cost(entry):
     proofSize = float(proofSize) if proofSize != 'N/A' else 0.0
     return refTime + proofSize
 
+def get_base_route(route):
+    # Eliminar los prefijos 'GET ' y 'POST ' si están presentes
+    if route.startswith('GET '):
+        route = route[len('GET '):]
+    elif route.startswith('POST '):
+        route = route[len('POST '):]
+    # Reemplazar segmentos variables por placeholders
+    if route.startswith('/role/'):
+        return 'GET /role/'  # Rutas genéricas para /role/
+    elif route.startswith('/has_permission/'):
+        return 'GET /has_permission/'  # Rutas genéricas para /has_permission/
+    elif route.startswith('/create_user_with_dynamic_gas'):
+        return 'POST /create_user_with_dynamic_gas'
+    # Agregar más patrones según tus endpoints
+    else:
+        print(f"Ruta no reconocida: {route}")
+        return route
+
 def parse_data(data):
     parsed_data = []
     null_entries = 0
@@ -101,6 +119,11 @@ def parse_data(data):
                 ram_start = float(entry.get('ramUsageStart', '0').replace('%', ''))
                 ram_end = float(entry.get('ramUsageEnd', '0').replace('%', ''))
                 
+                # Obtener la ruta genérica
+                route = entry.get('route', 'Unknown')
+                
+                base_route = get_base_route(route)
+
                 parsed_entry = {
                     'duration': duration,
                     'cpuUsageStart': cpu_start,
@@ -117,7 +140,8 @@ def parse_data(data):
                     'totalTransactions': int(entry.get('totalTransactions', 0)) if entry.get('totalTransactions', 'N/A') != 'N/A' else 0,
                     'testType': entry.get('testType', 'Unknown'),
                     'parametersLength': int(entry.get('parametersLength', 0)) if entry.get('parametersLength', 'N/A') != 'N/A' else 0,
-                    'method': entry.get('method', 'Unknown')
+                    'method': entry.get('method', 'Unknown'),
+                    'route': base_route  # Agregar este campo
                 }
                 parsed_data.append(parsed_entry)
             else:
@@ -137,7 +161,11 @@ def parse_data(data):
 
     return parsed_data
 
-def plot_metric_vs_time(data, metric, title):
+def sanitize_filename(name):
+    # Reemplazar caracteres inválidos por guiones bajos
+    return re.sub(r'[\\/*?:"<>|]', "_", name)
+
+def plot_metric_vs_time(data, metric, title, route):
     if not data:
         print(f"No hay datos para graficar {metric}")
         return
@@ -181,6 +209,11 @@ def plot_metric_vs_time(data, metric, title):
         avg_duration = mean(max_durations) if max_durations else 1
         print(f"Duración promedio para {test_type}: {avg_duration:.2f} minutos")
         
+        # Evitar división por cero
+        if avg_duration == 0:
+            print(f"Advertencia: Duración promedio es cero para {test_type}. Saltando este grupo.")
+            continue  # O establecer avg_duration = 1 para evitar división por cero
+        
         # Recolectar todos los puntos normalizados
         all_points = []
         
@@ -208,19 +241,21 @@ def plot_metric_vs_time(data, metric, title):
 
     plt.xlabel('Porcentaje de Tiempo Transcurrido (%)')
     plt.ylabel(metric)
-    plt.title(title, fontsize=15)
+    plt.title(f"{title} - {route}")
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.grid(True)
     
+    # Sanitizar el nombre de la ruta para usarlo en el nombre del archivo
+    sanitized_route = sanitize_filename(route)
     try:
-        plt.savefig(f'{metric}_vs_time.png', bbox_inches='tight')
-        print(f"Gráfica guardada: {metric}_vs_time.png")
+        plt.savefig(f'{metric}_vs_time_{sanitized_route}.png', bbox_inches='tight')
+        print(f"Gráfica guardada: {metric}_vs_time_{sanitized_route}.png")
     except Exception as e:
         print(f"Error guardando la gráfica {metric}: {str(e)}")
     
     plt.close()
 
-def plot_metric_vs_transaction(data, metric, title):
+def plot_metric_vs_transaction(data, metric, title, route):
     if not data:
         print(f"No hay datos para graficar {metric}")
         return
@@ -255,13 +290,15 @@ def plot_metric_vs_transaction(data, metric, title):
 
     plt.xlabel('Número de Transacción')
     plt.ylabel(metric)
-    plt.title(title)
+    plt.title(f"{title} - {route}")
     plt.legend()
     plt.grid(True)
 
+    # Sanitizar el nombre de la ruta para usarlo en el nombre del archivo
+    sanitized_route = sanitize_filename(route)
     try:
-        plt.savefig(f'{metric}_vs_transaction.png', bbox_inches='tight')
-        print(f"Gráfica guardada: {metric}_vs_transaction.png")
+        plt.savefig(f'{metric}_vs_transaction_{sanitized_route}.png', bbox_inches='tight')
+        print(f"Gráfica guardada: {metric}_vs_transaction_{sanitized_route}.png")
     except Exception as e:
         print(f"Error guardando la gráfica {metric}: {str(e)}")
 
@@ -332,10 +369,14 @@ def main():
     print(f"Se procesaron exitosamente {len(parsed_data)} entradas de datos")
     
     # Gráficos actualizados
-    plot_metric_vs_transaction(parsed_data, 'cpuUsageDiff', 'Diferencia de Uso de CPU vs Número de Transacción')
-    plot_metric_vs_transaction(parsed_data, 'ramUsageDiff', 'Diferencia de Uso de RAM vs Número de Transacción')
-    plot_metric_vs_transaction(parsed_data, 'transactionCost', 'Costo de Transacción vs Número de Transacción')
-    #plot_metric_vs_time(parsed_data, 'latency', 'Latencia vs Tiempo')
+    metrics = ['cpuUsageDiff', 'ramUsageDiff', 'transactionCost']
+    routes = set(entry['route'] for entry in parsed_data)
+    print(f"Rutas encontradas: {routes}")
+    for route in routes:
+        route_data = [entry for entry in parsed_data if entry['route'] == route]
+        for metric in metrics:
+            plot_metric_vs_transaction("Ruta base:", metric, f'{metric} vs Número de Transacción', route)
+            plot_metric_vs_time(route_data, metric, f'{metric} vs Tiempo', route)
     
     # Gráfico de Costo Transaccional vs Longitud de Parámetros
     plot_transaction_cost_vs_length(parsed_data)
