@@ -52,9 +52,15 @@ async function getRole(publicAddress) {
 }
 
 // Función para hacer una solicitud GET a /has_permission/:granter/:grantee
-async function hasPermission(granter, grantee) {
+async function hasPermission(granter, grantee, groupID, requestNumber, totalTransactions) {
     try {
-        const response = await axios.get(`${FULL_URL}/has_permission/${granter}/${grantee}`);
+        const response = await axios.get(`${FULL_URL}/has_permission/${granter}/${grantee}`, {
+            params: {
+                groupID,
+                requestNumber,
+                totalTransactions
+            }
+        });
         return response.data;
     } catch (error) {
         console.error(`Error obteniendo permiso: ${error.message}`);
@@ -84,13 +90,25 @@ async function runGetRoleTest() {
 
     console.log(`Ejecutando prueba de get_role con ${accounts.length} usuarios...`);
 
+    // Generar un groupID único para esta sesión de pruebas
+    const groupID = uuidv4();
+    const totalTransactions = accounts.length;
+    let requestNumber = 0;
+
     // Llamadas individuales al endpoint /role/:publicAddress
     for (const accountId of accounts) {
         try {
-            const role = await getRole(accountId);
-            console.log(`Rol obtenido para ${accountId}:`, role);
+            requestNumber++;
+            const response = await axios.get(`${FULL_URL}/role/${accountId}`, {
+                params: {
+                    groupID,
+                    requestNumber,
+                    totalTransactions
+                }
+            });
+            // ...manejo de la respuesta...
         } catch (error) {
-            console.error(`Error al obtener el rol para ${accountId}: ${error.message}`);
+            console.error(`Error al obtener rol: ${error.message}`);
         }
     }
 }
@@ -118,11 +136,18 @@ function generatePermissionTestData() {
 async function runHasPermissionTest() {
     console.log('Ejecutando prueba de hasPermission...');
     const totalTransactions = parseInt(TOTAL_REQUESTS);
+    // Generar un groupID único para esta sesión de pruebas
+    const groupID = uuidv4();
+    let requestNumber = 0;
+
     for (let i = 0; i < totalTransactions; i++) {
         const data = generatePermissionTestData();
-        if (!data) break;
+        if (!data) return;
+
         console.log(`Solicitando permiso de ${data.granter} a ${data.grantee}`);
-        await hasPermission(data.granter, data.grantee);
+        requestNumber++;
+
+        await hasPermission(data.granter, data.grantee, groupID, requestNumber, totalTransactions);
     }
     console.log('Prueba de hasPermission completada');
 }
