@@ -23,8 +23,8 @@ const ACCOUNT_IDS_FILE = path.join(__dirname, 'account_ids.txt');
 // Función para generar datos aleatorios
 function generateTestData() {
     return {
-        name: faker.random.alpha({ count: 6 }),
-        lastname: faker.random.alpha({ count: 7 }),
+        name: faker.random.alpha({ count: 5 }),
+        lastname: faker.random.alpha({ count: 6 }),
         dni: faker.datatype.number({ min: 10000000, max: 99999999 }).toString(),
         email: faker.random.alphaNumeric(10) + '12@gmail.com', // Total de 22 caracteres
         role: faker.datatype.number({ min: 0, max: 1 })

@@ -43,12 +43,13 @@ function logRequestToTxt(req, res, next) {
     res.on('finish', () => {
         const duration = Date.now() - startTime;
         const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage();
-        const groupID = req.body.groupID || 'N/A'; // Obtener el groupID de la solicitud
-        const totalTransactions = req.body.totalTransactions || 'N/A'; // Obtener totalTransactions de la solicitud
+        const groupID = req.body.groupID || req.query.groupID || 'N/A';
+        const totalTransactions = req.body.totalTransactions || req.query.totalTransactions || 'N/A';
+        const requestNumber = res.locals.requestNumber || 'N/A';
 
         const logEntry = `
         Time: ${new Date().toISOString()}
-        Request Number: ${res.locals.transactionCount}
+        Request Number: ${requestNumber}
         GroupID: ${groupID}
         Total Transactions: ${totalTransactions}
         Route: ${req.method} ${req.originalUrl}
@@ -85,12 +86,13 @@ function logRequestToJson(req, res, next) {
     res.on('finish', () => {
         const duration = Date.now() - startTime;
         const { cpuUsage: endCpu, memUsage: endMem } = getSystemUsage();
-        const groupID = req.body.groupID || 'N/A'; // Obtener el groupID de la solicitud
-        const totalTransactions = req.body.totalTransactions || 'N/A'; // Obtener totalTransactions de la solicitud
+        const groupID = req.body.groupID || req.query.groupID || 'N/A';
+        const totalTransactions = req.body.totalTransactions || req.query.totalTransactions || 'N/A';
+        const requestNumber = res.locals.requestNumber || 'N/A';
 
         const logEntry = {
             time: new Date().toISOString(),
-            requestNumber: res.locals.transactionCount,
+            requestNumber: requestNumber,
             groupID: groupID,
             totalTransactions: totalTransactions,
             route: `${req.method} ${req.originalUrl}`,

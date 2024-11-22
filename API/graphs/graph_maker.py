@@ -64,12 +64,12 @@ def read_data():
 
 
 def calculate_transaction_cost(entry):
+    if entry.get('method') == 'GET':
+        return 0.0
     refTime = entry.get('refTime', '0')
     proofSize = entry.get('proofSize', '0')
     refTime = float(refTime) if refTime != 'N/A' else 0.0
     proofSize = float(proofSize) if proofSize != 'N/A' else 0.0
-    if entry.get('method') == 'GET':
-        return 0.0
     return refTime + proofSize
 
 def parse_data(data):
@@ -227,8 +227,14 @@ def plot_metric_vs_transaction(data, metric, title):
 
     plt.figure(figsize=(12, 8))
 
-    # Filtrar datos válidos
-    valid_data = [entry for entry in data if entry.get(metric) is not None and entry.get('requestNumber') is not None]
+    # Filtrar datos válidos y asegurar que las solicitudes GET tienen costo 0
+    valid_data = []
+    for entry in data:
+        if entry.get(metric) is not None and entry.get('requestNumber') is not None:
+            if entry['method'] == 'GET' and metric == 'transactionCost':
+                entry[metric] = 0.0
+            valid_data.append(entry)
+
     if not valid_data:
         print(f"No se encontraron valores válidos para la métrica {metric}")
         return
@@ -327,8 +333,9 @@ def main():
     
     # Gráficos actualizados
     plot_metric_vs_transaction(parsed_data, 'cpuUsageDiff', 'Diferencia de Uso de CPU vs Número de Transacción')
-    plot_metric_vs_time(parsed_data, 'ramUsageDiff', 'Diferencia de Uso de RAM vs Tiempo')
-    plot_metric_vs_time(parsed_data, 'latency', 'Latencia vs Tiempo')
+    plot_metric_vs_transaction(parsed_data, 'ramUsageDiff', 'Diferencia de Uso de RAM vs Número de Transacción')
+    plot_metric_vs_transaction(parsed_data, 'transactionCost', 'Costo de Transacción vs Número de Transacción')
+    #plot_metric_vs_time(parsed_data, 'latency', 'Latencia vs Tiempo')
     
     # Gráfico de Costo Transaccional vs Longitud de Parámetros
     plot_transaction_cost_vs_length(parsed_data)
@@ -340,7 +347,7 @@ def main():
     metrics = ['cpuUsageDiff', 'ramUsageDiff', 'transactionCost', 'latency']
     stats_table = generate_statistics_table(parsed_data, metrics)
     
-    print("Estadísticas:")
+    print("Estadisticas:")
     print(stats_table)
     stats_table.to_csv('statistics_summary.csv', index=False)
 

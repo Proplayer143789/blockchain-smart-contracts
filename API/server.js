@@ -259,6 +259,11 @@ async function assignRole(alice, newAccount, role, userInfo, gasLimit) {
 // Ruta para obtener las cuentas asociadas a un dni
 app.get('/get_accounts/:dni', async (req, res) => {
     const { dni } = req.params;
+    const { requestNumber, groupID, totalTransactions } = req.query;
+
+    res.locals.requestNumber = requestNumber || 'N/A';
+    res.locals.groupID = groupID || 'N/A';
+    res.locals.totalTransactions = totalTransactions || 'N/A';
 
     try {
         console.log(`Attempting to fetch accounts for DNI: ${dni}`);
@@ -275,6 +280,7 @@ app.get('/get_accounts/:dni', async (req, res) => {
         console.log('Query output:', output ? output.toHuman() : 'No output');
 
         if (result.isOk) {
+            res.locals.transactionSuccess = true;
             if (output) {
                 const accounts = output.toJSON();
                 console.log('Parsed accounts:', accounts);
@@ -291,10 +297,12 @@ app.get('/get_accounts/:dni', async (req, res) => {
                 res.status(404).send(`No accounts found for dni ${dni}`);
             }
         } else {
+            res.locals.transactionSuccess = false;
             console.error('Contract call failed:', result.asErr.toHuman());
             res.status(500).send('Error fetching accounts: Contract call failed');
         }
     } catch (error) {
+        res.locals.transactionSuccess = false;
         console.error(`Error fetching accounts for dni ${dni}:`, error);
         res.status(500).send(`Error fetching accounts: ${error.message}`);
     }
@@ -426,6 +434,11 @@ app.post('/create_user_with_existing_address', async (req, res) => {
 // Endpoint para obtener el rol de un usuario
 app.get('/role/:publicAddress', async (req, res) => {
     const { publicAddress } = req.params;
+    const { requestNumber, groupID, totalTransactions } = req.query;
+
+    res.locals.requestNumber = requestNumber || 'N/A';
+    res.locals.groupID = groupID || 'N/A';
+    res.locals.totalTransactions = totalTransactions || 'N/A';
 
     try {
         const keyring = new Keyring({ type: 'sr25519' });
@@ -448,17 +461,21 @@ app.get('/role/:publicAddress', async (req, res) => {
         console.log("Contract query response:", output ? output.toHuman() : "No output");
 
         if (!output || output.isNone) {
+            res.locals.transactionSuccess = false;
             return res.status(404).send(`Role not found for account ${publicAddress}`);
         }
 
         // Verifica si output tiene la propiedad value y maneja Option<u8>
         if (output && output.value !== undefined) {
             const role = output.value !== null ? output.value.toString() : 'None';
+            res.locals.transactionSuccess = true;
             res.status(200).send(`Role for account ${publicAddress}: ${role}`);
         } else {
+            res.locals.transactionSuccess = false;
             res.status(500).send('Error fetching role: Invalid output format');
         }
     } catch (error) {
+        res.locals.transactionSuccess = false;
         console.error("Error fetching role:", error);
         res.status(500).send(`Error fetching role: ${error.message}`);
     }
@@ -601,6 +618,11 @@ app.post('/create_user_with_dynamic_gas', async (req, res) => {
 // Endpoint para verificar si un permiso existe entre dos usuarios
 app.get('/has_permission/:granter/:grantee', async (req, res) => {
     const { granter, grantee } = req.params;
+    const { requestNumber, groupID, totalTransactions } = req.query;
+
+    res.locals.requestNumber = requestNumber || 'N/A';
+    res.locals.groupID = groupID || 'N/A';
+    res.locals.totalTransactions = totalTransactions || 'N/A';
 
     try {
         const granterAccountId = api.createType('AccountId', granter);
@@ -614,15 +636,37 @@ app.get('/has_permission/:granter/:grantee', async (req, res) => {
         const { output } = await contract.query.hasPermission(granterAccountId, { value: 0, gasLimit }, granterAccountId, granteeAccountId);
 
         if (output) {
+            res.locals.transactionSuccess = true;
             const hasPermission = output.toHuman();
             res.status(200).json({ hasPermission });
         } else {
+            res.locals.transactionSuccess = false;
             res.status(404).send('No se pudo obtener el permiso');
         }
 
     } catch (error) {
+        res.locals.transactionSuccess = false;
         console.error('Error al consultar el permiso:', error);
         res.status(500).send(`Error al consultar el permiso: ${error.message}`);
+    }
+});
+
+// Nuevo endpoint para otorgar permisos
+app.post('/grant_permission', async (req, res) => {
+    const { granter, grantee, requestNumber, groupID, totalTransactions } = req.body;
+
+    res.locals.requestNumber = requestNumber || 'N/A';
+    res.locals.groupID = groupID || 'N/A';
+    res.locals.totalTransactions = totalTransactions || 'N/A';
+
+    try {
+        // Implementar la lógica para otorgar permisos
+        // ...código para otorgar permisos...
+        res.locals.transactionSuccess = true;
+        res.status(200).send('Permiso otorgado exitosamente');
+    } catch (error) {
+        res.locals.transactionSuccess = false;
+        res.status(500).send(`Error al otorgar el permiso: ${error.message}`);
     }
 });
 
