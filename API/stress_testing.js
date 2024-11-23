@@ -14,6 +14,9 @@ const SIMULTANEOUS_REQUESTS = 10; // Cantidad de solicitudes simultáneas por lo
 let MODE = process.env.TEST_TYPE || 'concurrent'; // Puede ser 'sequential', 'concurrent', o 'batch'
 const BATCH_WAIT_TIME = process.env.BATCH_WAIT_TIME || 6; // Tiempo de espera entre lotes
 
+// Añadir la variable ALL_TESTS cerca de las otras variables de entorno
+const ALL_TESTS = process.env.ALL_TESTS === 'true'; // Convertir el string a booleano
+
 // URL completa de tu API (basada en HOST y PORT)
 const FULL_URL = `http://${HOST}:${PORT}`;  // Construir correctamente el URL
 
@@ -356,16 +359,22 @@ Selecciona la opción: `, (answer) => {
 (async () => {
     const endpoint = await promptUserForEndpoint();
 
-    if (endpoint === 'ALL') {
-        const endpoints = ['create_user_with_dynamic_gas', 'get_role', 'has_permission'];
-        const testModes = ['sequential', 'concurrent', 'batch'];
+    if (endpoint === 'ALL' || ALL_TESTS) {
+        const endpoints = endpoint === 'ALL' 
+            ? ['create_user_with_dynamic_gas', 'get_role', 'has_permission']
+            : [endpoint];
+        const testModes = ALL_TESTS 
+            ? ['sequential', 'concurrent', 'batch']
+            : [MODE];
 
-        console.log(`\nEjecutando todas las pruebas en todos los modos...\n`);
+        console.log(`\nEjecutando pruebas con la siguiente configuración:`);
+        console.log(`Endpoints: ${endpoints.join(', ')}`);
+        console.log(`Modos: ${testModes.join(', ')}\n`);
 
         for (const ep of endpoints) {
             for (const mode of testModes) {
                 console.log(`\nEjecutando prueba '${ep}' en modo: ${mode.toUpperCase()}\n`);
-                // No modificar la variable global MODE
+                
                 if (ep === 'get_role') {
                     await runGetRoleTest(mode);
                 } else if (ep === 'has_permission') {
@@ -385,10 +394,12 @@ Selecciona la opción: `, (answer) => {
                             console.error('Modo de prueba no válido');
                     }
                 }
+                // Esperar un momento entre pruebas para evitar sobrecarga
+                await new Promise(resolve => setTimeout(resolve, 2000));
             }
         }
     } else {
-        // Para opciones específicas, utilizar MODE
+        // Ejecución normal para un solo endpoint y modo
         if (endpoint === 'get_role') {
             await runGetRoleTest(MODE);
         } else if (endpoint === 'has_permission') {

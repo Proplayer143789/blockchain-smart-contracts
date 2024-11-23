@@ -43,6 +43,8 @@ const ACCOUNT_IDS_FILE = path.join(__dirname, 'account_ids.txt');
 
 let api;
 let contract;
+
+// Añadimos la variable global aliceNonce
 let aliceNonce; // Variable global para el nonce de Alice
 
 async function init() {
@@ -59,7 +61,7 @@ async function init() {
 
     contract = new ContractPromise(api, contractAbi, CONTRACT_ADDRESS);
 
-    // Obtener el nonce actual de Alice al inicializar
+    // Obtenemos el nonce actual de Alice al inicializar
     const keyring = new Keyring({ type: 'sr25519' });
     const alice = keyring.addFromUri('//Alice');
     aliceNonce = await api.rpc.system.accountNextIndex(alice.address);
@@ -99,11 +101,23 @@ async function init() {
     });
 }
 
-// Función para obtener y actualizar el nonce de manera atómica
-function getAndIncrementNonce() {
+// Mantenemos la función getAndIncrementNonce
+async function getAndIncrementNonce() {
+    await syncNonce(); // Sincronizar el aliceNonce con la blockchain
     const currentNonce = aliceNonce;
     aliceNonce = aliceNonce.addn(1); // Incrementar el nonce
     return currentNonce;
+}
+
+// Función opcional para sincronizar el nonce manualmente cuando sea necesario
+async function syncNonce() {
+    const currentNonce = await api.rpc.system.accountNextIndex(alice.address);
+    aliceNonce = currentNonce;
+}
+
+// Función para obtener el nonce actual
+async function getCurrentNonce(address) {
+    return await api.rpc.system.accountNextIndex(address);
 }
 
 let transactionCount = 0; // Contador global de transacciones
@@ -145,7 +159,7 @@ function createNewAccount(customText = null) {
 // Función para transferir fondos con tip incluido usando transferKeepAlive
 async function transferFunds(sender, recipient, amount) {
     const tip = getTip(); // Obtener el tip usando la función getTip
-    const nonce = getAndIncrementNonce(); // Obtener y actualizar el nonce
+    const nonce = await getAndIncrementNonce(); // Usar el nonce incrementado
     const transfer = api.tx.balances.transferKeepAlive(recipient, amount);
 
     return new Promise((resolve, reject) => {
@@ -174,7 +188,7 @@ async function addUser(alice, newAccount, userInfo, role, gasLimit, res) {
     updateTransactionCount();
     const numberTransaction = transactionCount;
     const tip = getTip(); // Obtener el tip usando la función getTip
-    const nonce = getAndIncrementNonce(); // Obtener y actualizar el nonce
+    const nonce = await getAndIncrementNonce(); // Usar el nonce incrementado
     const addUserTx = contract.tx.addUser({ value: 0, gasLimit }, newAccount.address, userInfo, role);
 
     // Inicializar variables para el gas
@@ -504,7 +518,7 @@ async function executeContractAndGetGas(contract, signer, res, ...params) {
     try {
         updateTransactionCount(); // Actualizar el contador de transacciones
         const tip = getTip();
-        const nonce = getAndIncrementNonce(); // Obtener y actualizar el nonce
+        const nonce = await getCurrentNonce(signer.address); // Obtener el nonce actual
         // Definir un límite de gas alto para asegurar la ejecución (sin estimación previa)
         const gasLimit = api.registry.createType('WeightV2', {
             refTime: api.registry.createType('Compact<u64>', 20000000000), // Ajusta este valor según sea necesario
