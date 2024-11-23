@@ -246,22 +246,35 @@ async function runConcurrentTest(endpoint, mode) {  // Añadir 'mode' como pará
     let requestNumber = 0;  // Inicializar requestNumber
 
     for (let i = 0; i < totalTransactions; i++) {
-        const data = generatePermissionTestData();
-        if (!data) return;
         requestNumber++;
-        data.groupID = groupID;
-        data.totalTransactions = totalTransactions;
-        data.requestNumber = requestNumber;  // Asignar requestNumber al data
-        data.testType = mode;  // Asignar testType al data
-
+        
+        // Generar datos según el endpoint
+        let data;
         if (endpoint === 'create_user_with_dynamic_gas') {
+            data = generateTestData(mode);
+            data.groupID = groupID;
+            data.totalTransactions = totalTransactions;
+            data.requestNumber = requestNumber;
+            data.testType = mode;
             promises.push(createUserWithDynamicGas(data, mode));
-        } else if (endpoint === 'get_role') {
-            promises.push(getRole(data.dni, groupID, requestNumber, totalTransactions, mode));  // Pasar los parámetros necesarios
-        } else if (endpoint === 'has_permission') {
+        } 
+        else if (endpoint === 'get_role') {
+            const accounts = getUserAccountsFromFile();
+            if (accounts.length > 0) {
+                const randomAccount = accounts[Math.floor(Math.random() * accounts.length)];
+                promises.push(getRole(randomAccount, groupID, requestNumber, totalTransactions, mode));
+            } else {
+                console.log('No hay cuentas disponibles para probar get_role');
+                return;
+            }
+        } 
+        else if (endpoint === 'has_permission') {
             const permData = generatePermissionTestData();
             if (permData) {
-                promises.push(hasPermission(permData.granter, permData.grantee, groupID, requestNumber, totalTransactions, mode));  // Pasar los parámetros necesarios
+                promises.push(hasPermission(permData.granter, permData.grantee, groupID, requestNumber, totalTransactions, mode));
+            } else {
+                console.log('No hay suficientes usuarios para probar has_permission');
+                return;
             }
         }
     }
@@ -397,44 +410,3 @@ Selecciona la opción: `, (answer) => {
         }
     }
 })();
-
-// Configurar los endpoints a probar
-const ENDPOINTS = [
-    { method: 'GET', url: '/get_role/' },
-    { method: 'GET', url: '/has_permission/' }
-];
-
-// Función para seleccionar un endpoint de forma aleatoria o equilibrada
-function chooseEndpoint() {
-    // Opcional: Implementar una distribución equitativa
-    const index = Math.floor(Math.random() * ENDPOINTS.length);
-    return ENDPOINTS[index];
-}
-
-// Función para realizar una solicitud
-async function sendRequest() {
-    const endpoint = chooseEndpoint();
-    const url = `http://${HOST}:${PORT}${endpoint.url}`;
-
-    try {
-        let response;
-        if (endpoint.method === 'GET') {
-            // Ejemplo de parámetros necesarios
-            const params = {
-                // Añadir parámetros según el endpoint
-            };
-            response = await axios.get(url, { params });
-        }
-        // Manejar otros métodos si es necesario
-
-        console.log(`Solicitud a ${endpoint.url} respondida con estado ${response.status}`);
-    } catch (error) {
-        console.error(`Error en solicitud a ${endpoint.url}: ${error.message}`);
-    }
-}
-
-// Iniciar las solicitudes
-for (let i = 0; i < TOTAL_REQUESTS; i++) {
-    sendRequest();
-}
-

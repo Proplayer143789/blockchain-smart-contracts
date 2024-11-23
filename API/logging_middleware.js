@@ -12,13 +12,28 @@ let fileExists = fs.existsSync(logFileJsonPath);
 
 // Función para obtener el uso de sistema actual (CPU y RAM)
 function getSystemUsage() {
-    const cpuUsage = os.loadavg()[0]; // Promedio de carga de 1 minuto
+    const cpus = os.cpus();
+
+    let totalIdle = 0;
+    let totalTick = 0;
+
+    cpus.forEach((core) => {
+        for (const type in core.times) {
+            totalTick += core.times[type];
+        }
+        totalIdle += core.times.idle;
+    });
+
+    const idle = totalIdle / cpus.length;
+    const total = totalTick / cpus.length;
+    const usage = 100 - Math.round((100 * idle) / total);
+
     const totalMem = os.totalmem();
     const freeMem = os.freemem();
     const usedMem = totalMem - freeMem;
     const memUsage = (usedMem / totalMem) * 100;
 
-    return { cpuUsage, memUsage };
+    return { cpuUsage: usage, memUsage };
 }
 
 // Función para calcular la longitud total de los parámetros
@@ -48,9 +63,8 @@ function logRequestToTxt(req, res, next) {
         const groupID = req.body.groupID || req.query.groupID || 'N/A';
         const totalTransactions = req.body.totalTransactions || req.query.totalTransactions || 'N/A';
         const requestNumber = res.locals.requestNumber || 'N/A';
-        // Obtener 'testType' directamente de la solicitud
         const testType = req.body.testType || req.query.testType || 'N/A';
-        const route = `${req.method} ${req.originalUrl.split('?')[0]}`; // Asegurar que solo se registra la ruta base
+        const route = `${req.method} ${req.originalUrl.split('?')[0]}`;
 
         const logEntry = `
         Time: ${new Date().toISOString()}
@@ -97,9 +111,8 @@ function logRequestToJson(req, res, next) {
         const groupID = req.body.groupID || req.query.groupID || 'N/A';
         const totalTransactions = req.body.totalTransactions || req.query.totalTransactions || 'N/A';
         const requestNumber = res.locals.requestNumber || 'N/A';
-        // Obtener 'testType' directamente de la solicitud
         const testType = req.body.testType || req.query.testType || 'N/A';
-        const route = `${req.method} ${req.originalUrl.split('?')[0]}`; // Asegurar que solo se registra la ruta base
+        const route = `${req.method} ${req.originalUrl.split('?')[0]}`;
 
         const logEntry = {
             time: new Date().toISOString(),

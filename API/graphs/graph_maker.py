@@ -145,7 +145,9 @@ def parse_data(data):
                     'testType': test_type,  # Actualizado para usar test_type normalizado
                     'parametersLength': int(entry.get('parametersLength', 0)) if entry.get('parametersLength', 'N/A') != 'N/A' else 0,
                     'method': entry.get('method', 'Unknown'),
-                    'route': base_route  # Asegurarse de que la ruta es limpia y consistente
+                    'route': base_route,  # Asegurarse de que la ruta es limpia y consistente
+                    'refTime': float(entry.get('refTime', '0')) if entry.get('refTime') != 'N/A' else 0.0,
+                    'proofSize': float(entry.get('proofSize', '0')) if entry.get('proofSize') != 'N/A' else 0.0,
                 }
                 parsed_data.append(parsed_entry)
             else:
@@ -395,6 +397,31 @@ def calculate_transaction_speed(data, interval='60S'):
     plt.savefig('transaction_speed_in_time.png')
     return transaction_speed
 
+def plot_gas_consumption(data, route):
+    if not data:
+        print("No hay datos para graficar el consumo de gas")
+        return
+
+    plt.figure(figsize=(12, 8))
+    gas = [entry['refTime'] + entry['proofSize'] for entry in data]
+    transactions = [entry['requestNumber'] for entry in data]
+
+    plt.plot(transactions, gas, marker='o', markersize=2, label='Consumo de Gas')
+    plt.xlabel('Id de transacción')
+    plt.ylabel('Gas Consumido (refTime + proofSize)')
+    plt.title(f'Consumo de Gas vs Id de Transacción - {route}')
+    plt.legend()
+    plt.grid(True)
+
+    sanitized_route = sanitize_filename(route)
+    try:
+        plt.savefig(f'gas_consumption_vs_transaction_{sanitized_route}.png', bbox_inches='tight')
+        print(f"Gráfica de consumo de gas guardada: gas_consumption_vs_transaction_{sanitized_route}.png")
+    except Exception as e:
+        print(f"Error guardando la gráfica de gas: {str(e)}")
+
+    plt.close()
+
 def main():
     data = read_data()
     if not data:
@@ -414,9 +441,10 @@ def main():
     print(f"Rutas encontradas: {routes}")
     for route in routes:
         route_data = [entry for entry in parsed_data if entry['route'] == route]
-        for metric in metrics:
+        for metric in ['cpuUsageDiff', 'ramUsageDiff', 'transactionCost']:
             plot_metric_vs_transaction(route_data, metric, f'{metric} vs Número de Transacción', route)  
             plot_metric_vs_time(route_data, metric, f'{metric} vs Tiempo', route)
+        plot_gas_consumption(route_data, route)
     
     # Generar tabla de Costo Transaccional por Longitud de Parámetros
     plot_transaction_cost_vs_length(parsed_data)

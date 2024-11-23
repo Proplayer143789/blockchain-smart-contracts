@@ -24,7 +24,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Contract Dirección y ABI
-const CONTRACT_ADDRESS = '5FpR6ZCqMaTVgmNnm9usHyh1EpDxcHWs6CjDCZVdYFuWfeXb';
+const CONTRACT_ADDRESS = '5F5GArrrZiJZBjKS1GciaB3BijUFVQKU1w6hohye388Q7WdL';
 const CONTRACT_ABI_PATH = path.resolve(__dirname, '../target/ink/smart_contract/smart_contract.json');
 
 // Performance monitoring configuration
@@ -335,8 +335,11 @@ app.post('/create_user', async (req, res) => {
             proofSize: api.registry.createType('Compact<u64>', 10000000)
         });
 
-        // Añadir el usuario y su información
-        await addUser(alice, newAccount, userInfo, role, gasLimit);
+        console.log("Gas limit: ", gasLimit);
+        // Añadir el usuario y su información, pasando el objeto res
+        await addUser(alice, newAccount, userInfo, role, gasLimit, res);
+        // Eliminado: res.locals.refTime = addUserTx.gasConsumed.refTime;
+        // Eliminado: res.locals.proofSize = addUserTx.gasConsumed.proofSize;
 
         // Si la adición del usuario fue exitosa, agregar el rol (si es necesario)
         // await assignRole(alice, newAccount, role, userInfo, gasLimit);
@@ -482,6 +485,13 @@ app.get('/role/:publicAddress', async (req, res) => {
     }
 });
 
+// Alias para obtener el rol de un usuario usando /get_role/:publicAddress
+app.get('/get_role/:publicAddress', async (req, res) => {
+    // Reutilizar el manejador de la ruta /role/:publicAddress
+    req.url = `/role/${req.params.publicAddress}`;
+    return app._router.handle(req, res, () => {});
+});
+
 // Endpoint para obtener la dirección de Alice
 app.get('/alice_account_id', async (req, res) => {
     const keyring = new Keyring({ type: 'sr25519' });
@@ -597,7 +607,7 @@ app.post('/create_user_with_dynamic_gas', async (req, res) => {
 
         // Ejecutar la transacción del contrato (addUser) y guardar el gas consumido y tip
         await addUser(alice, newAccount, userInfo, role, gasLimit, res, testType);
-
+        
         // Guardar el Account ID en 'account_ids.txt'
         fs.appendFileSync(ACCOUNT_IDS_FILE, `${newAccount.address}\n`, 'utf8');
 
@@ -620,6 +630,12 @@ app.post('/create_user_with_dynamic_gas', async (req, res) => {
 app.get('/has_permission/:granter/:grantee', async (req, res) => {
     const { granter, grantee } = req.params;
     const { requestNumber, groupID, totalTransactions, testType } = req.query;
+
+    // Validar que ambos parámetros estén presentes
+    if (!granter || !grantee) {
+        res.locals.transactionSuccess = false;
+        return res.status(400).send('Parámetros "granter" y "grantee" son requeridos.');
+    }
 
     res.locals.requestNumber = requestNumber || 'N/A';
     res.locals.groupID = groupID || 'N/A';
