@@ -24,7 +24,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Contract Dirección y ABI
-const CONTRACT_ADDRESS = '5F5GArrrZiJZBjKS1GciaB3BijUFVQKU1w6hohye388Q7WdL';
+const CONTRACT_ADDRESS = '5D5qKYHtx9HioYRkcvYdSvhytbvpuWPEXxcc2XA5QRZTh3j4';
 const CONTRACT_ABI_PATH = path.resolve(__dirname, '../target/ink/smart_contract/smart_contract.json');
 
 // Performance monitoring configuration
@@ -103,7 +103,7 @@ async function init() {
 
 // Mantenemos la función getAndIncrementNonce
 async function getAndIncrementNonce() {
-    await syncNonce(); // Sincronizar el aliceNonce con la blockchain
+    //await syncNonce(); // Sincronizar el aliceNonce con la blockchain
     const currentNonce = aliceNonce;
     aliceNonce = aliceNonce.addn(1); // Incrementar el nonce
     return currentNonce;
@@ -336,7 +336,7 @@ app.post('/create_user', async (req, res) => {
 
     try {
         const keyring = new Keyring({ type: 'sr25519' });
-        const alice = keyring.addFromUri('//Alice'); // Usar la cuenta de Alice para firmar la transacción
+        alice = keyring.addFromUri('//Alice'); // Usar la cuenta de Alice para firmar la transacción
 
         // Transferir fondos a la nueva cuenta usando transferKeepAlive
         //await transferFunds(alice, newAccount.address, 1000000000000);
@@ -378,7 +378,7 @@ app.post('/create_user_based_on_personalized_mnemonic', async (req, res) => {
 
     try {
         const keyring = new Keyring({ type: 'sr25519' });
-        const alice = keyring.addFromUri('//Alice'); // Usar la cuenta de Alice para firmar la transacción
+        alice = keyring.addFromUri('//Alice'); // Usar la cuenta de Alice para firmar la transacción
 
         // Transferir fondos a la nueva cuenta usando transferKeepAlive
         await transferFunds(alice, newAccount.address, 1000000000000);
@@ -424,7 +424,7 @@ app.post('/create_user_with_existing_address', async (req, res) => {
     };
 
     try {
-        const alice = keyring.addFromUri('//Alice'); // Use Alice's account to sign the transaction
+        alice = keyring.addFromUri('//Alice'); // Use Alice's account to sign the transaction
 
         // Transfer funds to the user's address using transferKeepAlive
         await transferFunds(alice, userAddress, 1000000000000);
@@ -599,7 +599,7 @@ app.post('/create_user_with_dynamic_gas', async (req, res) => {
 
     try {
         const keyring = new Keyring({ type: 'sr25519' });
-        const alice = keyring.addFromUri('//Alice'); // Usar la cuenta de Alice para firmar la transacción
+        alice = keyring.addFromUri('//Alice'); // Usar la cuenta de Alice para firmar la transacción
 
         const newAccount = createNewAccount(); // Genera una nueva cuenta
 
